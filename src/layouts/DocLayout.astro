@@ -35,7 +35,7 @@ const {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href={`${import.meta.env.BASE_URL}assets/favicon.png`} />
+    <link rel="icon" type="image/png" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/assets/favicon.png`} />
     <meta name="generator" content={Astro.generator} />
     <title>{title} | USMP Docs</title>
     <meta name="description" content={description} />
@@ -43,7 +43,7 @@ const {
     <meta property="og:type" content="website" />
     <meta property="og:title" content={`${title} | USMP Docs`} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={`${import.meta.env.BASE_URL}assets/logo.png`} />
+    <meta property="og:image" content={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/assets/logo.png`} />
 
     <script is:inline>
       const theme = localStorage.getItem('theme') || 'dark';
@@ -119,7 +119,7 @@ const {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-12 pt-8 border-t border-neutral-900">
             {prev ? (
               <a 
-                href={prev.slug === "" ? `${import.meta.env.BASE_URL}docs` : `${import.meta.env.BASE_URL}docs/${prev.slug}`} 
+                href={prev.slug === "" ? `${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs` : `${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs/${prev.slug}`} 
                 class="flex flex-col items-start p-4 border border-neutral-900 rounded-sm bg-neutral-950 hover:border-neutral-500 transition-all duration-300 group no-underline"
               >
                 <span class="text-[10px] font-mono font-bold tracking-wider text-neutral-500 uppercase mb-1">PREVIOUS MODULE</span>
@@ -132,7 +132,7 @@ const {
 
             {next ? (
               <a 
-                href={next.slug === "" ? `${import.meta.env.BASE_URL}docs` : `${import.meta.env.BASE_URL}docs/${next.slug}`} 
+                href={next.slug === "" ? `${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs` : `${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs/${next.slug}`} 
                 class="flex flex-col items-end p-4 border border-neutral-900 rounded-sm bg-neutral-950 hover:border-neutral-500 transition-all duration-300 group text-right no-underline"
               >
                 <span class="text-[10px] font-mono font-bold tracking-wider text-neutral-500 uppercase mb-1">NEXT MODULE</span>
@@ -184,7 +184,7 @@ const {
               <span>View Source Code</span>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
             </a>
-            <a href={`${import.meta.env.BASE_URL}docs/spec`} class="text-neutral-400 hover:text-white transition-colors flex items-center gap-1.5 no-underline">
+            <a href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs/spec`} class="text-neutral-400 hover:text-white transition-colors flex items-center gap-1.5 no-underline">
               <span>Protocol Spec</span>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
             </a>

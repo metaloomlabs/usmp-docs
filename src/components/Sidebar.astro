@@ -55,7 +55,7 @@ function getSectionIcon(title: string) {
               </h4>
               <ul class="section-list">
                 {item.items.map((subItem) => {
-                  const href = subItem.slug === "" ? `${import.meta.env.BASE_URL}docs` : `${import.meta.env.BASE_URL}docs/${subItem.slug}`;
+                  const href = subItem.slug === "" ? `${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs` : `${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs/${subItem.slug}`;
                   const active = isLinkActive(subItem.slug, currentSlug);
                   return (
                     <li class="section-item">
@@ -73,7 +73,7 @@ function getSectionIcon(title: string) {
           ) : (
             // If it's a top-level link (e.g. Home, Spec)
             <a 
-              href={item.slug === "" ? `${import.meta.env.BASE_URL}docs` : `${import.meta.env.BASE_URL}docs/${item.slug}`} 
+              href={item.slug === "" ? `${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs` : `${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs/${item.slug}`} 
               class={`top-link ${isLinkActive(item.slug, currentSlug) ? 'active' : ''}`}
             >
               {item.title}
