@@ -1,0 +1,190 @@
+---
+import { navigation, type NavItem } from '../config/navigation';
+
+interface Props {
+  currentSlug?: string;
+}
+
+const { currentSlug = "" } = Astro.props;
+
+// Helper to determine if a item's URL matches current slug
+function isLinkActive(itemSlug: string | undefined, activeSlug: string) {
+  if (itemSlug === undefined) return false;
+  
+  // Normalize slugs (remove leading/trailing slashes)
+  const normItem = itemSlug.replace(/^\/|\/$/g, '');
+  const normActive = activeSlug.replace(/^\/|\/$/g, '');
+  
+  return normItem === normActive;
+}
+
+// Map section headers to custom monochromatic SVG icons
+function getSectionIcon(title: string) {
+  switch (title.toLowerCase()) {
+    case 'getting started':
+      return `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="shrink-0"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>`;
+    case 'protocol':
+      return `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="shrink-0"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>`;
+    case 'ports':
+      return `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="shrink-0"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3"/></svg>`;
+    case 'sdk':
+      return `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="shrink-0"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`;
+    case 'tools':
+      return `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="shrink-0"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>`;
+    case 'security':
+      return `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+    case 'examples':
+      return `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="shrink-0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`;
+    default:
+      return '';
+  }
+}
+---
+
+<nav class="sidebar-nav">
+  <div class="sidebar-scroll">
+    <ul class="nav-list">
+      {navigation.map((item) => (
+        <li class="nav-section">
+          {item.items ? (
+            // If it's a section with sub-items
+            <div class="section-container">
+              <h4 class="section-title">
+                <span class="section-icon-wrapper" set:html={getSectionIcon(item.title)} />
+                <span>{item.title}</span>
+              </h4>
+              <ul class="section-list">
+                {item.items.map((subItem) => {
+                  const href = subItem.slug === "" ? `${import.meta.env.BASE_URL}docs` : `${import.meta.env.BASE_URL}docs/${subItem.slug}`;
+                  const active = isLinkActive(subItem.slug, currentSlug);
+                  return (
+                    <li class="section-item">
+                      <a 
+                        href={href} 
+                        class={`section-link ${active ? 'active' : ''}`}
+                      >
+                        {subItem.title}
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : (
+            // If it's a top-level link (e.g. Home, Spec)
+            <a 
+              href={item.slug === "" ? `${import.meta.env.BASE_URL}docs` : `${import.meta.env.BASE_URL}docs/${item.slug}`} 
+              class={`top-link ${isLinkActive(item.slug, currentSlug) ? 'active' : ''}`}
+            >
+              {item.title}
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+  </div>
+</nav>
+
+<style>
+  :root {
+    --text-muted: #888888;
+    --text-heading: #ffffff;
+    --border-color: #1c1c1c;
+    --transition-fast: 0.15s ease-out;
+  }
+
+  .sidebar-nav {
+    width: 100%;
+  }
+
+  .sidebar-scroll {
+    width: 100%;
+  }
+
+  .nav-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .nav-section {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .top-link {
+    font-size: 0.825rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    padding: 0.2rem 0.75rem;
+    transition: all var(--transition-fast);
+  }
+
+  .top-link:hover {
+    color: #ffffff;
+  }
+
+  .top-link.active {
+    color: #ffffff;
+    font-weight: 600;
+  }
+
+  .section-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .section-title {
+    font-family: var(--font-heading);
+    font-size: 0.725rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #a3a3a3;
+    letter-spacing: 0.05em;
+    padding-left: 0.75rem;
+    margin-bottom: 0.15rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #666666;
+  }
+
+  .section-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-left: 0.75rem;
+    padding-left: 14px; /* Align items horizontally below title icon offset */
+  }
+
+  .section-item {
+    display: flex;
+  }
+
+  .section-link {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    padding: 0.2rem 0;
+    width: 100%;
+    transition: all var(--transition-fast);
+  }
+
+  .section-link:hover {
+    color: #ffffff;
+  }
+
+  .section-link.active {
+    color: #ffffff;
+    font-weight: 600;
+    background: transparent;
+  }
+</style>

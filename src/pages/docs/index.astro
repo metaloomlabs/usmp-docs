@@ -1,0 +1,87 @@
+---
+import { getEntry, render } from 'astro:content';
+import DocLayout from '../../layouts/DocLayout.astro';
+import { getPrevNext } from '../../utils/navigation';
+import PacketFlowVisualizer from '../../components/docs/PacketFlowVisualizer.astro';
+import SequenceDiagram from '../../components/docs/SequenceDiagram.astro';
+
+// Retrieve the root index markdown
+const entry = await getEntry('docs', 'index');
+
+if (!entry) {
+  return new Response("Document index.md not found in content collections", { status: 404 });
+}
+
+const { Content, headings } = await render(entry);
+const title = entry.data?.title || "USMP | Unified Secure Multi-transport Protocol";
+
+// Compute reading time
+const wordCount = entry.body.split(/\s+/).length;
+const readingTime = Math.max(1, Math.round(wordCount / 200));
+
+// Breadcrumb is just Home
+const breadcrumbs = [{ title: "Home" }];
+
+// Get previous and next links relative to the home page slug ("")
+const { prev, next } = getPrevNext("");
+---
+
+<DocLayout 
+  title={title} 
+  headings={headings} 
+  currentSlug=""
+  breadcrumbs={breadcrumbs}
+  readingTime={readingTime}
+  prev={prev}
+  next={next}
+>
+  <Content />
+
+  <div class="mt-12 pt-8 border-t border-neutral-900 flex flex-col gap-6">
+    <SequenceDiagram type="simple" />
+    <PacketFlowVisualizer />
+  </div>
+</DocLayout>
+
+<script is:inline>
+  // Dynamic floating Copy Code buttons
+  function setupCopyButtons() {
+    const codeBlocks = document.querySelectorAll('.code-block-wrapper, pre');
+    codeBlocks.forEach(block => {
+      if (block.querySelector('.copy-code-btn')) return;
+
+      const pre = block.tagName === 'PRE' ? block : block.querySelector('pre');
+      if (!pre) return;
+
+      if (block.tagName === 'PRE') {
+        block.style.position = 'relative';
+      }
+
+      const button = document.createElement('button');
+      button.className = 'copy-code-btn';
+      button.innerText = 'Copy';
+      button.setAttribute('aria-label', 'Copy code to clipboard');
+
+      button.addEventListener('click', async () => {
+        const codeText = pre.innerText;
+        try {
+          await navigator.clipboard.writeText(codeText);
+          button.innerText = 'Copied';
+          button.classList.add('copied');
+          setTimeout(() => {
+            button.innerText = 'Copy';
+            button.classList.remove('copied');
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy code text:', err);
+          button.innerText = 'Error';
+        }
+      });
+
+      block.appendChild(button);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', setupCopyButtons);
+  window.addEventListener('load', setupCopyButtons);
+</script>

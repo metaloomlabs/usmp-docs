@@ -1,0 +1,26 @@
+---
+interface Props {
+  name: string;
+  type: string;
+  defaultVal: string;
+}
+
+const { name, type, defaultVal } = Astro.props;
+---
+
+<div class="border border-border-subtle bg-bg-card rounded-card p-4 my-6 box-shadow shadow-md transition-all duration-300 hover:border-border-glow">
+  <div class="flex items-start justify-between flex-wrap gap-2 mb-3">
+    <div class="font-mono text-sm font-semibold text-white tracking-wide">{name}</div>
+    <div class="flex gap-2">
+      <span class="px-2 py-0.5 text-[10px] font-mono bg-slate-800 text-slate-300 border border-slate-700/50 rounded-md">
+        Type: {type}
+      </span>
+      <span class="px-2 py-0.5 text-[10px] font-mono bg-neutral-900 text-white border border-neutral-800 rounded-md">
+        Default: {defaultVal}
+      </span>
+    </div>
+  </div>
+  <div class="text-sm text-slate-300 leading-relaxed font-sans">
+    <slot />
+  </div>
+</div>

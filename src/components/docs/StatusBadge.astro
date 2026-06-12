@@ -1,0 +1,27 @@
+---
+interface Props {
+  status: 'STABLE' | 'WIP' | 'PLANNED' | 'TESTED';
+}
+
+const { status } = Astro.props;
+
+let badgeColor = '';
+switch (status.toUpperCase()) {
+  case 'STABLE':
+  case 'TESTED':
+    badgeColor = 'text-white border-neutral-700 bg-neutral-900';
+    break;
+  case 'WIP':
+    badgeColor = 'text-neutral-300 border-neutral-800 bg-neutral-950';
+    break;
+  case 'PLANNED':
+    badgeColor = 'text-neutral-500 border-neutral-800/80 bg-neutral-950/40';
+    break;
+  default:
+    badgeColor = 'text-slate-400 border-slate-800 bg-slate-900/40';
+}
+---
+
+<span class={`inline-flex items-center px-2 py-0.5 rounded border text-[9px] font-mono font-bold uppercase tracking-wider ${badgeColor} select-none`}>
+  {status}
+</span>

@@ -1,0 +1,26 @@
+---
+interface Props {
+  type: 'TCP' | 'UDP' | 'UART';
+}
+
+const { type } = Astro.props;
+
+let badgeColor = '';
+switch (type.toUpperCase()) {
+  case 'TCP':
+    badgeColor = 'text-white border-neutral-700 bg-neutral-900';
+    break;
+  case 'UDP':
+    badgeColor = 'text-neutral-300 border-neutral-800 bg-neutral-950';
+    break;
+  case 'UART':
+    badgeColor = 'text-neutral-400 border-neutral-800 bg-neutral-950';
+    break;
+  default:
+    badgeColor = 'text-slate-400 border-slate-800 bg-slate-900/60';
+}
+---
+
+<span class={`inline-flex items-center px-1.5 py-0.5 rounded border text-[9px] font-mono font-bold uppercase tracking-wider ${badgeColor} select-none`}>
+  {type}
+</span>

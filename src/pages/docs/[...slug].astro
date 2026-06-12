@@ -1,0 +1,134 @@
+---
+import { getCollection, render } from 'astro:content';
+import DocLayout from '../../layouts/DocLayout.astro';
+import { getPrevNext } from '../../utils/navigation';
+import { navigation } from '../../config/navigation';
+
+export async function getStaticPaths() {
+  const docs = await getCollection('docs');
+  return docs
+    .filter((entry) => entry.id !== 'index')
+    .map((entry) => ({
+      params: { slug: entry.id },
+      props: { entry },
+    }));
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+
+// Extract title from frontmatter, first markdown heading, or fallback to file name
+let title = entry.data?.title;
+if (!title) {
+  const headingMatch = entry.body.match(/^#\s+(.+)$/m);
+  if (headingMatch) {
+    title = headingMatch[1].trim();
+  } else {
+    title = entry.id.split('/').pop()?.replace(/-/g, ' ') || 'Documentation';
+  }
+}
+
+// Compute reading time (approx 200 words per minute)
+const wordCount = entry.body.split(/\s+/).length;
+const readingTime = Math.max(1, Math.round(wordCount / 200));
+
+// Build breadcrumbs dynamically based on path segments and navigation config
+const parts = entry.id.split('/');
+const breadcrumbs = [];
+if (parts.length > 1) {
+  const sectionSlug = parts[0];
+  const navSection = navigation.find(
+    (n) => n.items && n.items.some((sub) => sub.slug?.startsWith(sectionSlug))
+  );
+  const parentTitle = navSection ? navSection.title : sectionSlug.replace(/-/g, ' ');
+  breadcrumbs.push({ title: parentTitle });
+}
+breadcrumbs.push({ title });
+
+// Get previous and next links
+const { prev, next } = getPrevNext(entry.id);
+
+// Dynamic components matching
+import TelemetryPanel from '../../components/TelemetryPanel.astro';
+import FrameInspector from '../../components/docs/FrameInspector.astro';
+import SequenceDiagram from '../../components/docs/SequenceDiagram.astro';
+import PacketFlowVisualizer from '../../components/docs/PacketFlowVisualizer.astro';
+---
+
+<DocLayout 
+  title={title} 
+  headings={headings} 
+  currentSlug={entry.id}
+  breadcrumbs={breadcrumbs}
+  readingTime={readingTime}
+  prev={prev}
+  next={next}
+>
+  <Content />
+
+  {entry.id === 'tools/telemetry' && (
+    <div class="mt-10 pt-8 border-t border-neutral-900">
+      <TelemetryPanel />
+    </div>
+  )}
+
+  {entry.id === 'protocol/frame-format' && (
+    <div class="mt-10 pt-8 border-t border-neutral-900">
+      <FrameInspector />
+    </div>
+  )}
+
+  {entry.id === 'protocol/handshake' && (
+    <div class="mt-10 pt-8 border-t border-neutral-900 flex flex-col gap-6">
+      <SequenceDiagram type="detailed" />
+      <PacketFlowVisualizer />
+    </div>
+  )}
+</DocLayout>
+
+<script is:inline>
+  // Dynamic floating Copy Code buttons
+  function setupCopyButtons() {
+    const codeBlocks = document.querySelectorAll('.code-block-wrapper, pre');
+    codeBlocks.forEach(block => {
+      if (block.querySelector('.copy-code-btn')) return;
+
+      const pre = block.tagName === 'PRE' ? block : block.querySelector('pre');
+      if (!pre) return;
+
+      // Standardize parent position for absolute copy button positioning
+      if (block.tagName === 'PRE') {
+        block.style.position = 'relative';
+      }
+
+      const button = document.createElement('button');
+      button.className = 'copy-code-btn';
+      button.innerText = 'Copy';
+      button.setAttribute('aria-label', 'Copy code to clipboard');
+
+      button.addEventListener('click', async () => {
+        // Pseudo element CSS counter text is omitted automatically by innerText
+        const codeText = pre.innerText;
+        try {
+          await navigator.clipboard.writeText(codeText);
+          button.innerText = 'Copied';
+          button.classList.add('copied');
+          setTimeout(() => {
+            button.innerText = 'Copy';
+            button.classList.remove('copied');
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy code text:', err);
+          button.innerText = 'Error';
+        }
+      });
+
+      block.appendChild(button);
+    });
+  }
+
+  // Setup on page load
+  document.addEventListener('DOMContentLoaded', setupCopyButtons);
+  // Setup support for custom client transitions or direct updates
+  window.addEventListener('load', setupCopyButtons);
+</script>

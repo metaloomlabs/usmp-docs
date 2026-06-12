@@ -1,0 +1,226 @@
+---
+---
+
+<div class="border border-neutral-900 bg-neutral-950/20 rounded-sm p-6 my-8 text-left">
+  <div class="mb-5 pb-4 border-b border-neutral-900 flex justify-between items-center flex-wrap gap-2">
+    <div>
+      <h3 class="text-xs font-mono font-bold text-white uppercase tracking-wider">Protocol Architectural Flow</h3>
+      <p class="text-[11px] text-neutral-400 font-sans mt-1">Interactive state machine transition and handshake sequence.</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" id="flow-status-pulse"></span>
+      <span class="text-[9px] font-mono text-neutral-400 font-bold uppercase tracking-wider" id="flow-status-text">HANDSHAKE_FLOW</span>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE SVG DIAGRAM -->
+  <div class="flex justify-center items-center py-6 bg-neutral-950/60 border border-neutral-900 rounded-sm relative overflow-hidden">
+    <div class="absolute inset-0 grid-bg-overlay opacity-10"></div>
+    
+    <svg class="w-full max-w-[420px] h-[340px] font-mono select-none" viewBox="0 0 400 340" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="flow-arrow-down" viewBox="0 0 10 10" refX="5" refY="6" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M 1 1 L 5 7 L 9 1 z" fill="#222222" />
+        </marker>
+        <marker id="flow-arrow-down-active" viewBox="0 0 10 10" refX="5" refY="6" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M 1 1 L 5 7 L 9 1 z" fill="#ffffff" />
+        </marker>
+        <marker id="flow-arrow-down-success" viewBox="0 0 10 10" refX="5" refY="6" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M 1 1 L 5 7 L 9 1 z" fill="#34d399" />
+        </marker>
+        <marker id="flow-arrow-down-passed" viewBox="0 0 10 10" refX="5" refY="6" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M 1 1 L 5 7 L 9 1 z" fill="#555555" />
+        </marker>
+      </defs>
+
+      <!-- Center connector path -->
+      <line x1="200" y1="30" x2="200" y2="310" stroke="#222222" stroke-width="1.5" stroke-dasharray="3 3" />
+
+      <!-- Step Connector Lines -->
+      <line id="line-hello" x1="200" y1="50" x2="200" y2="70" stroke="#222222" stroke-width="1.5" marker-end="url(#flow-arrow-down)" class="transition-all duration-300" />
+      <line id="line-challenge" x1="200" y1="94" x2="200" y2="114" stroke="#222222" stroke-width="1.5" marker-end="url(#flow-arrow-down)" class="transition-all duration-300" />
+      <line id="line-auth" x1="200" y1="138" x2="200" y2="158" stroke="#222222" stroke-width="1.5" marker-end="url(#flow-arrow-down)" class="transition-all duration-300" />
+      <line id="line-session" x1="200" y1="182" x2="200" y2="202" stroke="#222222" stroke-width="1.5" marker-end="url(#flow-arrow-down)" class="transition-all duration-300" />
+      <line id="line-channel" x1="200" y1="226" x2="200" y2="246" stroke="#222222" stroke-width="1.5" marker-end="url(#flow-arrow-down)" class="transition-all duration-300" />
+
+      <!-- Node 1: DEVICE -->
+      <g transform="translate(100, 10)" id="node-device">
+        <rect width="200" height="40" rx="3" fill="#0c0c0c" stroke="#555555" stroke-width="1.5" class="transition-all duration-300" />
+        <text x="100" y="22" text-anchor="middle" fill="#ffffff" font-size="9" font-weight="bold">DEVICE</text>
+        <text x="100" y="32" text-anchor="middle" fill="#777777" font-size="7">ESP32 / Arduino</text>
+      </g>
+
+      <!-- Node 2: HELLO -->
+      <g transform="translate(120, 70)" id="node-hello">
+        <rect width="160" height="24" rx="2" fill="#0c0c0c" stroke="#222222" stroke-width="1" class="transition-all duration-300" />
+        <text x="80" y="15" text-anchor="middle" fill="#555555" font-size="8" font-weight="bold" class="transition-all duration-300">1. CLIENT_HELLO</text>
+      </g>
+
+      <!-- Node 3: CHALLENGE -->
+      <g transform="translate(120, 114)" id="node-challenge">
+        <rect width="160" height="24" rx="2" fill="#0c0c0c" stroke="#222222" stroke-width="1" class="transition-all duration-300" />
+        <text x="80" y="15" text-anchor="middle" fill="#555555" font-size="8" font-weight="bold" class="transition-all duration-300">2. SERVER_CHALLENGE</text>
+      </g>
+
+      <!-- Node 4: AUTHENTICATION -->
+      <g transform="translate(120, 158)" id="node-auth">
+        <rect width="160" height="24" rx="2" fill="#0c0c0c" stroke="#222222" stroke-width="1" class="transition-all duration-300" />
+        <text x="80" y="15" text-anchor="middle" fill="#555555" font-size="8" font-weight="bold" class="transition-all duration-300">3. MUTUAL_AUTH</text>
+      </g>
+
+      <!-- Node 5: SESSION ESTABLISHED -->
+      <g transform="translate(110, 202)" id="node-session">
+        <rect width="180" height="24" rx="2" fill="#0c0c0c" stroke="#222222" stroke-width="1" class="transition-all duration-300" />
+        <text x="90" y="15" text-anchor="middle" fill="#555555" font-size="8" font-weight="bold" class="transition-all duration-300">4. DERIVE_SESSION_KEY</text>
+      </g>
+
+      <!-- Node 6: SECURE ENCRYPTED CHANNEL -->
+      <g transform="translate(90, 246)" id="node-channel">
+        <rect width="220" height="24" rx="2" fill="#0c0c0c" stroke="#222222" stroke-width="1" class="transition-all duration-300" />
+        <text x="110" y="15" text-anchor="middle" fill="#555555" font-size="8" font-weight="bold" class="transition-all duration-300">SECURE ENCRYPTED CHANNEL</text>
+      </g>
+
+      <!-- Node 7: GATEWAY -->
+      <g transform="translate(100, 290)" id="node-gateway">
+        <rect width="200" height="40" rx="3" fill="#0c0c0c" stroke="#555555" stroke-width="1.5" class="transition-all duration-300" />
+        <text x="100" y="22" text-anchor="middle" fill="#ffffff" font-size="9" font-weight="bold">GATEWAY</text>
+        <text x="100" y="32" text-anchor="middle" fill="#777777" font-size="7">Server / Cloud</text>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Protocol characteristics metrics below the diagram -->
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-8 pt-6 border-t border-neutral-900 text-center font-mono text-[10px]">
+    <div class="flex flex-col items-center gap-1">
+      <span class="text-white font-bold">~200ms</span>
+      <span class="text-[8px] text-neutral-500 uppercase tracking-wide">Handshake</span>
+    </div>
+    <div class="flex flex-col items-center gap-1 border-l border-neutral-900">
+      <span class="text-white font-bold">&lt;5ms</span>
+      <span class="text-[8px] text-neutral-500 uppercase tracking-wide">Frame Send</span>
+    </div>
+    <div class="flex flex-col items-center gap-1 border-l border-neutral-900">
+      <span class="text-white font-bold">X25519</span>
+      <span class="text-[8px] text-neutral-500 uppercase tracking-wide">Key Exchange</span>
+    </div>
+    <div class="flex flex-col items-center gap-1 border-l border-neutral-900">
+      <span class="text-white font-bold">PSK + HMAC</span>
+      <span class="text-[8px] text-neutral-500 uppercase tracking-wide">Authentication</span>
+    </div>
+    <div class="flex flex-col items-center gap-1 border-l border-neutral-900">
+      <span class="text-white font-bold">REPLAY PROT.</span>
+      <span class="text-[8px] text-neutral-500 uppercase tracking-wide">Monotonic Seq</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Handshake Step animation loop
+  const steps = [
+    { node: 'node-hello', line: 'line-hello', text: 'HANDSHAKE: HELLO', status: 'handshake' },
+    { node: 'node-challenge', line: 'line-challenge', text: 'HANDSHAKE: CHALLENGE', status: 'handshake' },
+    { node: 'node-auth', line: 'line-auth', text: 'HANDSHAKE: AUTH', status: 'handshake' },
+    { node: 'node-session', line: 'line-session', text: 'HANDSHAKE: KEY_DERIVE', status: 'handshake' },
+    { node: 'node-channel', line: 'line-channel', text: 'ACTIVE (SECURED)', status: 'secured' }
+  ];
+
+  let currentStep = 0;
+
+  function resetAll() {
+    steps.forEach(s => {
+      const nodeEl = document.getElementById(s.node);
+      const lineEl = document.getElementById(s.line);
+      if (nodeEl) {
+        const rect = nodeEl.querySelector('rect');
+        const text = nodeEl.querySelector('text');
+        if (rect) {
+          rect.setAttribute('fill', '#0c0c0c');
+          rect.setAttribute('stroke', '#222222');
+          rect.setAttribute('stroke-width', '1');
+        }
+        if (text) text.setAttribute('fill', '#555555');
+      }
+      if (lineEl) {
+        lineEl.setAttribute('stroke', '#222222');
+        lineEl.setAttribute('marker-end', 'url(#flow-arrow-down)');
+      }
+    });
+
+    const statusPulse = document.getElementById('flow-status-pulse');
+    const statusText = document.getElementById('flow-status-text');
+    if (statusPulse) statusPulse.className = 'w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping';
+    if (statusText) {
+      statusText.innerText = 'HANDSHAKE_FLOW';
+      statusText.className = 'text-[9px] font-mono text-neutral-400 font-bold uppercase tracking-wider';
+    }
+  }
+
+  function runFlowStep() {
+    // If resetting at the beginning of the loop
+    if (currentStep === 0) {
+      resetAll();
+    }
+
+    // Highlight all steps up to current
+    for (let i = 0; i <= currentStep; i++) {
+      const step = steps[i];
+      const nodeEl = document.getElementById(step.node);
+      const lineEl = document.getElementById(step.line);
+      const isLast = i === currentStep;
+      
+      const isSecured = step.status === 'secured';
+
+      if (nodeEl) {
+        const rect = nodeEl.querySelector('rect');
+        const text = nodeEl.querySelector('text');
+        if (rect) {
+          if (isSecured) {
+            rect.setAttribute('fill', 'rgba(52, 211, 153, 0.05)');
+            rect.setAttribute('stroke', '#34d399');
+            rect.setAttribute('stroke-width', '1.5');
+          } else {
+            rect.setAttribute('fill', isLast ? 'rgba(255, 255, 255, 0.03)' : '#0d0d0d');
+            rect.setAttribute('stroke', isLast ? '#ffffff' : '#555555');
+            rect.setAttribute('stroke-width', isLast ? '1.5' : '1');
+          }
+        }
+        if (text) {
+          text.setAttribute('fill', isSecured ? '#34d399' : '#ffffff');
+        }
+      }
+
+      if (lineEl) {
+        if (isSecured) {
+          lineEl.setAttribute('stroke', '#34d399');
+          lineEl.setAttribute('marker-end', 'url(#flow-arrow-down-success)');
+        } else {
+          lineEl.setAttribute('stroke', isLast ? '#ffffff' : '#555555');
+          lineEl.setAttribute('marker-end', isLast ? 'url(#flow-arrow-down-active)' : 'url(#flow-arrow-down-passed)');
+        }
+      }
+
+      if (isLast) {
+        const statusPulse = document.getElementById('flow-status-pulse');
+        const statusText = document.getElementById('flow-status-text');
+        if (statusPulse) {
+          statusPulse.className = isSecured 
+            ? 'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse' 
+            : 'w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping';
+        }
+        if (statusText) {
+          statusText.innerText = step.text;
+          statusText.className = isSecured 
+            ? 'text-[9px] font-mono text-emerald-400 font-bold uppercase tracking-wider' 
+            : 'text-[9px] font-mono text-amber-400 font-bold uppercase tracking-wider';
+        }
+      }
+    }
+
+    currentStep = (currentStep + 1) % steps.length;
+  }
+
+  // Run initial step
+  runFlowStep();
+  // Loop execution (every 2.2 seconds)
+  setInterval(runFlowStep, 2200);
+</script>

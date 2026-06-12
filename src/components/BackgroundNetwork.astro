@@ -1,0 +1,30 @@
+---
+---
+
+<div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none bg-bg-dark">
+  <!-- Monochromatic Grid Background -->
+  <div class="grid-bg-overlay"></div>
+
+  <!-- Noise Texture -->
+  <div class="noise-overlay"></div>
+
+  <!-- Ambient extremely low opacity grayscale gradient -->
+  <div class="absolute top-[10%] left-[10%] w-[600px] h-[600px] rounded-full bg-[rgba(255,255,255,0.015)] filter blur-[100px] pointer-events-none"></div>
+  <div class="absolute bottom-[10%] right-[10%] w-[600px] h-[600px] rounded-full bg-[rgba(255,255,255,0.015)] filter blur-[100px] pointer-events-none"></div>
+
+  <!-- Static neutral sequence lines (no color, minimal visibility) -->
+  <svg class="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
+    <path 
+      d="M -100 150 Q 200 80 500 250 T 1100 100 T 1600 350" 
+      fill="none" 
+      stroke="rgba(255, 255, 255, 0.15)" 
+      stroke-width="1"
+    />
+    <path 
+      d="M -50 650 Q 400 500 800 700 T 1500 550 T 1900 750" 
+      fill="none" 
+      stroke="rgba(255, 255, 255, 0.1)" 
+      stroke-width="0.75"
+    />
+  </svg>
+</div>

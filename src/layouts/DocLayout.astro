@@ -1,0 +1,348 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Sidebar from '../components/Sidebar.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import Search from '../components/Search.astro';
+import BackgroundNetwork from '../components/BackgroundNetwork.astro';
+import TelemetryPanel from '../components/TelemetryPanel.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  headings?: { depth: number; slug: string; text: string }[];
+  currentSlug?: string;
+  breadcrumbs?: { title: string; href?: string }[] | null;
+  readingTime?: number | null;
+  prev?: { title: string; slug: string } | null;
+  next?: { title: string; slug: string } | null;
+}
+
+const { 
+  title = "USMP Documentation", 
+  description = "USMP Protocol Documentation",
+  headings = [],
+  currentSlug = "",
+  breadcrumbs = null,
+  readingTime = null,
+  prev = null,
+  next = null
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href={`${import.meta.env.BASE_URL}assets/favicon.png`} />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title} | USMP Docs</title>
+    <meta name="description" content={description} />
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={`${title} | USMP Docs`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={`${import.meta.env.BASE_URL}assets/logo.png`} />
+
+    <script is:inline>
+      const theme = localStorage.getItem('theme') || 'dark';
+      if (theme === 'light') {
+        document.documentElement.classList.add('light');
+      } else {
+        document.documentElement.classList.remove('light');
+      }
+    </script>
+  </head>
+  <body class="bg-bg-dark text-slate-200 min-h-screen flex flex-col relative antialiased">
+    <!-- Pulse Network Background -->
+    <BackgroundNetwork />
+    
+    <!-- Top Dashboard Header -->
+    <Header currentSlug={currentSlug} />
+    
+    <!-- Main Dashboard Container -->
+    <div class="flex-1 w-full max-w-[1440px] mx-auto px-4 md:px-8 py-8 flex items-start gap-8 relative z-10">
+      
+      <!-- LEFT SIDEBAR: Navigation Panel -->
+      <aside 
+        id="sidebar-menu" 
+        class="w-[280px] shrink-0 hidden lg:block sticky top-[80px] h-[calc(100vh-110px)] flex flex-col py-5 pr-5 border-r border-neutral-900 overflow-y-auto"
+      >
+        <!-- Project Brand & Version Selector -->
+        <div class="border-b border-neutral-900 pb-5 mb-5 shrink-0">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+            <span class="text-[10px] font-mono font-bold tracking-wider text-neutral-400 uppercase">ACTIVE CORE</span>
+          </div>
+          <select 
+            class="w-full bg-bg-code border border-neutral-900 rounded-sm text-xs font-mono text-slate-300 py-2 px-3 focus:outline-none focus:border-white cursor-pointer transition-colors hover:border-neutral-700"
+            aria-label="Version selector"
+          >
+            <option>usmp-spec-v0.2.0 (Latest)</option>
+            <option>usmp-spec-v0.1.0</option>
+          </select>
+        </div>
+
+        <!-- Navigation Tree -->
+        <div class="flex-1 pr-1">
+          <Sidebar currentSlug={currentSlug} />
+        </div>
+      </aside>
+      
+      <!-- CENTER CONTENT AREA -->
+      <main class="flex-1 min-w-0 max-w-[850px] px-2 md:px-6 relative">
+        <!-- Breadcrumbs trail -->
+        {breadcrumbs && breadcrumbs.length > 0 && (
+          <div class="flex items-center gap-2 text-xs font-mono text-neutral-500 mb-6 flex-wrap">
+            <a href={import.meta.env.BASE_URL} class="hover:text-white transition-colors">USMP_CORE</a>
+            {breadcrumbs.map((crumb) => (
+              <span class="flex items-center gap-2">
+                <span class="text-neutral-700">/</span>
+                {crumb.href ? (
+                  <a href={crumb.href} class="hover:text-white transition-colors">{crumb.title.toUpperCase()}</a>
+                ) : (
+                  <span class="text-neutral-400">{crumb.title.toUpperCase()}</span>
+                )}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <!-- Article Contents slot -->
+        <article class="prose max-w-none text-slate-300">
+          <slot />
+        </article>
+
+        <!-- Previous/Next page links -->
+        {(prev || next) && (
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-12 pt-8 border-t border-neutral-900">
+            {prev ? (
+              <a 
+                href={prev.slug === "" ? `${import.meta.env.BASE_URL}docs` : `${import.meta.env.BASE_URL}docs/${prev.slug}`} 
+                class="flex flex-col items-start p-4 border border-neutral-900 rounded-sm bg-neutral-950 hover:border-neutral-500 transition-all duration-300 group no-underline"
+              >
+                <span class="text-[10px] font-mono font-bold tracking-wider text-neutral-500 uppercase mb-1">PREVIOUS MODULE</span>
+                <span class="text-sm font-semibold text-white group-hover:text-white transition-colors flex items-center gap-2">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                  {prev.title}
+                </span>
+              </a>
+            ) : <div />}
+
+            {next ? (
+              <a 
+                href={next.slug === "" ? `${import.meta.env.BASE_URL}docs` : `${import.meta.env.BASE_URL}docs/${next.slug}`} 
+                class="flex flex-col items-end p-4 border border-neutral-900 rounded-sm bg-neutral-950 hover:border-neutral-500 transition-all duration-300 group text-right no-underline"
+              >
+                <span class="text-[10px] font-mono font-bold tracking-wider text-neutral-500 uppercase mb-1">NEXT MODULE</span>
+                <span class="text-sm font-semibold text-white group-hover:text-white transition-colors flex items-center gap-2">
+                  {next.title}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </span>
+              </a>
+            ) : <div />}
+          </div>
+        )}
+      </main>
+      
+      <!-- RIGHT SIDEBAR: Table of Contents, Reading Time, Quick Links -->
+      <aside class="w-[240px] shrink-0 hidden xl:block sticky top-[80px] h-[calc(100vh-110px)] overflow-y-auto flex flex-col gap-6 font-mono text-[11px] border-l border-neutral-900 pl-5">
+        <!-- Telemetry Status Panel -->
+        <div class="border-b border-neutral-900 pb-6 mb-2">
+          <TelemetryPanel />
+        </div>
+        <div>
+          <span class="text-[9px] font-bold text-neutral-500 uppercase tracking-widest block mb-3">ON THIS PAGE</span>
+          <div class="toc-progress-wrapper">
+            <div id="toc-progress" class="toc-progress-bar"></div>
+            <TableOfContents headings={headings} />
+          </div>
+        </div>
+
+        <div class="border-t border-neutral-900 pt-5 flex flex-col gap-2 text-neutral-400">
+          {readingTime && (
+            <div class="flex items-center justify-between">
+              <span class="text-neutral-500">READ TIME:</span>
+              <span class="text-white">{readingTime} MIN</span>
+            </div>
+          )}
+          <div class="flex items-center justify-between">
+            <span class="text-neutral-500">VERSION:</span>
+            <span class="text-white">v0.2.0</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-neutral-500">LAST UPDATED:</span>
+            <span class="text-white">2026-06-10</span>
+          </div>
+        </div>
+
+        <div class="border-t border-neutral-900 pt-5">
+          <span class="text-[9px] font-bold text-neutral-500 uppercase tracking-widest block mb-3">QUICK LINKS</span>
+          <div class="flex flex-col gap-2">
+            <a href="https://github.com/metaloomlabs/usmp" target="_blank" rel="noopener noreferrer" class="text-neutral-400 hover:text-white transition-colors flex items-center gap-1.5 no-underline">
+              <span>View Source Code</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+            </a>
+            <a href={`${import.meta.env.BASE_URL}docs/spec`} class="text-neutral-400 hover:text-white transition-colors flex items-center gap-1.5 no-underline">
+              <span>Protocol Spec</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+            </a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <Search />
+
+    <!-- Client-side script for dynamic behaviors -->
+    <script>
+      // 1. Mobile navigation drawer toggle
+      const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+      const sidebarMenu = document.getElementById('sidebar-menu');
+
+      if (mobileMenuToggle && sidebarMenu) {
+        mobileMenuToggle.addEventListener('click', () => {
+          sidebarMenu.classList.toggle('hidden');
+          sidebarMenu.classList.toggle('sticky');
+          sidebarMenu.classList.toggle('fixed');
+          sidebarMenu.classList.toggle('top-[80px]');
+          sidebarMenu.classList.toggle('top-[72px]');
+          sidebarMenu.classList.toggle('bottom-[20px]');
+          sidebarMenu.classList.toggle('left-4');
+          sidebarMenu.classList.toggle('h-[calc(100vh-110px)]');
+          sidebarMenu.classList.toggle('h-auto');
+          sidebarMenu.classList.toggle('z-[100]');
+          sidebarMenu.classList.toggle('w-[280px]');
+          sidebarMenu.classList.toggle('w-[calc(100vw-32px)]');
+          
+          // Drawer overlay visual classes for mobile
+          sidebarMenu.classList.toggle('bg-bg-panel');
+          sidebarMenu.classList.toggle('border-r');
+          sidebarMenu.classList.toggle('border');
+          sidebarMenu.classList.toggle('border-neutral-900');
+          sidebarMenu.classList.toggle('rounded-sm');
+          sidebarMenu.classList.toggle('py-5');
+          sidebarMenu.classList.toggle('pr-5');
+          sidebarMenu.classList.toggle('p-5');
+
+          mobileMenuToggle.classList.toggle('active');
+        });
+      }
+
+      // 2. Scroll Progress indicator tracking
+      const progressLine = document.getElementById('toc-progress');
+      if (progressLine) {
+        const updateProgress = () => {
+          const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+          if (totalHeight > 0) {
+            const percentage = (window.scrollY / totalHeight) * 100;
+            progressLine.style.height = `${percentage}%`;
+          }
+        };
+        window.addEventListener('scroll', updateProgress);
+        window.addEventListener('resize', updateProgress);
+        updateProgress();
+      }
+
+      // 3. Shiki Code Block copy button addition and label creation
+      const preBlocks = document.querySelectorAll('pre:not(.mermaid)');
+      preBlocks.forEach((pre) => {
+        // Retrieve filename from preceding comment or custom attribute
+        const firstLine = pre.querySelector('code')?.innerText.split('\n')[0] || '';
+        let fileLabel = 'SOURCE';
+        if (firstLine.includes('//') && (firstLine.includes('.') || firstLine.includes('h'))) {
+          fileLabel = firstLine.replace('//', '').trim();
+        } else if (firstLine.includes('#') && firstLine.includes('.')) {
+          fileLabel = firstLine.replace('#', '').trim();
+        }
+
+        // Wrap in code block shell
+        const outerWrapper = document.createElement('div');
+        outerWrapper.className = 'code-block-wrapper';
+        pre.parentNode?.insertBefore(outerWrapper, pre);
+        
+        // Header
+        const header = document.createElement('div');
+        header.className = 'code-header';
+        header.innerHTML = `
+          <div class="code-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            <span>${fileLabel}</span>
+          </div>
+          <div class="code-header-actions flex items-center gap-3">
+            <button class="copy-btn-new text-[10px] font-mono font-semibold tracking-wider text-slate-500 hover:text-white uppercase flex items-center gap-1.5 cursor-pointer transition-colors" aria-label="Copy code">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+              <span>COPY</span>
+            </button>
+            <div class="code-header-dots">
+              <div class="code-dot"></div>
+              <div class="code-dot"></div>
+              <div class="code-dot"></div>
+            </div>
+          </div>
+        `;
+        outerWrapper.appendChild(header);
+        outerWrapper.appendChild(pre);
+
+        // Copy button trigger
+        const copyBtn = header.querySelector('.copy-btn-new');
+        copyBtn?.addEventListener('click', async () => {
+          const codeText = pre.querySelector('code')?.innerText || '';
+          try {
+            await navigator.clipboard.writeText(codeText);
+            const span = copyBtn.querySelector('span');
+            if (span) {
+              span.innerText = 'COPIED!';
+              copyBtn.classList.remove('text-slate-500');
+              copyBtn.classList.add('text-white');
+              setTimeout(() => {
+                span.innerText = 'COPY';
+                copyBtn.classList.remove('text-white');
+                copyBtn.classList.add('text-slate-500');
+              }, 2000);
+            }
+          } catch (err) {
+            console.error('Failed to copy', err);
+          }
+        });
+      });
+
+      // 4. Client-side Mermaid diagrams compilation
+      const mermaidBlocks = document.querySelectorAll('pre.mermaid');
+      if (mermaidBlocks.length > 0) {
+        mermaidBlocks.forEach((pre) => {
+          const code = pre.querySelector('code');
+          if (code) {
+            const text = code.innerText;
+            const container = document.createElement('div');
+            container.className = 'mermaid-container';
+            const graphDiv = document.createElement('div');
+            graphDiv.className = 'mermaid';
+            graphDiv.textContent = text;
+            container.appendChild(graphDiv);
+            pre.parentNode?.replaceChild(container, pre);
+          }
+        });
+
+        // @ts-ignore
+        import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs').then((m) => {
+          m.default.initialize({
+            startOnLoad: false,
+            theme: 'dark',
+            securityLevel: 'loose',
+            themeVariables: {
+              background: '#0a0a0a',
+              primaryColor: '#ffffff',
+              textColor: '#e5e5e5',
+              lineColor: 'rgba(255, 255, 255, 0.1)',
+            }
+          });
+          m.default.run();
+        });
+      }
+
+
+    </script>
+  </body>
+</html>

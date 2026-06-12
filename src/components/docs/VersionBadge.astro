@@ -1,0 +1,11 @@
+---
+interface Props {
+  version: string;
+}
+
+const { version } = Astro.props;
+---
+
+<span class="inline-flex items-center px-2 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-wider bg-neutral-900 text-white border border-neutral-800 rounded-full select-none">
+  Since {version}
+</span>
