@@ -1,9 +1,9 @@
 export const monoTheme = {
-  name: 'mono-dark',
+  name: 'mono-dynamic',
   type: 'dark',
   colors: {
-    'editor.background': '#080808',
-    'editor.foreground': '#ffffff',
+    'editor.background': 'var(--shiki-color-background)',
+    'editor.foreground': 'var(--shiki-color-text)',
   },
   tokenColors: [
     {
@@ -16,52 +16,52 @@ export const monoTheme = {
         'punctuation.definition.preprocessor'
       ],
       settings: {
-        foreground: '#ffffff',
+        foreground: 'var(--shiki-token-keyword)',
         fontStyle: 'bold',
       },
     },
     {
       scope: ['entity.name.function', 'support.function', 'entity.name.method'],
       settings: {
-        foreground: '#ffffff',
+        foreground: 'var(--shiki-token-function)',
       },
     },
     {
       scope: ['variable', 'support.variable', 'entity.name.variable', 'parameter', 'variable.parameter'],
       settings: {
-        foreground: '#e5e5e5',
+        foreground: 'var(--shiki-token-variable)',
       },
     },
     {
       scope: ['entity.name.type', 'support.type', 'storage.type.c', 'storage.type.cpp'],
       settings: {
-        foreground: '#e5e5e5',
+        foreground: 'var(--shiki-token-type)',
         fontStyle: 'italic',
       },
     },
     {
       scope: ['constant', 'constant.numeric', 'constant.language', 'support.constant', 'constant.character'],
       settings: {
-        foreground: '#a3a3a3',
+        foreground: 'var(--shiki-token-constant)',
       },
     },
     {
       scope: ['string', 'string.template', 'punctuation.definition.string'],
       settings: {
-        foreground: '#737373',
+        foreground: 'var(--shiki-token-string)',
       },
     },
     {
       scope: ['comment', 'punctuation.definition.comment'],
       settings: {
-        foreground: '#404040',
+        foreground: 'var(--shiki-token-comment)',
         fontStyle: 'italic',
       },
     },
     {
       scope: ['punctuation', 'meta.brace', 'keyword.operator', 'storage.modifier.pointer'],
       settings: {
-        foreground: '#a3a3a3',
+        foreground: 'var(--shiki-token-punctuation)',
       },
     },
   ],

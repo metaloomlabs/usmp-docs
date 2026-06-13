@@ -62,7 +62,6 @@ const filteredHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
     height: calc(100vh - var(--header-height) - 4rem);
     width: 100%;
     overflow-y: auto;
-    border-left: 1px solid var(--border-color);
     padding-left: 1rem;
   }
 
@@ -103,7 +102,7 @@ const filteredHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
   }
 
   .toc-link.active {
-    color: var(--primary);
-    font-weight: 500;
+    color: var(--brand-accent);
+    font-weight: 600;
   }
 </style>

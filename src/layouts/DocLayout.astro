@@ -5,7 +5,6 @@ import Sidebar from '../components/Sidebar.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 import Search from '../components/Search.astro';
 import BackgroundNetwork from '../components/BackgroundNetwork.astro';
-import TelemetryPanel from '../components/TelemetryPanel.astro';
 
 interface Props {
   title?: string;
@@ -46,17 +45,19 @@ const {
     <meta property="og:image" content={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/assets/logo.png`} />
 
     <script is:inline>
-      const theme = localStorage.getItem('theme') || 'dark';
-      if (theme === 'light') {
-        document.documentElement.classList.add('light');
+      const theme = localStorage.getItem('theme') || 'light';
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
       } else {
-        document.documentElement.classList.remove('light');
+        document.documentElement.classList.remove('dark');
       }
     </script>
   </head>
-  <body class="bg-bg-dark text-slate-200 min-h-screen flex flex-col relative antialiased">
+  <body class="bg-bg-dark text-text-primary min-h-screen flex flex-col relative antialiased transition-colors duration-300">
     <!-- Pulse Network Background -->
-    <BackgroundNetwork />
+    <div class="hidden dark:block">
+      <BackgroundNetwork />
+    </div>
     
     <!-- Top Dashboard Header -->
     <Header currentSlug={currentSlug} />
@@ -67,16 +68,16 @@ const {
       <!-- LEFT SIDEBAR: Navigation Panel -->
       <aside 
         id="sidebar-menu" 
-        class="w-[280px] shrink-0 hidden lg:block sticky top-[80px] h-[calc(100vh-110px)] flex flex-col py-5 pr-5 border-r border-neutral-900 overflow-y-auto"
+        class="w-[280px] shrink-0 hidden lg:block sticky top-[80px] h-[calc(100vh-110px)] flex flex-col py-5 pr-5 border-r border-border-subtle overflow-y-auto"
       >
         <!-- Project Brand & Version Selector -->
-        <div class="border-b border-neutral-900 pb-5 mb-5 shrink-0">
+        <div class="border-b border-border-subtle pb-5 mb-5 shrink-0">
           <div class="flex items-center gap-2 mb-3">
-            <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
-            <span class="text-[10px] font-mono font-bold tracking-wider text-neutral-400 uppercase">ACTIVE CORE</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-text-heading"></span>
+            <span class="text-[10px] font-mono font-bold tracking-wider text-text-primary/75 uppercase">ACTIVE CORE</span>
           </div>
           <select 
-            class="w-full bg-bg-code border border-neutral-900 rounded-sm text-xs font-mono text-slate-300 py-2 px-3 focus:outline-none focus:border-white cursor-pointer transition-colors hover:border-neutral-700"
+            class="w-full bg-bg-code border border-border-subtle rounded-sm text-xs font-mono text-text-primary py-2 px-3 focus:outline-none focus:border-brand-accent cursor-pointer transition-colors hover:border-border-glow"
             aria-label="Version selector"
           >
             <option>usmp-spec-v0.2.0 (Latest)</option>
@@ -94,15 +95,15 @@ const {
       <main class="flex-1 min-w-0 max-w-[850px] px-2 md:px-6 relative">
         <!-- Breadcrumbs trail -->
         {breadcrumbs && breadcrumbs.length > 0 && (
-          <div class="flex items-center gap-2 text-xs font-mono text-neutral-500 mb-6 flex-wrap">
-            <a href={import.meta.env.BASE_URL} class="hover:text-white transition-colors">USMP_CORE</a>
+          <div class="flex items-center gap-2 text-xs font-mono text-text-primary/60 mb-6 flex-wrap">
+            <a href={import.meta.env.BASE_URL} class="hover:text-text-heading transition-colors no-underline">USMP_CORE</a>
             {breadcrumbs.map((crumb) => (
               <span class="flex items-center gap-2">
-                <span class="text-neutral-700">/</span>
+                <span class="text-text-primary/30">/</span>
                 {crumb.href ? (
-                  <a href={crumb.href} class="hover:text-white transition-colors">{crumb.title.toUpperCase()}</a>
+                  <a href={crumb.href} class="hover:text-text-heading transition-colors no-underline">{crumb.title.toUpperCase()}</a>
                 ) : (
-                  <span class="text-neutral-400">{crumb.title.toUpperCase()}</span>
+                  <span class="text-text-primary/80">{crumb.title.toUpperCase()}</span>
                 )}
               </span>
             ))}
@@ -110,20 +111,20 @@ const {
         )}
 
         <!-- Article Contents slot -->
-        <article class="prose max-w-none text-slate-300">
+        <article class="prose max-w-none text-text-primary">
           <slot />
         </article>
 
         <!-- Previous/Next page links -->
         {(prev || next) && (
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-12 pt-8 border-t border-neutral-900">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-12 pt-8 border-t border-border-subtle">
             {prev ? (
               <a 
                 href={prev.slug === "" ? `${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs` : `${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs/${prev.slug}`} 
-                class="flex flex-col items-start p-4 border border-neutral-900 rounded-sm bg-neutral-950 hover:border-neutral-500 transition-all duration-300 group no-underline"
+                class="flex flex-col items-start p-4 border border-border-subtle rounded-sm bg-bg-panel hover:border-brand-accent transition-all duration-300 group no-underline"
               >
-                <span class="text-[10px] font-mono font-bold tracking-wider text-neutral-500 uppercase mb-1">PREVIOUS MODULE</span>
-                <span class="text-sm font-semibold text-white group-hover:text-white transition-colors flex items-center gap-2">
+                <span class="text-[10px] font-mono font-bold tracking-wider text-text-primary/60 uppercase mb-1">PREVIOUS MODULE</span>
+                <span class="text-sm font-semibold text-text-heading group-hover:text-brand-accent transition-colors flex items-center gap-2">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                   {prev.title}
                 </span>
@@ -133,10 +134,10 @@ const {
             {next ? (
               <a 
                 href={next.slug === "" ? `${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs` : `${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs/${next.slug}`} 
-                class="flex flex-col items-end p-4 border border-neutral-900 rounded-sm bg-neutral-950 hover:border-neutral-500 transition-all duration-300 group text-right no-underline"
+                class="flex flex-col items-end p-4 border border-border-subtle rounded-sm bg-bg-panel hover:border-brand-accent transition-all duration-300 group text-right no-underline"
               >
-                <span class="text-[10px] font-mono font-bold tracking-wider text-neutral-500 uppercase mb-1">NEXT MODULE</span>
-                <span class="text-sm font-semibold text-white group-hover:text-white transition-colors flex items-center gap-2">
+                <span class="text-[10px] font-mono font-bold tracking-wider text-text-primary/60 uppercase mb-1">NEXT MODULE</span>
+                <span class="text-sm font-semibold text-text-heading group-hover:text-brand-accent transition-colors flex items-center gap-2">
                   {next.title}
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </span>
@@ -147,44 +148,40 @@ const {
       </main>
       
       <!-- RIGHT SIDEBAR: Table of Contents, Reading Time, Quick Links -->
-      <aside class="w-[240px] shrink-0 hidden xl:block sticky top-[80px] h-[calc(100vh-110px)] overflow-y-auto flex flex-col gap-6 font-mono text-[11px] border-l border-neutral-900 pl-5">
-        <!-- Telemetry Status Panel -->
-        <div class="border-b border-neutral-900 pb-6 mb-2">
-          <TelemetryPanel />
-        </div>
+      <aside class="w-[240px] shrink-0 hidden xl:block sticky top-[80px] h-[calc(100vh-110px)] overflow-y-auto flex flex-col gap-6 text-[11px] border-l border-border-subtle pl-5">
         <div>
-          <span class="text-[9px] font-bold text-neutral-500 uppercase tracking-widest block mb-3">ON THIS PAGE</span>
+          <span class="text-[9px] font-bold text-text-primary/60 uppercase tracking-widest block mb-3">ON THIS PAGE</span>
           <div class="toc-progress-wrapper">
             <div id="toc-progress" class="toc-progress-bar"></div>
             <TableOfContents headings={headings} />
           </div>
         </div>
 
-        <div class="border-t border-neutral-900 pt-5 flex flex-col gap-2 text-neutral-400">
+        <div class="border-t border-border-subtle pt-5 flex flex-col gap-2 text-text-primary/85">
           {readingTime && (
             <div class="flex items-center justify-between">
-              <span class="text-neutral-500">READ TIME:</span>
-              <span class="text-white">{readingTime} MIN</span>
+              <span class="text-text-primary/60">READ TIME:</span>
+              <span class="text-text-heading font-semibold">{readingTime} MIN</span>
             </div>
           )}
           <div class="flex items-center justify-between">
-            <span class="text-neutral-500">VERSION:</span>
-            <span class="text-white">v0.2.0</span>
+            <span class="text-text-primary/60">VERSION:</span>
+            <span class="text-text-heading font-semibold">v0.2.0</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-neutral-500">LAST UPDATED:</span>
-            <span class="text-white">2026-06-10</span>
+            <span class="text-text-primary/60">LAST UPDATED:</span>
+            <span class="text-text-heading font-semibold">2026-06-10</span>
           </div>
         </div>
 
-        <div class="border-t border-neutral-900 pt-5">
-          <span class="text-[9px] font-bold text-neutral-500 uppercase tracking-widest block mb-3">QUICK LINKS</span>
+        <div class="border-t border-border-subtle pt-5">
+          <span class="text-[9px] font-bold text-text-primary/60 uppercase tracking-widest block mb-3">QUICK LINKS</span>
           <div class="flex flex-col gap-2">
-            <a href="https://github.com/metaloomlabs/usmp" target="_blank" rel="noopener noreferrer" class="text-neutral-400 hover:text-white transition-colors flex items-center gap-1.5 no-underline">
+            <a href="https://github.com/metaloomlabs/usmp" target="_blank" rel="noopener noreferrer" class="text-text-primary/80 hover:text-brand-accent transition-colors flex items-center gap-1.5 no-underline">
               <span>View Source Code</span>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
             </a>
-            <a href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs/spec`} class="text-neutral-400 hover:text-white transition-colors flex items-center gap-1.5 no-underline">
+            <a href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs/spec`} class="text-text-primary/80 hover:text-brand-accent transition-colors flex items-center gap-1.5 no-underline">
               <span>Protocol Spec</span>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
             </a>
@@ -271,7 +268,7 @@ const {
             <span>${fileLabel}</span>
           </div>
           <div class="code-header-actions flex items-center gap-3">
-            <button class="copy-btn-new text-[10px] font-mono font-semibold tracking-wider text-slate-500 hover:text-white uppercase flex items-center gap-1.5 cursor-pointer transition-colors" aria-label="Copy code">
+            <button class="copy-btn-new text-[10px] font-mono font-semibold tracking-wider text-text-primary/70 hover:text-text-heading uppercase flex items-center gap-1.5 cursor-pointer transition-colors" aria-label="Copy code">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
               <span>COPY</span>
             </button>
@@ -294,12 +291,10 @@ const {
             const span = copyBtn.querySelector('span');
             if (span) {
               span.innerText = 'COPIED!';
-              copyBtn.classList.remove('text-slate-500');
-              copyBtn.classList.add('text-white');
+              copyBtn.classList.add('text-emerald-500');
               setTimeout(() => {
                 span.innerText = 'COPY';
-                copyBtn.classList.remove('text-white');
-                copyBtn.classList.add('text-slate-500');
+                copyBtn.classList.remove('text-emerald-500');
               }, 2000);
             }
           } catch (err) {

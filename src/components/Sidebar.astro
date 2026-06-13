@@ -87,9 +87,9 @@ function getSectionIcon(title: string) {
 
 <style>
   :root {
-    --text-muted: #888888;
-    --text-heading: #ffffff;
-    --border-color: #1c1c1c;
+    --text-muted: var(--color-text-primary);
+    --text-heading: var(--color-text-heading);
+    --border-color: var(--color-border-subtle);
     --transition-fast: 0.15s ease-out;
   }
 
@@ -106,6 +106,8 @@ function getSectionIcon(title: string) {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    padding: 0;
+    margin: 0;
   }
 
   .nav-section {
@@ -119,14 +121,15 @@ function getSectionIcon(title: string) {
     color: var(--text-muted);
     padding: 0.2rem 0.75rem;
     transition: all var(--transition-fast);
+    text-decoration: none;
   }
 
   .top-link:hover {
-    color: #ffffff;
+    color: var(--text-heading);
   }
 
   .top-link.active {
-    color: #ffffff;
+    color: var(--color-brand-accent);
     font-weight: 600;
   }
 
@@ -141,20 +144,23 @@ function getSectionIcon(title: string) {
     font-size: 0.725rem;
     font-weight: 700;
     text-transform: uppercase;
-    color: #a3a3a3;
+    color: var(--text-heading);
+    opacity: 0.85;
     letter-spacing: 0.05em;
     padding-left: 0.75rem;
     margin-bottom: 0.15rem;
     display: flex;
     align-items: center;
     gap: 8px;
+    margin-top: 0;
   }
 
   .section-icon-wrapper {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #666666;
+    color: var(--text-muted);
+    opacity: 0.7;
   }
 
   .section-list {
@@ -163,7 +169,9 @@ function getSectionIcon(title: string) {
     flex-direction: column;
     gap: 0.25rem;
     margin-left: 0.75rem;
-    padding-left: 14px; /* Align items horizontally below title icon offset */
+    padding-left: 14px;
+    margin-top: 0;
+    margin-bottom: 0;
   }
 
   .section-item {
@@ -176,15 +184,21 @@ function getSectionIcon(title: string) {
     padding: 0.2rem 0;
     width: 100%;
     transition: all var(--transition-fast);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    padding-left: 8px;
+    margin-left: -8px;
   }
 
   .section-link:hover {
-    color: #ffffff;
+    color: var(--text-heading);
+    border-left-color: var(--color-border-glow);
   }
 
   .section-link.active {
-    color: #ffffff;
+    color: var(--color-brand-accent);
     font-weight: 600;
     background: transparent;
+    border-left-color: var(--color-brand-accent);
   }
 </style>

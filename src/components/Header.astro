@@ -6,7 +6,7 @@ interface Props {
 const { currentSlug = "" } = Astro.props;
 ---
 
-<header class="sticky top-0 z-50 h-14 border-b border-white/[0.04] bg-neutral-950/70 backdrop-blur-md transition-all duration-300 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[1px] after:bg-gradient-to-r after:from-transparent after:via-white/5 after:to-transparent">
+<header class="sticky top-0 z-50 h-14 border-b border-border-subtle bg-bg-panel/80 backdrop-blur-md transition-all duration-300">
   <div class="max-w-[1440px] h-full mx-auto px-4 md:px-8 flex items-center justify-between">
     
     <div class="flex items-center gap-4">
@@ -16,16 +16,16 @@ const { currentSlug = "" } = Astro.props;
         class="lg:hidden flex flex-col justify-between w-5 h-3.5 bg-transparent border-none cursor-pointer p-0 group"
         aria-label="Toggle Navigation Panel"
       >
-        <span class="w-full h-[2px] bg-slate-300 rounded-sm transition-all duration-300 group-[.active]:translate-y-[6px] group-[.active]:rotate-45"></span>
-        <span class="w-full h-[2px] bg-slate-300 rounded-sm transition-all duration-300 group-[.active]:opacity-0"></span>
-        <span class="w-full h-[2px] bg-slate-300 rounded-sm transition-all duration-300 group-[.active]:translate-y-[-6px] group-[.active]:-rotate-45"></span>
+        <span class="w-full h-[2px] bg-text-primary rounded-sm transition-all duration-300 group-[.active]:translate-y-[6px] group-[.active]:rotate-45"></span>
+        <span class="w-full h-[2px] bg-text-primary rounded-sm transition-all duration-300 group-[.active]:opacity-0"></span>
+        <span class="w-full h-[2px] bg-text-primary rounded-sm transition-all duration-300 group-[.active]:translate-y-[-6px] group-[.active]:-rotate-45"></span>
       </button>
 
       <!-- Dashboard Logo -->
-      <a href={import.meta.env.BASE_URL} class="flex items-center gap-2.5 text-white font-heading font-bold text-base md:text-lg no-underline hover:opacity-90 transition-opacity">
+      <a href={import.meta.env.BASE_URL} class="flex items-center gap-2.5 text-text-heading font-heading font-bold text-base md:text-lg no-underline hover:opacity-90 transition-opacity">
         <img src={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/assets/logo.png`} alt="USMP Logo" class="h-6 w-6 object-contain" />
-        <span class="tracking-wider bg-gradient-to-r from-white via-neutral-100 to-neutral-400 bg-clip-text text-transparent">USMP</span>
-        <span class="font-mono text-[8px] font-semibold text-neutral-400 bg-neutral-900 border border-white/[0.06] px-1.5 py-0.5 rounded-full ml-1">
+        <span class="tracking-wider">USMP</span>
+        <span class="font-mono text-[8px] font-semibold text-text-primary bg-bg-code border border-border-subtle px-1.5 py-0.5 rounded-full ml-1">
           v0.2.0
         </span>
       </a>
@@ -35,19 +35,19 @@ const { currentSlug = "" } = Astro.props;
     <nav class="hidden md:flex items-center gap-2">
       <a 
         href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs`} 
-        class={`text-[11px] font-semibold uppercase tracking-wider transition-all duration-300 px-3 py-1.5 rounded-md no-underline ${currentSlug !== 'spec' && currentSlug !== 'tools/telemetry' ? 'text-white bg-white/5 border border-white/10' : 'text-neutral-400 hover:text-white hover:bg-white/[0.02] border border-transparent'}`}
+        class={`text-[11px] font-semibold uppercase tracking-wider transition-all duration-300 px-3 py-1.5 rounded-md no-underline ${currentSlug !== 'spec' && currentSlug !== 'tools/telemetry' ? 'text-brand-accent dark:text-white bg-brand-accent/5 dark:bg-white/5 border border-brand-accent/20 dark:border-white/10' : 'text-text-primary hover:text-text-heading hover:bg-bg-code border border-transparent'}`}
       >
         DASHBOARD
       </a>
       <a 
         href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs/spec`} 
-        class={`text-[11px] font-semibold uppercase tracking-wider transition-all duration-300 px-3 py-1.5 rounded-md no-underline ${currentSlug === 'spec' ? 'text-white bg-white/5 border border-white/10' : 'text-neutral-400 hover:text-white hover:bg-white/[0.02] border border-transparent'}`}
+        class={`text-[11px] font-semibold uppercase tracking-wider transition-all duration-300 px-3 py-1.5 rounded-md no-underline ${currentSlug === 'spec' ? 'text-brand-accent dark:text-white bg-brand-accent/5 dark:bg-white/5 border border-brand-accent/20 dark:border-white/10' : 'text-text-primary hover:text-text-heading hover:bg-bg-code border border-transparent'}`}
       >
         SPECIFICATION
       </a>
       <a 
         href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs/tools/telemetry`} 
-        class={`text-[11px] font-semibold uppercase tracking-wider transition-all duration-300 px-3 py-1.5 rounded-md no-underline ${currentSlug === 'tools/telemetry' ? 'text-white bg-white/5 border border-white/10' : 'text-neutral-400 hover:text-white hover:bg-white/[0.02] border border-transparent'}`}
+        class={`text-[11px] font-semibold uppercase tracking-wider transition-all duration-300 px-3 py-1.5 rounded-md no-underline ${currentSlug === 'tools/telemetry' ? 'text-brand-accent dark:text-white bg-brand-accent/5 dark:bg-white/5 border border-brand-accent/20 dark:border-white/10' : 'text-text-primary hover:text-text-heading hover:bg-bg-code border border-transparent'}`}
       >
         SIMULATOR
       </a>
@@ -58,12 +58,12 @@ const { currentSlug = "" } = Astro.props;
       <!-- Search Input trigger -->
       <button 
         id="search-trigger" 
-        class="flex items-center gap-2 bg-neutral-900/50 border border-white/[0.06] text-neutral-400 hover:text-white hover:border-white/20 py-1.5 px-3 rounded-md text-[10px] font-mono tracking-wide cursor-pointer transition-all duration-300 min-w-[130px] md:min-w-[160px] text-left"
+        class="flex items-center gap-2 bg-bg-code/50 border border-border-subtle text-text-primary hover:text-text-heading hover:border-border-glow py-1.5 px-3 rounded-md text-[10px] font-mono tracking-wide cursor-pointer transition-all duration-300 min-w-[130px] md:min-w-[160px] text-left"
         aria-label="Search documents"
       >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
-        <span class="flex-grow text-neutral-400">Search...</span>
-        <kbd class="hidden sm:inline-block text-[8px] bg-neutral-950 text-neutral-500 border border-white/5 px-1.5 py-0.5 rounded font-sans">Ctrl+K</kbd>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-text-primary/60"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+        <span class="flex-grow text-text-primary/80">Search...</span>
+        <kbd class="hidden sm:inline-block text-[8px] bg-bg-panel text-text-primary/60 border border-border-subtle px-1.5 py-0.5 rounded font-sans">Ctrl+K</kbd>
       </button>
 
       <!-- GitHub Link -->
@@ -71,7 +71,7 @@ const { currentSlug = "" } = Astro.props;
         href="https://github.com/metaloomlabs/usmp" 
         target="_blank" 
         rel="noopener noreferrer" 
-        class="text-neutral-400 hover:text-white transition-colors border border-white/[0.06] hover:border-white/20 bg-neutral-900/30 w-8 h-8 rounded-lg flex items-center justify-center"
+        class="text-text-primary hover:text-text-heading transition-colors border border-border-subtle hover:border-border-glow bg-bg-code/30 w-8 h-8 rounded-lg flex items-center justify-center no-underline"
         aria-label="GitHub repository"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
@@ -80,7 +80,7 @@ const { currentSlug = "" } = Astro.props;
       <!-- Theme Switch Toggle -->
       <button 
         id="doc-theme-toggle" 
-        class="bg-neutral-900/30 border border-white/[0.06] text-slate-400 hover:text-white hover:border-white/20 w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer transition-all duration-300"
+        class="bg-bg-code/30 border border-border-subtle text-text-primary hover:text-text-heading hover:border-border-glow w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer transition-all duration-300"
         aria-label="Toggle light/dark mode"
       >
         <!-- Sun Icon -->
@@ -97,9 +97,9 @@ const { currentSlug = "" } = Astro.props;
   const themeToggle = document.getElementById('doc-theme-toggle');
   if (themeToggle) {
     themeToggle.addEventListener('click', () => {
-      const isLight = document.documentElement.classList.toggle('light');
-      localStorage.setItem('theme', isLight ? 'light' : 'dark');
-      window.dispatchEvent(new CustomEvent('theme-change', { detail: { theme: isLight ? 'light' : 'dark' } }));
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      window.dispatchEvent(new CustomEvent('theme-change', { detail: { theme: isDark ? 'dark' : 'light' } }));
     });
   }
 

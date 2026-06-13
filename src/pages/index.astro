@@ -40,7 +40,10 @@ async def main():
     server = USMPServer(host="0.0.0.0", port=9000, psk=b"secure_psk_key_123")
     await server.start(handle_client)
 
-asyncio.run(main())`;
+async def main_run():
+    await main()
+
+asyncio.run(main_run())`;
 ---
 
 <LandingLayout>
@@ -48,33 +51,33 @@ asyncio.run(main())`;
   <section class="relative pt-24 pb-16 text-left max-w-[900px] mx-auto px-6">
     <div class="relative z-10">
       <!-- Status Badge indicator -->
-      <div class="inline-flex items-center gap-2 px-3 py-1 bg-neutral-900/80 border border-border-subtle rounded-sm text-[10px] font-mono font-bold tracking-wider text-white uppercase mb-8 select-none">
-        <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+      <div class="inline-flex items-center gap-2 px-3 py-1 bg-bg-code border border-border-subtle rounded-sm text-[10px] font-mono font-bold tracking-wider text-text-heading uppercase mb-8 select-none">
+        <span class="w-1.5 h-1.5 rounded-full bg-brand-coral"></span>
         PROTOCOL_STATUS: SPECIFICATION_ACTIVE_V0.2.0
       </div>
 
-      <h1 class="text-4xl sm:text-5xl font-heading font-extrabold tracking-tight text-white leading-tight mb-4">
+      <h1 class="text-4xl sm:text-5xl font-heading font-extrabold tracking-tight text-text-heading leading-tight mb-4">
         Unified Secure Multi-transport Protocol
       </h1>
       
-      <p class="text-base sm:text-lg text-white font-medium font-sans leading-relaxed mb-6">
+      <p class="text-base sm:text-lg text-text-primary font-semibold font-sans leading-relaxed mb-6">
         Secure, lightweight, transport-agnostic application session protocol for constrained embedded systems.
       </p>
 
-      <p class="text-sm text-neutral-400 font-sans leading-relaxed mb-8">
+      <p class="text-sm text-text-primary/75 font-sans leading-relaxed mb-8">
         USMP provides mutually authenticated, AES-256-GCM encrypted session framing for IoT microcontrollers and gateway nodes. Designed specifically for low-resource environments, it eliminates the handshake and footprint overhead of full TLS while ensuring forward secrecy and replay protection.
       </p>
       
       <div class="flex flex-wrap gap-4">
         <a 
           href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs`} 
-          class="px-5 py-2.5 bg-white text-black font-semibold rounded-sm text-xs tracking-wider uppercase transition-colors hover:bg-neutral-200"
+          class="px-5 py-2.5 bg-text-heading text-bg-panel font-semibold rounded-sm text-xs tracking-wider uppercase transition-all hover:opacity-90 no-underline shadow-sm"
         >
           Initialize Core
         </a>
         <a 
           href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/docs/spec`} 
-          class="px-5 py-2.5 bg-neutral-900 border border-neutral-800 text-neutral-300 font-semibold rounded-sm text-xs tracking-wider uppercase transition-colors hover:border-neutral-500 hover:text-white"
+          class="px-5 py-2.5 bg-bg-panel border border-border-subtle text-text-primary font-semibold rounded-sm text-xs tracking-wider uppercase transition-colors hover:border-border-glow hover:text-text-heading no-underline"
         >
           Inspect Specification
         </a>
@@ -82,21 +85,21 @@ asyncio.run(main())`;
 
       <!-- Monochromatic Metrics Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12 text-left">
-        <div class="border border-neutral-900 bg-neutral-950 p-5 rounded-sm">
-          <span class="text-[9px] font-mono font-bold text-neutral-500 uppercase tracking-widest block mb-1">SECURE BY DEFAULT</span>
-          <span class="text-xs font-semibold text-white font-mono">AES-256-GCM</span>
+        <div class="border border-border-subtle bg-bg-panel p-5 rounded-sm">
+          <span class="text-[9px] font-mono font-bold text-text-primary/50 uppercase tracking-widest block mb-1">SECURE BY DEFAULT</span>
+          <span class="text-xs font-semibold text-text-heading font-mono">AES-256-GCM</span>
         </div>
-        <div class="border border-neutral-900 bg-neutral-950 p-5 rounded-sm">
-          <span class="text-[9px] font-mono font-bold text-neutral-500 uppercase tracking-widest block mb-1">LIGHTWEIGHT</span>
-          <span class="text-xs font-semibold text-white font-mono">&lt;50 KB FOOTPRINT</span>
+        <div class="border border-border-subtle bg-bg-panel p-5 rounded-sm">
+          <span class="text-[9px] font-mono font-bold text-text-primary/50 uppercase tracking-widest block mb-1">LIGHTWEIGHT</span>
+          <span class="text-xs font-semibold text-text-heading font-mono">&lt;50 KB FOOTPRINT</span>
         </div>
-        <div class="border border-neutral-900 bg-neutral-950 p-5 rounded-sm">
-          <span class="text-[9px] font-mono font-bold text-neutral-500 uppercase tracking-widest block mb-1">TRANSPORT AGNOSTIC</span>
-          <span class="text-xs font-semibold text-white font-mono">TCP, UART, BLE</span>
+        <div class="border border-border-subtle bg-bg-panel p-5 rounded-sm">
+          <span class="text-[9px] font-mono font-bold text-text-primary/50 uppercase tracking-widest block mb-1">TRANSPORT AGNOSTIC</span>
+          <span class="text-xs font-semibold text-text-heading font-mono">TCP, UART, BLE</span>
         </div>
-        <div class="border border-neutral-900 bg-neutral-950 p-5 rounded-sm">
-          <span class="text-[9px] font-mono font-bold text-neutral-500 uppercase tracking-widest block mb-1">LANGUAGES</span>
-          <span class="text-xs font-semibold text-white font-mono">C, ARDUINO, PYTHON</span>
+        <div class="border border-border-subtle bg-bg-panel p-5 rounded-sm">
+          <span class="text-[9px] font-mono font-bold text-text-primary/50 uppercase tracking-widest block mb-1">LANGUAGES</span>
+          <span class="text-xs font-semibold text-text-heading font-mono">C, ARDUINO, PYTHON</span>
         </div>
       </div>
     </div>
@@ -105,39 +108,39 @@ asyncio.run(main())`;
   <!-- Interactive Code Switcher (Control Console) -->
   <section class="py-12 relative max-w-[900px] mx-auto px-6">
     <div>
-      <div class="text-left mb-6 border-b border-neutral-900 pb-3">
-        <h2 class="text-sm font-heading font-bold text-white tracking-wider uppercase mb-1">INTERACTIVE CONSOLE</h2>
-        <p class="text-[10px] font-mono text-neutral-500">BOILERPLATE CODE AND LIVE PROTOCOL HANDSHAKE SIMULATOR</p>
+      <div class="text-left mb-6 border-b border-border-subtle pb-3">
+        <h2 class="text-sm font-heading font-bold text-text-heading tracking-wider uppercase mb-1">INTERACTIVE CONSOLE</h2>
+        <p class="text-[10px] font-mono text-text-primary/60">BOILERPLATE CODE AND LIVE PROTOCOL HANDSHAKE SIMULATOR</p>
       </div>
 
       <!-- Console Window shell -->
-      <div class="bg-neutral-950 border border-neutral-900 rounded-sm overflow-hidden">
+      <div class="bg-bg-panel border border-border-subtle rounded-sm overflow-hidden">
         <!-- Tab controls header -->
-        <div class="flex items-center justify-between px-4 bg-neutral-900/40 border-b border-neutral-900">
+        <div class="flex items-center justify-between px-4 bg-bg-code border-b border-border-subtle">
           <div class="flex font-mono">
             <button 
-              class="tab-btn py-3 px-4 text-xs font-bold tracking-wider text-white border-r border-neutral-900 border-b-2 border-b-white bg-[#070707] transition-colors" 
+              class="tab-btn py-3 px-4 text-xs font-bold tracking-wider text-text-heading border-r border-border-subtle border-b-2 border-b-brand-accent bg-bg-panel transition-colors" 
               data-tab="client"
             >
               CLIENT.CPP
             </button>
             <button 
-              class="tab-btn py-3 px-4 text-xs font-bold tracking-wider text-neutral-500 border-r border-neutral-900 hover:text-white transition-colors" 
+              class="tab-btn py-3 px-4 text-xs font-bold tracking-wider text-text-primary/60 border-r border-border-subtle hover:text-text-heading transition-colors" 
               data-tab="server"
             >
               GATEWAY.PY
             </button>
             <button 
-              class="tab-btn py-3 px-4 text-xs font-bold tracking-wider text-neutral-500 border-r border-neutral-900 hover:text-white transition-colors" 
+              class="tab-btn py-3 px-4 text-xs font-bold tracking-wider text-text-primary/60 border-r border-border-subtle hover:text-text-heading transition-colors" 
               data-tab="simulator"
             >
               PROTOCOL SIMULATOR
             </button>
           </div>
           <div class="flex gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-neutral-900"></span>
-            <span class="w-2 h-2 rounded-full bg-neutral-900"></span>
-            <span class="w-2 h-2 rounded-full bg-neutral-900"></span>
+            <span class="w-2 h-2 rounded-full bg-border-subtle"></span>
+            <span class="w-2 h-2 rounded-full bg-border-subtle"></span>
+            <span class="w-2 h-2 rounded-full bg-border-subtle"></span>
           </div>
         </div>
 
@@ -160,41 +163,41 @@ asyncio.run(main())`;
   <!-- Features Grid -->
   <section class="py-16 max-w-[900px] mx-auto px-6">
     <div>
-      <div class="text-left mb-8 border-b border-neutral-900 pb-3">
-        <h2 class="text-sm font-heading font-extrabold text-white tracking-wider uppercase">Cryptographic Specification</h2>
-        <p class="text-[10px] text-neutral-500 font-mono">USMP STRUCTURAL CHARACTERISTICS</p>
+      <div class="text-left mb-8 border-b border-border-subtle pb-3">
+        <h2 class="text-sm font-heading font-extrabold text-text-heading tracking-wider uppercase">Cryptographic Specification</h2>
+        <p class="text-[10px] text-text-primary/60 font-mono">USMP STRUCTURAL CHARACTERISTICS</p>
       </div>
 
       <!-- Grid layout -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Box 1 -->
-        <div class="border border-neutral-900 bg-neutral-950 p-6 rounded-sm">
-          <h3 class="text-xs font-mono font-bold text-white uppercase tracking-wider mb-2">Mutual Authentication</h3>
-          <p class="text-xs text-neutral-400 leading-relaxed">
+        <div class="border border-border-subtle bg-bg-panel p-6 rounded-sm hover:border-brand-accent transition-colors">
+          <h3 class="text-xs font-mono font-bold text-text-heading uppercase tracking-wider mb-2">Mutual Authentication</h3>
+          <p class="text-xs text-text-primary/80 leading-relaxed">
             The handshake protocol authenticates both endpoints natively. Devices and gateways verify identities using Pre-Shared Keys (PSK) combined with cryptographically secure challenge nonces via HMAC-SHA256, eliminating unauthorized hardware connections.
           </p>
         </div>
 
         <!-- Box 2 -->
-        <div class="border border-neutral-900 bg-neutral-950 p-6 rounded-sm">
-          <h3 class="text-xs font-mono font-bold text-white uppercase tracking-wider mb-2">Forward Secrecy</h3>
-          <p class="text-xs text-neutral-400 leading-relaxed font-sans">
+        <div class="border border-border-subtle bg-bg-panel p-6 rounded-sm hover:border-brand-accent transition-colors">
+          <h3 class="text-xs font-mono font-bold text-text-heading uppercase tracking-wider mb-2">Forward Secrecy</h3>
+          <p class="text-xs text-text-primary/80 leading-relaxed font-sans">
             Every secure session derives temporary, ephemeral X25519 keypairs. Future compromises of static keys on flash storage guarantee zero exposure of previously captured network sessions.
           </p>
         </div>
 
         <!-- Box 3 -->
-        <div class="border border-neutral-900 bg-neutral-950 p-6 rounded-sm">
-          <h3 class="text-xs font-mono font-bold text-white uppercase tracking-wider mb-2">AES-256-GCM</h3>
-          <p class="text-xs text-neutral-400 leading-relaxed font-sans">
+        <div class="border border-border-subtle bg-bg-panel p-6 rounded-sm hover:border-brand-accent transition-colors">
+          <h3 class="text-xs font-mono font-bold text-text-heading uppercase tracking-wider mb-2">AES-256-GCM</h3>
+          <p class="text-xs text-text-primary/80 leading-relaxed font-sans">
             Enforced session framing encryption. Every single payload byte is encrypted and protected by a Galois integrity check tag, offering hardware-accelerated protection against active network tampering.
           </p>
         </div>
 
         <!-- Box 4 -->
-        <div class="border border-neutral-900 bg-neutral-950 p-6 rounded-sm">
-          <h3 class="text-xs font-mono font-bold text-white uppercase tracking-wider mb-2">Replay Protection</h3>
-          <p class="text-xs text-neutral-400 leading-relaxed">
+        <div class="border border-border-subtle bg-bg-panel p-6 rounded-sm hover:border-brand-accent transition-colors">
+          <h3 class="text-xs font-mono font-bold text-text-heading uppercase tracking-wider mb-2">Replay Protection</h3>
+          <p class="text-xs text-text-primary/80 leading-relaxed">
             Per-session nonces joined with strict, monotonic, per-direction sequence numbers keep communication channels secure from packet injection and spoofing.
           </p>
         </div>
@@ -212,8 +215,8 @@ asyncio.run(main())`;
     tab.addEventListener('click', () => {
       // Deactivate tabs
       tabs.forEach(t => {
-        t.classList.remove('text-white', 'border-b-2', 'border-b-white', 'bg-[#070707]');
-        t.classList.add('text-neutral-500');
+        t.classList.remove('text-text-heading', 'border-b-2', 'border-b-brand-accent', 'bg-bg-panel');
+        t.classList.add('text-text-primary/60');
       });
       // Hide panes
       panes.forEach(p => {
@@ -222,8 +225,8 @@ asyncio.run(main())`;
       });
 
       // Activate clicked
-      tab.classList.add('text-white', 'border-b-2', 'border-b-white', 'bg-[#070707]');
-      tab.classList.remove('text-neutral-500');
+      tab.classList.add('text-text-heading', 'border-b-2', 'border-b-brand-accent', 'bg-bg-panel');
+      tab.classList.remove('text-text-primary/60');
 
       const targetId = `pane-${tab.getAttribute('data-tab')}`;
       const targetPane = document.getElementById(targetId);

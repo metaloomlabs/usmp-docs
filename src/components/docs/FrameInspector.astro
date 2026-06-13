@@ -1,16 +1,16 @@
 ---
 ---
 
-<div class="border border-neutral-900 bg-neutral-950/20 rounded-sm p-6 my-8 text-left select-none font-mono">
-  <div class="mb-5 pb-4 border-b border-neutral-900 flex justify-between items-center flex-wrap gap-2">
+<div class="border border-border-subtle bg-bg-panel/30 rounded-sm p-6 my-8 text-left select-none font-mono">
+  <div class="mb-5 pb-4 border-b border-border-subtle flex justify-between items-center flex-wrap gap-2">
     <div>
-      <h3 class="text-xs font-bold text-white uppercase tracking-wider">Interactive Frame Inspector</h3>
-      <p class="text-[11px] text-neutral-400 font-sans mt-1">Hover over frame segments or raw bytes to inspect their wire layout and values.</p>
+      <h3 class="text-xs font-bold text-text-heading uppercase tracking-wider">Interactive Frame Inspector</h3>
+      <p class="text-[11px] text-text-primary/70 font-sans mt-1">Hover over frame segments or raw bytes to inspect their wire layout and values.</p>
     </div>
     <div>
       <select 
         id="frame-preset-select" 
-        class="bg-neutral-950 border border-white/[0.06] rounded text-[10px] text-slate-300 py-1 px-2 focus:outline-none focus:border-white cursor-pointer transition-colors hover:border-neutral-700 font-mono"
+        class="bg-bg-code border border-border-subtle rounded text-[10px] text-text-primary py-1 px-2 focus:outline-none focus:border-brand-accent cursor-pointer transition-colors hover:border-border-glow font-mono"
       >
         <option value="pkt_data">DATA FRAME (5 Bytes Payload)</option>
         <option value="pkt_hello">CLIENT_HELLO (38 Bytes Payload)</option>
@@ -22,35 +22,35 @@
 
   <!-- FRAME VISUAL SEGMENTS GRID -->
   <div class="flex flex-col gap-2 mb-6">
-    <div class="text-[9px] text-neutral-500 font-bold uppercase tracking-wide mb-1">Frame Segment Map</div>
+    <div class="text-[9px] text-text-primary/50 font-bold uppercase tracking-wide mb-1">Frame Segment Map</div>
     <div class="flex flex-wrap gap-1.5 text-[9px] font-bold text-center">
-      <div class="flex-grow min-w-[50px] border border-purple-500/30 bg-purple-500/5 hover:bg-purple-500/10 text-purple-400 py-2.5 rounded transition-all cursor-help hover:border-purple-400" data-field="magic">
-        magic<br/><span class="text-neutral-500 text-[8px] font-normal">2 Bytes</span>
+      <div class="flex-grow min-w-[50px] border border-purple-500/30 bg-purple-500/5 hover:bg-purple-500/10 text-purple-600 dark:text-purple-400 py-2.5 rounded transition-all cursor-help hover:border-purple-500" data-field="magic">
+        magic<br/><span class="text-text-primary/50 text-[8px] font-normal">2 Bytes</span>
       </div>
-      <div class="flex-grow min-w-[40px] border border-cyan-500/30 bg-cyan-500/5 hover:bg-cyan-500/10 text-cyan-400 py-2.5 rounded transition-all cursor-help hover:border-cyan-400" data-field="version">
-        version<br/><span class="text-neutral-500 text-[8px] font-normal">1 Byte</span>
+      <div class="flex-grow min-w-[40px] border border-cyan-500/30 bg-cyan-500/5 hover:bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 py-2.5 rounded transition-all cursor-help hover:border-cyan-500" data-field="version">
+        version<br/><span class="text-text-primary/50 text-[8px] font-normal">1 Byte</span>
       </div>
-      <div class="flex-grow min-w-[40px] border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 text-amber-400 py-2.5 rounded transition-all cursor-help hover:border-amber-400" data-field="type">
-        type<br/><span class="text-neutral-500 text-[8px] font-normal">1 Byte</span>
+      <div class="flex-grow min-w-[40px] border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 text-amber-600 dark:text-amber-400 py-2.5 rounded transition-all cursor-help hover:border-amber-500" data-field="type">
+        type<br/><span class="text-text-primary/50 text-[8px] font-normal">1 Byte</span>
       </div>
-      <div class="flex-grow min-w-[60px] border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-400 py-2.5 rounded transition-all cursor-help hover:border-emerald-400" data-field="seq">
-        seq<br/><span class="text-neutral-500 text-[8px] font-normal">4 Bytes</span>
+      <div class="flex-grow min-w-[60px] border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 py-2.5 rounded transition-all cursor-help hover:border-emerald-500" data-field="seq">
+        seq<br/><span class="text-text-primary/50 text-[8px] font-normal">4 Bytes</span>
       </div>
-      <div class="flex-grow min-w-[50px] border border-sky-500/30 bg-sky-500/5 hover:bg-sky-500/10 text-sky-400 py-2.5 rounded transition-all cursor-help hover:border-sky-400" data-field="length">
-        length<br/><span class="text-neutral-500 text-[8px] font-normal">2 Bytes</span>
+      <div class="flex-grow min-w-[50px] border border-sky-500/30 bg-sky-500/5 hover:bg-sky-500/10 text-sky-600 dark:text-sky-400 py-2.5 rounded transition-all cursor-help hover:border-sky-500" data-field="length">
+        length<br/><span class="text-text-primary/50 text-[8px] font-normal">2 Bytes</span>
       </div>
-      <div class="flex-grow min-w-[50px] border border-rose-500/30 bg-rose-500/5 hover:bg-rose-500/10 text-rose-400 py-2.5 rounded transition-all cursor-help hover:border-rose-400" data-field="crc">
-        crc<br/><span class="text-neutral-500 text-[8px] font-normal">2 Bytes</span>
+      <div class="flex-grow min-w-[50px] border border-rose-500/30 bg-rose-500/5 hover:bg-rose-500/10 text-rose-600 dark:text-rose-400 py-2.5 rounded transition-all cursor-help hover:border-rose-500" data-field="crc">
+        crc<br/><span class="text-text-primary/50 text-[8px] font-normal">2 Bytes</span>
       </div>
-      <div class="flex-grow-[4] min-w-[120px] border border-neutral-600/30 bg-neutral-600/5 hover:bg-neutral-600/10 text-neutral-400 py-2.5 rounded transition-all cursor-help hover:border-neutral-400" data-field="payload">
-        payload (encrypted / auth tag)<br/><span class="text-neutral-500 text-[8px] font-normal" id="segment-payload-size">N Bytes</span>
+      <div class="flex-grow-[4] min-w-[120px] border border-neutral-600/30 bg-neutral-600/5 hover:bg-neutral-600/10 text-text-primary/80 py-2.5 rounded transition-all cursor-help hover:border-border-glow" data-field="payload">
+        payload (encrypted / auth tag)<br/><span class="text-text-primary/50 text-[8px] font-normal" id="segment-payload-size">N Bytes</span>
       </div>
     </div>
   </div>
 
   <!-- RAW WIRE BYTES VIEW -->
-  <div class="bg-neutral-950 border border-neutral-900 rounded-sm p-4 mb-6 relative overflow-hidden">
-    <div class="absolute top-2 right-3 text-[7px] text-neutral-600 font-bold uppercase tracking-wider">Raw Hex Payload</div>
+  <div class="bg-bg-code border border-border-subtle rounded-sm p-4 mb-6 relative overflow-hidden">
+    <div class="absolute top-2 right-3 text-[7px] text-text-primary/40 font-bold uppercase tracking-wider">Raw Hex Payload</div>
     
     <div class="flex flex-wrap gap-x-2 gap-y-1.5 font-mono text-xs md:text-sm pt-1" id="hex-bytes-grid">
       <!-- Generated by script -->
@@ -58,20 +58,20 @@
   </div>
 
   <!-- DETAILS DESCRIPTION CARD -->
-  <div class="border border-neutral-900 bg-neutral-950/40 rounded-sm p-4 flex flex-col gap-1.5 text-[10px]" id="inspector-details-card">
-    <div class="flex justify-between items-center border-b border-neutral-900 pb-2 mb-1">
-      <span class="text-white font-bold uppercase tracking-wider text-[11px]" id="detail-title">HOVER ANY FIELD</span>
-      <span class="text-neutral-500 font-semibold uppercase tracking-wider" id="detail-meta">Offset: - | Size: -</span>
+  <div class="border border-border-subtle bg-bg-code rounded-sm p-4 flex flex-col gap-1.5 text-[10px]" id="inspector-details-card">
+    <div class="flex justify-between items-center border-b border-border-subtle pb-2 mb-1">
+      <span class="text-text-heading font-bold uppercase tracking-wider text-[11px]" id="detail-title">HOVER ANY FIELD</span>
+      <span class="text-text-primary/50 font-semibold uppercase tracking-wider" id="detail-meta">Offset: - | Size: -</span>
     </div>
     <div class="flex gap-2 mb-1.5">
-      <span class="text-neutral-500">Decoded Hex:</span>
-      <span class="text-white font-semibold" id="detail-hex">-</span>
+      <span class="text-text-primary/60">Decoded Hex:</span>
+      <span class="text-text-heading font-semibold" id="detail-hex">-</span>
     </div>
     <div class="flex gap-2">
-      <span class="text-neutral-500">Parsed Value:</span>
-      <span class="text-white font-semibold" id="detail-value">-</span>
+      <span class="text-text-primary/60">Parsed Value:</span>
+      <span class="text-text-heading font-semibold" id="detail-value">-</span>
     </div>
-    <p class="text-neutral-400 font-sans leading-normal mt-2 pt-2 border-t border-white/[0.03]" id="detail-desc">
+    <p class="text-text-primary/80 font-sans leading-normal mt-2 pt-2 border-t border-border-subtle" id="detail-desc">
       Hover over any hex byte or segment block to view decoded fields, endianness details, and specification summaries.
     </p>
   </div>
@@ -382,23 +382,23 @@
 
   // Colors
   const borderColors: Record<string, string> = {
-    purple: 'border-purple-500/50 text-purple-400 bg-purple-950/20',
-    cyan: 'border-cyan-500/50 text-cyan-400 bg-cyan-950/20',
-    amber: 'border-amber-500/50 text-amber-400 bg-amber-950/20',
-    emerald: 'border-emerald-500/50 text-emerald-400 bg-emerald-950/20',
-    sky: 'border-sky-500/50 text-sky-400 bg-sky-950/20',
-    rose: 'border-rose-500/50 text-rose-400 bg-rose-950/20',
-    neutral: 'border-neutral-500/40 text-neutral-300 bg-neutral-900/30'
+    purple: 'border-purple-500/50 text-purple-600 dark:text-purple-400 bg-purple-500/10 dark:bg-purple-950/20',
+    cyan: 'border-cyan-500/50 text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 dark:bg-cyan-950/20',
+    amber: 'border-amber-500/50 text-amber-600 dark:text-amber-400 bg-amber-500/10 dark:bg-amber-950/20',
+    emerald: 'border-emerald-500/50 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-950/20',
+    sky: 'border-sky-500/50 text-sky-600 dark:text-sky-400 bg-sky-500/10 dark:bg-sky-950/20',
+    rose: 'border-rose-500/50 text-rose-600 dark:text-rose-400 bg-rose-500/10 dark:bg-rose-950/20',
+    neutral: 'border-border-glow text-text-primary bg-bg-code'
   };
 
   const textColors: Record<string, string> = {
-    purple: 'text-purple-400',
-    cyan: 'text-cyan-400',
-    amber: 'text-amber-400',
-    emerald: 'text-emerald-400',
-    sky: 'text-sky-400',
-    rose: 'text-rose-400',
-    neutral: 'text-neutral-400'
+    purple: 'text-purple-600 dark:text-purple-400',
+    cyan: 'text-cyan-600 dark:text-cyan-400',
+    amber: 'text-amber-600 dark:text-amber-400',
+    emerald: 'text-emerald-600 dark:text-emerald-400',
+    sky: 'text-sky-600 dark:text-sky-400',
+    rose: 'text-rose-600 dark:text-rose-400',
+    neutral: 'text-text-primary'
   };
 
   // Helper to determine field by byte offset
@@ -428,7 +428,7 @@
       const byteBox = document.createElement('span');
       
       byteBox.innerText = b;
-      byteBox.className = `px-2 py-1 border rounded text-[11px] font-bold cursor-help transition-all duration-150 border-white/[0.04] bg-neutral-950 text-neutral-600 hover:scale-105`;
+      byteBox.className = `px-2 py-1 border rounded text-[11px] font-bold cursor-help transition-all duration-150 border-border-subtle bg-bg-panel text-text-primary/40 hover:scale-105`;
       byteBox.setAttribute('data-offset', idx.toString());
       byteBox.setAttribute('data-field', fieldName);
       
@@ -449,8 +449,7 @@
     document.querySelectorAll('[data-field]').forEach(el => {
       const f = el.getAttribute('data-field');
       if (f === fieldName) {
-        el.className = el.className.replace(/border-[a-z]+-500\/30/g, '').replace(/bg-[a-z]+-500\/5/g, '');
-        el.classList.add('border-white', 'bg-white/10', 'scale-[1.02]');
+        el.classList.add('border-brand-accent', 'bg-brand-accent/10', 'scale-[1.02]');
       } else {
         el.classList.add('opacity-40');
       }
@@ -475,25 +474,24 @@
       valEl.innerText = info.value;
       descEl.innerText = info.desc;
       
-      detailsCard.className = `border rounded-sm p-4 flex flex-col gap-1.5 text-[10px] bg-neutral-950/40 transition-colors duration-200 border-${info.colorClass}-500/20`;
+      detailsCard.className = `border rounded-sm p-4 flex flex-col gap-1.5 text-[10px] bg-bg-code transition-colors duration-200 border-brand-accent/20`;
     }
   }
 
   function clearHighlight() {
     // Reset segments
     document.querySelectorAll('[data-field]').forEach(el => {
-      const f = el.getAttribute('data-field') as keyof Omit<FramePreset, 'bytes'>;
-      el.className = el.className.replace('border-white', '').replace('bg-white/10', '').replace('scale-[1.02]', '').replace('opacity-40', '');
+      el.classList.remove('border-brand-accent', 'bg-brand-accent/10', 'scale-[1.02]', 'opacity-40');
     });
 
     // Reset hex bytes
     document.querySelectorAll('[data-offset]').forEach(el => {
-      el.className = `px-2 py-1 border rounded text-[11px] font-bold cursor-help transition-all duration-150 border-white/[0.04] bg-neutral-950 text-neutral-600 hover:scale-105`;
+      el.className = `px-2 py-1 border rounded text-[11px] font-bold cursor-help transition-all duration-150 border-border-subtle bg-bg-panel text-text-primary/40 hover:scale-105`;
     });
 
     // Reset details card (keep info but remove active borders)
     if (detailsCard) {
-      detailsCard.className = 'border border-neutral-900 bg-neutral-950/40 rounded-sm p-4 flex flex-col gap-1.5 text-[10px]';
+      detailsCard.className = 'border border-border-subtle bg-bg-code rounded-sm p-4 flex flex-col gap-1.5 text-[10px]';
     }
   }
 
