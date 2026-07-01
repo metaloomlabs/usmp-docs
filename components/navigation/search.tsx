@@ -133,7 +133,7 @@ export function Search() {
         </div>
       </DialogTrigger>
 
-      <DialogContent className="top-[45%] max-w-xs p-0 sm:top-[38%] sm:max-w-lg">
+      <DialogContent className="top-[45%] max-w-[calc(100%-2rem)] p-0 sm:top-[38%] sm:max-w-2xl">
         <DialogTitle className="sr-only">Search</DialogTitle>
         <DialogHeader>
           <input
@@ -141,7 +141,7 @@ export function Search() {
             onChange={(e) => setSearchedInput(e.target.value)}
             placeholder="Search..."
             autoFocus
-            className="h-14 border-b bg-transparent px-4 text-[15px] outline-none"
+            className="h-14 w-full border-b bg-transparent px-4 text-[15px] outline-none"
           />
         </DialogHeader>
 
@@ -169,7 +169,7 @@ export function Search() {
                       <DialogClose key={item.href} asChild>
                         <Anchor
                           className={cn(
-                            'flex w-full max-w-77.5 flex-col gap-0.5 rounded-sm p-3 text-[15px] transition-all duration-300 hover:bg-neutral-100 sm:max-w-120 dark:hover:bg-neutral-900'
+                            'flex w-full flex-col gap-0.5 rounded-sm p-3 text-[15px] transition-all duration-300 hover:bg-neutral-100 dark:hover:bg-neutral-900'
                           )}
                           href={`/docs${item.href}`}
                         >

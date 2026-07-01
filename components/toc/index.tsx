@@ -19,9 +19,9 @@ export function TableOfContents({ tocs, pathName, frontmatter }: TableProps) {
         >
           {Settings.toc && <TableAnchor tocs={tocs.tocs} />}
           {Settings.feedback && <Feedback slug={pathName} title={frontmatter.title} />}
-          {Settings.totop && <BackToTop />}
         </aside>
       )}
+      {Settings.totop && <BackToTop />}
     </>
   )
 }

@@ -1,42 +1,40 @@
 'use client'
 
-import { type ReactElement, useEffect, useRef } from 'react'
+import { type ReactElement, useEffect, useState } from 'react'
 import { LuArrowUp } from 'react-icons/lu'
 
-function ScrollToTop() {
-  if (typeof window !== 'undefined') {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-}
-
 export function BackToTop(): ReactElement {
-  const ref = useRef<HTMLButtonElement>(null)
+  const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     function toggleVisible() {
       const { scrollTop } = document.documentElement
-      if (ref.current) {
-        ref.current.classList.toggle('opacity-0', scrollTop < 300)
-      }
+      setIsVisible(scrollTop >= 300)
     }
 
     window.addEventListener('scroll', toggleVisible)
+    toggleVisible() // Set initial state
+    
     return () => {
       window.removeEventListener('scroll', toggleVisible)
     }
   }, [])
 
+  function ScrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   return (
     <button
-      ref={ref}
       onClick={ScrollToTop}
       title="Scroll to top"
       aria-label="Scroll to top"
       type="button"
-      className="mt-2 ml-2 flex cursor-pointer items-center self-start text-sm text-foreground opacity-0 transition"
+      className={`fixed bottom-6 right-6 z-50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border bg-card text-foreground shadow-lg transition-all duration-300 hover:border-emerald-500/30 hover:bg-muted hover:text-emerald-500 hover:scale-110 active:scale-95 ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+      }`}
     >
-      <LuArrowUp className="mr-1 inline-block h-4 w-4 align-middle" />
-      <span>Scroll to top</span>
+      <LuArrowUp className="h-5 w-5" />
     </button>
   )
 }

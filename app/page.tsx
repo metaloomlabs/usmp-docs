@@ -164,11 +164,6 @@ export default function Home() {
 
       {/* HERO SECTION */}
       <section className="mx-auto max-w-7xl px-6 pt-20 pb-16 text-center sm:pt-28 lg:px-8 flex flex-col items-center">
-        {/* Minimalist Tech Badge */}
-        <div className="mb-6 flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-4 py-1.5 text-xs font-semibold text-emerald-500 backdrop-blur-md dark:border-emerald-500/30">
-          <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>New Release: v1.0.1 (Stable)</span>
-        </div>
 
         {/* Chrome / Metallic Centered Title */}
         <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-7xl lg:text-8xl">
@@ -237,7 +232,7 @@ export default function Home() {
             <span className="mt-1 text-xs text-muted-foreground uppercase tracking-widest font-mono">Dynamic Heap RAM</span>
           </div>
           <div className="flex flex-col items-center border-l border-border/40">
-            <span className="text-3xl font-extrabold text-foreground sm:text-4xl">3 Frames</span>
+            <span className="text-3xl font-extrabold text-foreground sm:text-4xl">4 Frames</span>
             <span className="mt-1 text-xs text-muted-foreground uppercase tracking-widest font-mono">Handshake Duration</span>
           </div>
           <div className="flex flex-col items-center border-l border-border/40">
@@ -677,7 +672,7 @@ export default function Home() {
           {[
             {
               q: 'Can USMP be ported to serial buses like UART, RS-485, or CAN?',
-              a: 'Yes, absolutely. USMP is completely transport-agnostic. It does not expect a socket connection. Instead, you register a simple write callback to transmit frames and call the receive handler when bytes arrive on your physical interface.'
+              a: 'No, not yet. Currently it only supports TCP and UDP, with others coming soon.'
             },
             {
               q: 'How does the protocol prevent Replay and Man-in-the-Middle attacks?',
@@ -689,7 +684,7 @@ export default function Home() {
             },
             {
               q: 'Can it run on 8-bit AVR microcontrollers?',
-              a: 'Yes. While hardware-accelerated AES is most efficient on 32-bit cores (like ESP32 or ARM Cortex), USMP supports modular crypto backends. By swap-in ChaCha20-Poly1305 or light software routines, it runs efficiently on low-spec AVR/PIC devices.'
+              a: 'On 8-bit it will work but not very well. 16-bit is good, but 32-bit is recommended.'
             }
           ].map((item, idx) => (
             <div key={idx} className="rounded-xl border border-border bg-card overflow-hidden">
@@ -719,13 +714,13 @@ export default function Home() {
 
       {/* CALL TO ACTION */}
       <section className="mx-auto max-w-7xl px-6 py-16 text-center lg:px-8 border-t border-border/30">
-        <div className="p-8 sm:p-16 rounded-3xl bg-neutral-950 border border-border/80 dark:border-border/40 relative overflow-hidden flex flex-col items-center">
+        <div className="p-8 sm:p-16 rounded-3xl bg-card border border-border/80 dark:border-border/40 relative overflow-hidden flex flex-col items-center">
           {/* Subtle glow behind CTA */}
           <div className="absolute -bottom-48 -left-48 h-96 w-96 rounded-full bg-emerald-500/5 blur-3xl" />
           <div className="absolute -top-48 -right-48 h-96 w-96 rounded-full bg-emerald-500/5 blur-3xl" />
 
           <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
-            Secure Your Embedded Sockets Today
+            Secure Your Embedded Transports Today
           </h2>
           <p className="mt-4 max-w-xl text-muted-foreground">
             Get started by reading our Quick Start guides, importing the library, or exploring the protocol design specs.

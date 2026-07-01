@@ -185,7 +185,7 @@ export function Footer() {
               <LuGithub className="size-5" />
             </a>
             <a
-              href="https://linkedin.com"
+              href="https://www.linkedin.com/company/metaloom"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-foreground transition-colors"

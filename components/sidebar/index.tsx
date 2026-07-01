@@ -19,10 +19,10 @@ import {
 export function Sidebar() {
   return (
     <aside
-      className="sticky top-26 hidden h-screen min-w-57.5 flex-1 flex-col overflow-y-auto md:flex"
+      className="sticky top-26 hidden h-[calc(100vh-7.5rem)] min-w-57.5 flex-1 flex-col md:flex"
       aria-label="Page navigation"
     >
-      <ScrollArea>
+      <ScrollArea className="h-full pr-3">
         <PageMenu />
       </ScrollArea>
     </aside>
@@ -45,7 +45,7 @@ export function SheetLeft() {
           </SheetClose>
         </SheetHeader>
         <SheetDescription className="sr-only">Page navigation</SheetDescription>
-        <ScrollArea className="flex h-full flex-col overflow-y-auto">
+        <ScrollArea className="flex h-full flex-col">
           <div className="mx-0 mt-3 flex flex-col gap-2.5 px-5">
             <NavMenu isSheet />
             <Separator className="my-2" />
