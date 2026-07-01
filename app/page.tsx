@@ -1,4 +1,4 @@
-import { LuArrowRight, LuGithub, LuTerminal } from 'react-icons/lu'
+import { LuArrowRight, LuGithub, LuTerminal, LuDownload } from 'react-icons/lu'
 
 import { buttonVariants } from '@/components/ui/button'
 import { PageRoutes } from '@/lib/pageroutes'
@@ -43,7 +43,7 @@ export default function Home() {
         </p>
 
         {/* High-Contrast Monochrome Action Buttons */}
-        <div className="mt-8 flex items-center justify-center gap-x-4">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <Link
             href={`/docs${PageRoutes[0].href}`}
             className={buttonVariants({
@@ -55,6 +55,19 @@ export default function Home() {
             Get Started
             <LuArrowRight className="size-4" />
           </Link>
+          <a
+            href="/usmp-0.5.1-arduino.zip"
+            download
+            className={buttonVariants({
+              variant: 'outline',
+              className:
+                'gap-2 px-6 py-5 border-border hover:bg-muted/50 transition-colors duration-200',
+              size: 'lg',
+            })}
+          >
+            <LuDownload className="size-4" />
+            Download Arduino ZIP
+          </a>
           <Link
             href={Settings.link}
             target="_blank"

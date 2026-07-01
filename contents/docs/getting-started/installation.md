@@ -49,10 +49,10 @@ This will automatically download and append USMP to your project's `main/idf_com
 
 For Arduino C++ development, the USMP library is packaged as an offline ZIP archive.
 
-1. Locate the pre-built ZIP package: `usmp-0.5.1-arduino.zip` (found in your workspace artifacts/releases folder).
+1. Download the pre-built ZIP package: **[usmp-0.5.1-arduino.zip](/usmp-0.5.1-arduino.zip)**.
 2. Open the **Arduino IDE** (v2.0 or later).
 3. Go to **Sketch** ➔ **Include Library** ➔ **Add .ZIP Library...**
-4. Navigate to and select the `usmp-0.5.1-arduino.zip` file.
+4. Navigate to and select the downloaded `usmp-0.5.1-arduino.zip` file.
 5. Click **Open** to import the library.
 
 To verify installation, you can inspect your libraries folder. The IDE will now recognize the `#include <USMP.h>` header.
