@@ -1,7 +1,7 @@
-import { LuGithub, LuLinkedin, LuSlack, LuYoutube, LuCompass } from 'react-icons/lu'
+import { LuCompass, LuGithub, LuLinkedin, LuSlack, LuYoutube } from 'react-icons/lu'
+
 import { Logo } from '@/components/navigation/logo'
 import { Link } from '@/lib/transition'
-import { Settings } from '@/types/settings'
 
 export function Footer() {
   return (

@@ -14,7 +14,7 @@ export function BackToTop(): ReactElement {
 
     window.addEventListener('scroll', toggleVisible)
     toggleVisible() // Set initial state
-    
+
     return () => {
       window.removeEventListener('scroll', toggleVisible)
     }

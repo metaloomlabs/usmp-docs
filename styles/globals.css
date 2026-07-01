@@ -98,7 +98,7 @@
 .typography h5,
 .typography h6,
 .typography th {
-  color: inherit !important;
+  color: inherit;
 }
 
 .prose {
@@ -127,15 +127,15 @@
 }
 
 pre {
-  padding: 0 !important;
-  width: inherit !important;
+  padding: 0;
+  width: inherit;
   overflow-x: auto;
 }
 
 pre > code {
   display: grid;
-  max-width: inherit !important;
-  padding: 14px 0 !important;
+  max-width: inherit;
+  padding: 14px 0;
 }
 
 .contains-task-list {
@@ -178,7 +178,7 @@ pre > code {
 }
 
 .highlight-comp > code {
-  background-color: transparent !important;
+  background-color: transparent;
 }
 
 .attr-name {
@@ -251,7 +251,7 @@ span.katex-html {
   @apply font-normal;
   @apply tracking-wider;
   @apply font-medium;
-  font-family: var(--font-code) !important;
+  font-family: var(--font-code);
 }
 
 .CollapsibleContent {

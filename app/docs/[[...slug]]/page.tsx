@@ -20,7 +20,7 @@ export default async function Pages({ params }: PageProps) {
 
   if (!res) notFound()
 
-  const { frontmatter, content, tocs } = res
+  const { frontmatter, content, tocs, relativeFilePath } = res
 
   return (
     <div className="flex items-start gap-10">
@@ -36,7 +36,12 @@ export default async function Pages({ params }: PageProps) {
           <Pagination pathname={pathName} />
         </Typography>
       </section>
-      <TableOfContents tocs={{ tocs }} pathName={pathName} frontmatter={frontmatter} />
+      <TableOfContents
+        tocs={{ tocs }}
+        pathName={pathName}
+        frontmatter={frontmatter}
+        relativeFilePath={relativeFilePath}
+      />
     </div>
   )
 }

@@ -2,22 +2,20 @@
 
 import { useState } from 'react'
 import {
+  LuActivity,
   LuArrowRight,
-  LuGithub,
-  LuTerminal,
-  LuDownload,
-  LuShieldCheck,
-  LuCpu,
-  LuWorkflow,
-  LuZap,
-  LuLayers,
-  LuKey,
   LuArrowUpRight,
   LuCheck,
-  LuChevronRight,
   LuChevronDown,
+  LuChevronRight,
+  LuCpu,
+  LuDownload,
+  LuGithub,
   LuLock,
-  LuActivity
+  LuShieldCheck,
+  LuTerminal,
+  LuWorkflow,
+  LuZap,
 } from 'react-icons/lu'
 
 import { buttonVariants } from '@/components/ui/button'
@@ -28,60 +26,76 @@ import { Settings } from '@/types/settings'
 // Handshake visualizer data
 const handshakeSteps = [
   {
-    title: '1. Client Hello (Session Init)',
-    desc: 'The client generates an ephemeral ECDH keypair and transmits its public key in a Client Hello frame. This initiates key agreement without exposing device identities.',
-    sender: 'Client (ESP32/Arduino)',
-    receiver: 'Gateway Server (Python)',
+    title: '1. Client Hello (PKT_HELLO)',
+    desc: 'The client initiates the handshake by announcing its physical hardware address (device_id) and transmitting its ephemeral Curve25519 public key (pub_C).',
+    sender: 'Client (Device)',
+    receiver: 'Server (Gateway)',
     direction: 'forward', // client -> server
     payload: {
-      frame_type: 'HANDSHAKE_HELLO',
-      protocol_version: '1.0.0',
-      client_ephemeral_pub: '04a8b1f2e96d...',
-      nonce: '4a28f89d10e5'
-    }
+      magic: '0xABCD',
+      version: '0x01',
+      type: 'PKT_HELLO (0x01)',
+      seq: 0,
+      length: 38,
+      payload: {
+        device_id: '04:a8:b1:f2:e9:6d',
+        pub_C: '4a28f89d10e5d9203e8a11f4...',
+      },
+    },
   },
   {
-    title: '2. Mutual Authentication',
-    desc: 'The server verifies the request, generates its own ephemeral keypair, derives the shared secret, generates a strong auth tag using the Pre-Shared Key (PSK), and returns them.',
-    sender: 'Gateway Server (Python)',
-    receiver: 'Client (ESP32/Arduino)',
+    title: '2. Server Challenge (PKT_CHALLENGE)',
+    desc: 'The server generates its own ephemeral keypair and responds with a cryptographically secure random challenge (nonce) and its public key (pub_S).',
+    sender: 'Server (Gateway)',
+    receiver: 'Client (Device)',
     direction: 'reverse', // server -> client
     payload: {
-      frame_type: 'HANDSHAKE_AUTH',
-      server_ephemeral_pub: '04c2b9a4f78e...',
-      server_auth_tag: 'b8f521c7fa09...',
-      nonce: 'd9203e8a11f4'
-    }
+      magic: '0xABCD',
+      version: '0x01',
+      type: 'PKT_CHALLENGE (0x02)',
+      seq: 0,
+      length: 64,
+      payload: {
+        nonce: '7fa093c4a28f89d10e5d9203...',
+        pub_S: '04c2b9a4f78eb8f521c7fa09...',
+      },
+    },
   },
   {
-    title: '3. Shared Key Derivation (ECDH + HKDF)',
-    desc: 'Both endpoints compute the Elliptic-Curve Diffie-Hellman (ECDH) secret, mixing it with the PSK using HKDF-SHA256. Symmetric keys are derived locally; keys are never transmitted.',
-    sender: 'Local Derivation',
-    receiver: 'Local Derivation',
-    direction: 'local',
-    payload: {
-      shared_secret: 'ecdh_secret = client_priv * server_pub',
-      kdf_hash: 'HKDF-SHA256(shared_secret, salt, PSK)',
-      derived_keys: {
-        tx_encryption_key: 'AES-256-GCM [32 bytes]',
-        rx_encryption_key: 'AES-256-GCM [32 bytes]'
-      }
-    }
-  },
-  {
-    title: '4. Encrypted Tunnel Established',
-    desc: 'Subsequent frames are encrypted via authenticated AES-256-GCM or ChaCha20-Poly1305. Sequence numbers guard against replay attacks; GCM tags ensure integrity.',
-    sender: 'Client (ESP32/Arduino)',
-    receiver: 'Gateway Server (Python)',
+    title: '3. Client Proof (PKT_HELLO_ACK)',
+    desc: 'Both devices derive session keys locally. The client then sends a client HMAC proof to prove its identity and knowledge of the Pre-Shared Key (PSK).',
+    sender: 'Client (Device)',
+    receiver: 'Server (Gateway)',
     direction: 'forward', // client -> server
     payload: {
-      frame_type: 'PAYLOAD_ENCRYPTED',
-      sequence_number: 104,
-      iv: '6a8d9e20fb31c9a4',
-      ciphertext: '4b92afc83d102fe8...',
-      gcm_tag: 'f3c8a901bd76'
-    }
-  }
+      magic: '0xABCD',
+      version: '0x01',
+      type: 'PKT_HELLO_ACK (0x03)',
+      seq: 0,
+      length: 32,
+      payload: {
+        hmac_client: 'b8f521c7fa093c4a28f89d10...',
+      },
+    },
+  },
+  {
+    title: '4. Session OK (PKT_SESSION_OK)',
+    desc: 'The server verifies the client proof, generates a random session_id, and returns its own server HMAC proof. Secure session established.',
+    sender: 'Server (Gateway)',
+    receiver: 'Client (Device)',
+    direction: 'reverse', // server -> client
+    payload: {
+      magic: '0xABCD',
+      version: '0x01',
+      type: 'PKT_SESSION_OK (0x04)',
+      seq: 0,
+      length: 48,
+      payload: {
+        session_id: 'a8b1f2e96d04c2b9...',
+        hmac_server: 'f3c8a901bd76a8d9e20fb31c...',
+      },
+    },
+  },
 ]
 
 // Code snippets data
@@ -133,7 +147,7 @@ async def main():
     server = USMPServer(psk="f3c54d89a2b10e9f...", port=8080)
     await server.start(handle_client)
 
-asyncio.run(main())`
+asyncio.run(main())`,
 }
 
 export default function Home() {
@@ -152,7 +166,10 @@ export default function Home() {
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,oklch(var(--border)/0.3)_1px,transparent_1px),linear-gradient(to_bottom,oklch(var(--border)/0.3)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30" />
 
       {/* Decorative ambient flares */}
-      <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80" aria-hidden="true">
+      <div
+        className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
+        aria-hidden="true"
+      >
         <div
           className="relative left-[calc(50%-15rem)] aspect-1155/678 w-[40rem] -translate-x-1/2 rotate-[10deg] bg-gradient-to-tr from-emerald-500/10 to-teal-500/5 opacity-40 sm:left-[calc(50%-30rem)] sm:w-[72rem]"
           style={{
@@ -164,7 +181,6 @@ export default function Home() {
 
       {/* HERO SECTION */}
       <section className="mx-auto max-w-7xl px-6 pt-20 pb-16 text-center sm:pt-28 lg:px-8 flex flex-col items-center">
-
         {/* Chrome / Metallic Centered Title */}
         <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-7xl lg:text-8xl">
           <span className="bg-gradient-to-b from-foreground via-foreground/90 to-muted-foreground bg-clip-text text-transparent dark:from-white dark:via-neutral-100 dark:to-neutral-500">
@@ -174,9 +190,10 @@ export default function Home() {
 
         {/* Centered Subtitle */}
         <p className="mt-6 max-w-3xl text-base leading-7 text-muted-foreground sm:text-xl sm:leading-8">
-          <strong>Unified Secure Multi-transport Protocol</strong>. Highly optimized, secure, and transport-agnostic 
-          communication protocol. Designed from scratch for resource-constrained microcontrollers, 
-          bringing mutual authentication and AES-256-GCM encryption with just three function calls.
+          <strong>Unified Secure Multi-transport Protocol</strong>. Highly optimized, secure, and
+          transport-agnostic communication protocol. Designed from scratch for resource-constrained
+          microcontrollers, bringing mutual authentication and AES-256-GCM encryption with just
+          three function calls.
         </p>
 
         {/* Action Buttons */}
@@ -225,19 +242,27 @@ export default function Home() {
         <div className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-4 w-full max-w-4xl border-y border-border/40 py-10">
           <div className="flex flex-col items-center">
             <span className="text-3xl font-extrabold text-foreground sm:text-4xl">11.2 KB</span>
-            <span className="mt-1 text-xs text-muted-foreground uppercase tracking-widest font-mono">ROM Footprint</span>
+            <span className="mt-1 text-xs text-muted-foreground uppercase tracking-widest font-mono">
+              ROM Footprint
+            </span>
           </div>
           <div className="flex flex-col items-center border-l border-border/40">
             <span className="text-3xl font-extrabold text-emerald-500 sm:text-4xl">0 Bytes</span>
-            <span className="mt-1 text-xs text-muted-foreground uppercase tracking-widest font-mono">Dynamic Heap RAM</span>
+            <span className="mt-1 text-xs text-muted-foreground uppercase tracking-widest font-mono">
+              Dynamic Heap RAM
+            </span>
           </div>
           <div className="flex flex-col items-center border-l border-border/40">
             <span className="text-3xl font-extrabold text-foreground sm:text-4xl">4 Frames</span>
-            <span className="mt-1 text-xs text-muted-foreground uppercase tracking-widest font-mono">Handshake Duration</span>
+            <span className="mt-1 text-xs text-muted-foreground uppercase tracking-widest font-mono">
+              Handshake Duration
+            </span>
           </div>
           <div className="flex flex-col items-center border-l border-border/40">
             <span className="text-3xl font-extrabold text-foreground sm:text-4xl">AES-GCM</span>
-            <span className="mt-1 text-xs text-muted-foreground uppercase tracking-widest font-mono">Hardware Safe</span>
+            <span className="mt-1 text-xs text-muted-foreground uppercase tracking-widest font-mono">
+              Hardware Safe
+            </span>
           </div>
         </div>
       </section>
@@ -249,8 +274,8 @@ export default function Home() {
             Built for Extreme Environments
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Standard security protocols (TLS, SSH) are too heavy for low-power MCUs. 
-            USMP fills this gap, offering robust modern cryptography with minimal resource overhead.
+            Standard security protocols (TLS, SSH) are too heavy for low-power MCUs. USMP fills this
+            gap, offering robust modern cryptography with minimal resource overhead.
           </p>
         </div>
 
@@ -262,7 +287,8 @@ export default function Home() {
               </div>
               <h3 className="text-lg font-bold text-foreground">Zero Heap Allocation</h3>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                Relies entirely on statically-sized static/stack buffers. Prevents heap fragmentation, ensuring year-round MCU uptime.
+                Relies entirely on statically-sized static/stack buffers. Prevents heap
+                fragmentation, ensuring year-round MCU uptime.
               </p>
             </div>
             <div className="mt-4 text-xs font-mono text-emerald-500">malloc() -&gt; NULL safe</div>
@@ -275,7 +301,8 @@ export default function Home() {
               </div>
               <h3 className="text-lg font-bold text-foreground">Transport Agnostic</h3>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                Operates smoothly over TCP sockets, UDP datagrams, BLE attributes, raw UART, RS-485, or CAN bus.
+                Operates smoothly over TCP sockets, UDP datagrams, BLE attributes, raw UART, RS-485,
+                or CAN bus.
               </p>
             </div>
             <div className="mt-4 text-xs font-mono text-emerald-500">Stream & Packet support</div>
@@ -288,7 +315,8 @@ export default function Home() {
               </div>
               <h3 className="text-lg font-bold text-foreground">Mutual Authentication</h3>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                Ensures both the server and client cryptographically verify each other before establishing a shared ephemeral session key.
+                Ensures both the server and client cryptographically verify each other before
+                establishing a shared ephemeral session key.
               </p>
             </div>
             <div className="mt-4 text-xs font-mono text-emerald-500">Prevents Spoofing & MITM</div>
@@ -301,7 +329,8 @@ export default function Home() {
               </div>
               <h3 className="text-lg font-bold text-foreground">Hardware Accelerable</h3>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                Designed to map directly onto hardware acceleration blocks (AES/GCM) present on ESP32, STM32, and other SOCs.
+                Designed to map directly onto hardware acceleration blocks (AES/GCM) present on
+                ESP32, STM32, and other SOCs.
               </p>
             </div>
             <div className="mt-4 text-xs font-mono text-emerald-500">AES-256-GCM / ChaCha20</div>
@@ -316,8 +345,9 @@ export default function Home() {
             Interactive Handshake Explorer
           </h2>
           <p className="mt-4 text-muted-foreground">
-            USMP initiates a secure session using Elliptic-Curve Diffie-Hellman (ECDH) mixed with a Pre-Shared Key (PSK). 
-            Click through the steps below to inspect how a session is established.
+            USMP initiates a secure session using Elliptic-Curve Diffie-Hellman (ECDH) mixed with a
+            Pre-Shared Key (PSK). Click through the steps below to inspect how a session is
+            established.
           </p>
         </div>
 
@@ -326,6 +356,7 @@ export default function Home() {
           <div className="lg:col-span-5 space-y-4">
             {handshakeSteps.map((step, idx) => (
               <button
+                type="button"
                 key={idx}
                 onClick={() => setActiveStep(idx)}
                 className={`w-full text-left p-5 rounded-2xl border transition-all duration-200 flex items-start gap-4 ${
@@ -344,7 +375,9 @@ export default function Home() {
                   0{idx + 1}
                 </div>
                 <div className="flex-1">
-                  <h3 className={`font-semibold text-base ${activeStep === idx ? 'text-foreground' : 'text-muted-foreground'}`}>
+                  <h3
+                    className={`font-semibold text-base ${activeStep === idx ? 'text-foreground' : 'text-muted-foreground'}`}
+                  >
                     {step.title}
                   </h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
@@ -430,7 +463,8 @@ export default function Home() {
             Integrates in Minutes
           </h2>
           <p className="mt-4 text-muted-foreground">
-            USMP is designed for simplicity. Initialize the session, bind to your transport, and start sending secure data.
+            USMP is designed for simplicity. Initialize the session, bind to your transport, and
+            start sending secure data.
           </p>
         </div>
 
@@ -438,12 +472,15 @@ export default function Home() {
           {/* Context content (left) */}
           <div className="lg:col-span-4 space-y-6">
             <div className="space-y-2">
-              <span className="text-xs uppercase font-bold text-emerald-500 tracking-widest font-mono">Developer Experience</span>
+              <span className="text-xs uppercase font-bold text-emerald-500 tracking-widest font-mono">
+                Developer Experience
+              </span>
               <h3 className="text-2xl font-bold text-foreground">Clean, Expressive APIs</h3>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Whether you are compiling for pure C targets (like ESP-IDF or STM32), writing C++ sketches in Arduino, 
-              or setting up a gateway server in Python, USMP offers consistent APIs.
+              Whether you are compiling for pure C targets (like ESP-IDF or STM32), writing C++
+              sketches in Arduino, or setting up a gateway server in Python, USMP offers consistent
+              APIs.
             </p>
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li className="flex items-center gap-2">
@@ -478,6 +515,7 @@ export default function Home() {
             <div className="flex items-center justify-between px-4 py-3 border-b border-border/40 bg-neutral-900/50 rounded-t-xl flex-wrap gap-2">
               <div className="flex gap-2">
                 <button
+                  type="button"
                   id="tab-c"
                   onClick={() => setActiveCodeTab('c')}
                   className={`px-3 py-1.5 text-xs font-semibold font-mono rounded-md transition-all ${
@@ -489,6 +527,7 @@ export default function Home() {
                   ESP-IDF (C)
                 </button>
                 <button
+                  type="button"
                   id="tab-cpp"
                   onClick={() => setActiveCodeTab('cpp')}
                   className={`px-3 py-1.5 text-xs font-semibold font-mono rounded-md transition-all ${
@@ -500,6 +539,7 @@ export default function Home() {
                   Arduino (C++)
                 </button>
                 <button
+                  type="button"
                   id="tab-python"
                   onClick={() => setActiveCodeTab('python')}
                   className={`px-3 py-1.5 text-xs font-semibold font-mono rounded-md transition-all ${
@@ -522,9 +562,7 @@ export default function Home() {
 
             {/* Pre/Code */}
             <pre className="p-6 overflow-x-auto text-[13px] leading-6 font-mono text-neutral-300 bg-neutral-950 rounded-b-xl max-h-[400px]">
-              <code>
-                {codeSnippets[activeCodeTab]}
-              </code>
+              <code>{codeSnippets[activeCodeTab]}</code>
             </pre>
           </div>
         </div>
@@ -537,6 +575,7 @@ export default function Home() {
           <div className="lg:col-span-7 space-y-6">
             <div className="flex gap-2 rounded-xl bg-muted p-1 w-fit mb-6">
               <button
+                type="button"
                 id="btn-metric-rom"
                 onClick={() => setBenchmarkMetric('rom')}
                 className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
@@ -548,6 +587,7 @@ export default function Home() {
                 Compiled Size (ROM)
               </button>
               <button
+                type="button"
                 id="btn-metric-ram"
                 onClick={() => setBenchmarkMetric('ram')}
                 className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
@@ -573,7 +613,10 @@ export default function Home() {
                       <span className="text-emerald-500">11.2 KB</span>
                     </div>
                     <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
-                      <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: '6.2%' }} />
+                      <div
+                        className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                        style={{ width: '6.2%' }}
+                      />
                     </div>
                   </div>
                   {/* Bar 2: TinyDTLS + CoAP */}
@@ -583,7 +626,10 @@ export default function Home() {
                       <span>48.0 KB</span>
                     </div>
                     <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
-                      <div className="h-full bg-neutral-600 rounded-full transition-all duration-500" style={{ width: '26.6%' }} />
+                      <div
+                        className="h-full bg-neutral-600 rounded-full transition-all duration-500"
+                        style={{ width: '26.6%' }}
+                      />
                     </div>
                   </div>
                   {/* Bar 3: MbedTLS (v1.3 TLS) */}
@@ -593,7 +639,10 @@ export default function Home() {
                       <span>180.0 KB</span>
                     </div>
                     <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
-                      <div className="h-full bg-neutral-800 rounded-full transition-all duration-500" style={{ width: '100%' }} />
+                      <div
+                        className="h-full bg-neutral-800 rounded-full transition-all duration-500"
+                        style={{ width: '100%' }}
+                      />
                     </div>
                   </div>
                 </>
@@ -609,7 +658,10 @@ export default function Home() {
                       <span className="text-emerald-500">0 Bytes (Fully Static)</span>
                     </div>
                     <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
-                      <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: '0.5%' }} />
+                      <div
+                        className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                        style={{ width: '0.5%' }}
+                      />
                     </div>
                   </div>
                   {/* Bar 2: TinyDTLS + CoAP */}
@@ -619,7 +671,10 @@ export default function Home() {
                       <span>8.5 KB (Heap allocations)</span>
                     </div>
                     <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
-                      <div className="h-full bg-neutral-600 rounded-full transition-all duration-500" style={{ width: '24.2%' }} />
+                      <div
+                        className="h-full bg-neutral-600 rounded-full transition-all duration-500"
+                        style={{ width: '24.2%' }}
+                      />
                     </div>
                   </div>
                   {/* Bar 3: MbedTLS (v1.3 TLS) */}
@@ -629,29 +684,35 @@ export default function Home() {
                       <span>35.0 KB (Minimum Handshake Buffer)</span>
                     </div>
                     <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
-                      <div className="h-full bg-neutral-800 rounded-full transition-all duration-500" style={{ width: '100%' }} />
+                      <div
+                        className="h-full bg-neutral-800 rounded-full transition-all duration-500"
+                        style={{ width: '100%' }}
+                      />
                     </div>
                   </div>
                 </>
               )}
               <div className="text-[11px] text-muted-foreground mt-4 leading-relaxed font-sans">
-                * ROM figures represent stripped release-optimized GCC compilations for the Xtensa LX7 (ESP32-S3) target. 
-                RAM figures are captured during active crypto payload framing cycles.
+                * ROM figures represent stripped release-optimized GCC compilations for the Xtensa
+                LX7 (ESP32-S3) target. RAM figures are captured during active crypto payload framing
+                cycles.
               </div>
             </div>
           </div>
 
           {/* Description (right) */}
           <div className="lg:col-span-5 space-y-6">
-            <span className="text-xs uppercase font-bold text-emerald-500 tracking-widest font-mono">Performance Benchmarks</span>
+            <span className="text-xs uppercase font-bold text-emerald-500 tracking-widest font-mono">
+              Performance Benchmarks
+            </span>
             <h3 className="text-3xl font-bold text-foreground">A Fraction of the Resource Cost</h3>
             <p className="text-muted-foreground leading-relaxed">
-              Standard TLS implementations require huge memory allocations for handshake buffers and crypt-state structures, 
-              which can trigger Out-Of-Memory crashes on small systems.
+              Standard TLS implementations require huge memory allocations for handshake buffers and
+              crypt-state structures, which can trigger Out-Of-Memory crashes on small systems.
             </p>
             <p className="text-muted-foreground leading-relaxed">
-              USMP bypasses the dynamic allocation altogether. Its static buffers fit comfortably in internal SRAM, 
-              even on low-cost microcontrollers.
+              USMP bypasses the dynamic allocation altogether. Its static buffers fit comfortably in
+              internal SRAM, even on low-cost microcontrollers.
             </p>
           </div>
         </div>
@@ -664,7 +725,8 @@ export default function Home() {
             Frequently Asked Questions
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Clear up common questions about integration, security properties, and protocol operations.
+            Clear up common questions about integration, security properties, and protocol
+            operations.
           </p>
         </div>
 
@@ -672,23 +734,24 @@ export default function Home() {
           {[
             {
               q: 'Can USMP be ported to serial buses like UART, RS-485, or CAN?',
-              a: 'No, not yet. Currently it only supports TCP and UDP, with others coming soon.'
+              a: 'No, not yet. Currently it only supports TCP and UDP, with others coming soon.',
             },
             {
               q: 'How does the protocol prevent Replay and Man-in-the-Middle attacks?',
-              a: 'Replay protection is enforced via strict, cryptographically bound sequence numbering and session nonces. MITM is blocked by mutual authentication: during the handshake, both devices must prove ownership of the Pre-Shared Key (PSK) to successfully complete the ECDH key exchange.'
+              a: 'Replay protection is enforced via strict, cryptographically bound sequence numbering and session nonces. MITM is blocked by mutual authentication: during the handshake, both devices must prove ownership of the Pre-Shared Key (PSK) to successfully complete the ECDH key exchange.',
             },
             {
               q: 'What is the packet size overhead for each message?',
-              a: 'Each encrypted frame adds exactly 28 bytes of overhead (12-byte IV for AES-GCM, 16-byte cryptographic authentication tag, and a 4-byte sequence identifier). This is drastically smaller than a TLS record or DTLS envelope.'
+              a: 'Each encrypted frame adds exactly 28 bytes of overhead (12-byte IV for AES-GCM, 16-byte cryptographic authentication tag, and a 4-byte sequence identifier). This is drastically smaller than a TLS record or DTLS envelope.',
             },
             {
               q: 'Can it run on 8-bit AVR microcontrollers?',
-              a: 'On 8-bit it will work but not very well. 16-bit is good, but 32-bit is recommended.'
-            }
+              a: 'On 8-bit it will work but not very well. 16-bit is good, but 32-bit is recommended.',
+            },
           ].map((item, idx) => (
             <div key={idx} className="rounded-xl border border-border bg-card overflow-hidden">
               <button
+                type="button"
                 id={`faq-btn-${idx}`}
                 onClick={() => toggleFaq(idx)}
                 className="w-full flex items-center justify-between p-5 text-left font-semibold text-foreground hover:bg-muted/50 transition-colors duration-150"
@@ -723,14 +786,16 @@ export default function Home() {
             Secure Your Embedded Transports Today
           </h2>
           <p className="mt-4 max-w-xl text-muted-foreground">
-            Get started by reading our Quick Start guides, importing the library, or exploring the protocol design specs.
+            Get started by reading our Quick Start guides, importing the library, or exploring the
+            protocol design specs.
           </p>
 
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
               href={`/docs${PageRoutes[0].href}`}
               className={buttonVariants({
-                className: 'gap-2 px-6 py-5 bg-foreground text-background hover:bg-foreground/90 font-semibold rounded-xl',
+                className:
+                  'gap-2 px-6 py-5 bg-foreground text-background hover:bg-foreground/90 font-semibold rounded-xl',
                 size: 'lg',
               })}
             >

@@ -18,7 +18,7 @@ export function Logo() {
         aria-label={`${Settings.title} main logo`}
         width={34}
         height={34}
-        loading="lazy"
+        priority
         decoding="async"
       />
       <span className="text-md font-semibold">{Settings.title}</span>

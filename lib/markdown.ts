@@ -102,6 +102,10 @@ const getDocumentPath = (() => {
 export const getDocument = cache(async (slug: string) => {
   try {
     const contentPath = getDocumentPath(slug)
+    const normalizedPath = contentPath.replace(/\\/g, '/')
+    const relativeFilePath = normalizedPath.includes('contents/docs')
+      ? normalizedPath.slice(normalizedPath.indexOf('contents/docs'))
+      : `contents/docs/${slug === '' || slug === 'welcome' ? 'index' : slug}/index.mdx`
 
     let mdx = ''
     let lastUpdated: string | null = null
@@ -173,6 +177,7 @@ ${finalBodyContent}`
       content: parsedMdx.content,
       tocs,
       lastUpdated,
+      relativeFilePath,
     }
   } catch (err) {
     console.error(err)

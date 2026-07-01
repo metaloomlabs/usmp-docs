@@ -6,11 +6,12 @@ import { GitHubLink } from '@/settings/navigation'
 interface FeedbackProps {
   title: string
   slug: string
+  relativeFilePath?: string
 }
 
-export function Feedback({ slug, title }: FeedbackProps) {
+export function Feedback({ slug, title, relativeFilePath }: FeedbackProps) {
   const feedbackUrl = `${GitHubLink.href}/issues/new?title=Feedback for "${title}"&labels=feedback`
-  const editUrl = `${GitHubLink.href}/edit/main/contents/docs/${slug}/index.mdx`
+  const editUrl = `${GitHubLink.href}/edit/main/${relativeFilePath || `contents/docs/${slug}/index.mdx`}`
 
   return (
     <div className="flex flex-col gap-3 pl-2">
