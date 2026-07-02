@@ -363,9 +363,9 @@ export default function Home() {
         </div>
 
         {/* Visual Asset: Interactive Handshake & Telemetry Encryption Terminal */}
-        <div className="mt-20 w-full max-w-5xl rounded-2xl border border-border/80 bg-neutral-950/80 backdrop-blur-md shadow-2xl overflow-hidden flex flex-col md:grid md:grid-cols-12 text-left">
+        <div className="mt-20 w-full max-w-5xl rounded-2xl border border-border bg-neutral-50 dark:bg-neutral-950/80 backdrop-blur-md shadow-2xl overflow-hidden flex flex-col md:grid md:grid-cols-12 text-left">
           {/* Handshake steps navigator (Left column: 5 cols) */}
-          <div className="md:col-span-5 border-b md:border-b-0 md:border-r border-border/60 bg-neutral-950/40 p-6 flex flex-col justify-between">
+          <div className="md:col-span-5 border-b md:border-b-0 md:border-r border-border/80 bg-neutral-100/30 dark:bg-neutral-950/40 p-6 flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-2 mb-6">
                 <div className="flex gap-1.5">
@@ -373,34 +373,35 @@ export default function Home() {
                   <span className="w-3 h-3 rounded-full bg-yellow-500/80" />
                   <span className="w-3 h-3 rounded-full bg-green-500/80" />
                 </div>
-                <span className="text-xs text-neutral-400 font-mono ml-2">USMP Handshake Trace</span>
+                <span className="text-xs text-neutral-600 dark:text-neutral-400 font-mono ml-2">USMP Handshake Trace</span>
               </div>
               <div className="space-y-3">
                 {handshakeSteps.map((step, idx) => (
                   <button
                     key={idx}
+                    id={`handshake-step-btn-${idx}`}
                     type="button"
                     onClick={() => setActiveHandshakeStep(idx)}
                     className={`w-full text-left p-4 rounded-xl border transition-all duration-200 flex items-start gap-3 ${
                       activeHandshakeStep === idx
                         ? 'border-emerald-500/40 bg-emerald-500/5 text-foreground shadow-md shadow-emerald-500/5'
-                        : 'border-border/40 bg-transparent hover:bg-neutral-900/40 text-neutral-400'
+                        : 'border-border/40 bg-transparent hover:bg-neutral-100 dark:hover:bg-neutral-900/40 text-neutral-500 dark:text-neutral-400'
                     }`}
                   >
                     <div
                       className={`flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-lg text-xs font-mono font-bold ${
                         activeHandshakeStep === idx
                           ? 'bg-emerald-500 text-neutral-950'
-                          : 'bg-neutral-800 text-neutral-400'
+                          : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400'
                       }`}
                     >
                       0{idx + 1}
                     </div>
                     <div>
-                      <h4 className={`text-sm font-semibold font-mono leading-tight ${activeHandshakeStep === idx ? 'text-foreground' : 'text-neutral-300'}`}>
+                      <h4 className={`text-sm font-semibold font-mono leading-tight ${activeHandshakeStep === idx ? 'text-foreground' : 'text-neutral-700 dark:text-neutral-300'}`}>
                         {step.title}
                       </h4>
-                      <p className="mt-1 text-xs text-neutral-400 leading-normal line-clamp-2">
+                      <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400 leading-normal line-clamp-2">
                         {step.desc}
                       </p>
                     </div>
@@ -414,22 +415,23 @@ export default function Home() {
               <span className="text-[11px] font-mono uppercase tracking-widest text-emerald-500 font-bold block mb-2">
                 Live Telemetry Encrypter
               </span>
-              <div className="bg-black/60 rounded-lg p-3 border border-border/30">
-                <label className="text-[10px] text-neutral-400 font-mono block mb-1">
+              <div className="bg-neutral-50 dark:bg-black/60 rounded-lg p-3 border border-border/40">
+                <label className="text-[10px] text-neutral-600 dark:text-neutral-400 font-mono block mb-1">
                   Type telemetry payload:
                 </label>
                 <input
                   type="text"
+                  id="live-telemetry-input"
                   value={telemetryInput}
                   onChange={(e) => setTelemetryInput(e.target.value)}
-                  className="w-full bg-transparent text-xs text-emerald-400 font-mono focus:outline-none border-b border-border/40 pb-1"
+                  className="w-full bg-transparent text-xs text-emerald-600 dark:text-emerald-400 font-mono focus:outline-none border-b border-border/40 pb-1"
                 />
                 <div className="mt-3">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-[10px] text-neutral-400 font-mono">Encrypted USMP Frame:</span>
+                    <span className="text-[10px] text-neutral-600 dark:text-neutral-400 font-mono">Encrypted USMP Frame:</span>
                     <LuLock className="size-3 text-emerald-500 animate-pulse" />
                   </div>
-                  <div className="bg-black/90 p-2 rounded text-[10px] font-mono text-neutral-300 break-all select-all select-none border border-border/20">
+                  <div className="bg-neutral-100/80 dark:bg-black/90 p-2 rounded text-[10px] font-mono text-neutral-700 dark:text-neutral-300 break-all select-all select-none border border-border/30">
                     {encryptedHex}
                   </div>
                 </div>
@@ -438,24 +440,24 @@ export default function Home() {
           </div>
 
           {/* Terminal details (Right column: 7 cols) */}
-          <div className="md:col-span-7 bg-black p-6 flex flex-col justify-between h-full min-h-[460px]">
+          <div className="md:col-span-7 bg-white dark:bg-black p-6 flex flex-col justify-between h-full min-h-[460px]">
             {/* Terminal Top */}
             <div>
-              <div className="flex justify-between items-center mb-4 border-b border-neutral-900 pb-3">
-                <span className="text-xs font-mono text-emerald-400 flex items-center gap-1.5">
+              <div className="flex justify-between items-center mb-4 border-b border-border/40 pb-3">
+                <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                   <LuTerminal className="size-4" /> debug_session_monitor
                 </span>
-                <span className="text-[10px] uppercase font-mono bg-neutral-800 text-neutral-300 px-2 py-0.5 rounded">
+                <span className="text-[10px] uppercase font-mono bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 px-2 py-0.5 rounded">
                   {handshakeSteps[activeHandshakeStep].direction === 'forward' ? 'Client -> Server' : 'Server -> Client'}
                 </span>
               </div>
 
               {/* Console log outputs */}
-              <div className="space-y-2 font-mono text-xs leading-relaxed text-neutral-300 bg-neutral-950/40 p-4 rounded-lg border border-border/10 mb-6">
+              <div className="space-y-2 font-mono text-xs leading-relaxed text-neutral-800 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-950/40 p-4 rounded-lg border border-border/40 mb-6">
                 {handshakeSteps[activeHandshakeStep].terminalLogs.map((log, index) => (
                   <div key={index} className="flex gap-2">
-                    <span className="text-neutral-600 select-none">&gt;</span>
-                    <span className={log.startsWith('[System]') ? 'text-emerald-400 font-semibold' : log.includes('VERIFIED') ? 'text-emerald-400' : 'text-neutral-300'}>
+                    <span className="text-neutral-400 dark:text-neutral-600 select-none">&gt;</span>
+                    <span className={log.startsWith('[System]') ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : log.includes('VERIFIED') ? 'text-emerald-600 dark:text-emerald-400' : 'text-neutral-800 dark:text-neutral-300'}>
                       {log}
                     </span>
                   </div>
@@ -464,11 +466,11 @@ export default function Home() {
             </div>
 
             {/* Packet Wire Structure */}
-            <div className="border-t border-neutral-900 pt-4 mt-auto">
-              <span className="text-xs text-neutral-400 font-mono block mb-2">
+            <div className="border-t border-border/40 pt-4 mt-auto">
+              <span className="text-xs text-neutral-600 dark:text-neutral-400 font-mono block mb-2">
                 Wire Frame Payload JSON:
               </span>
-              <pre className="p-4 overflow-x-auto text-[11px] leading-5 font-mono text-emerald-400 bg-neutral-950 border border-border/25 rounded-xl">
+              <pre className="p-4 overflow-x-auto text-[11px] leading-5 font-mono text-emerald-600 dark:text-emerald-400 bg-neutral-50 dark:bg-neutral-950 border border-border/40 rounded-xl">
                 <code>{JSON.stringify(handshakeSteps[activeHandshakeStep].payload, null, 2)}</code>
               </pre>
             </div>
@@ -771,7 +773,7 @@ export default function Home() {
                 className={`w-full text-left px-4 py-3.5 rounded-xl border font-mono text-xs flex justify-between items-center transition-all ${
                   activeCodeTab === 'esp32'
                     ? 'border-emerald-500/40 bg-emerald-500/5 text-foreground font-bold shadow-md shadow-emerald-500/5'
-                    : 'border-border/60 bg-card hover:bg-muted/40 text-neutral-400'
+                    : 'border-border bg-neutral-50 dark:bg-card hover:bg-muted/65 text-neutral-600 dark:text-neutral-400'
                 }`}
               >
                 <span>ESP32 (C / ESP-IDF)</span>
@@ -784,7 +786,7 @@ export default function Home() {
                 className={`w-full text-left px-4 py-3.5 rounded-xl border font-mono text-xs flex justify-between items-center transition-all ${
                   activeCodeTab === 'arduino'
                     ? 'border-emerald-500/40 bg-emerald-500/5 text-foreground font-bold shadow-md shadow-emerald-500/5'
-                    : 'border-border/60 bg-card hover:bg-muted/40 text-neutral-400'
+                    : 'border-border bg-neutral-50 dark:bg-card hover:bg-muted/65 text-neutral-600 dark:text-neutral-400'
                 }`}
               >
                 <span>Arduino (C++ / ESP32)</span>
@@ -797,7 +799,7 @@ export default function Home() {
                 className={`w-full text-left px-4 py-3.5 rounded-xl border font-mono text-xs flex justify-between items-center transition-all ${
                   activeCodeTab === 'python'
                     ? 'border-emerald-500/40 bg-emerald-500/5 text-foreground font-bold shadow-md shadow-emerald-500/5'
-                    : 'border-border/60 bg-card hover:bg-muted/40 text-neutral-400'
+                    : 'border-border bg-neutral-50 dark:bg-card hover:bg-muted/65 text-neutral-600 dark:text-neutral-400'
                 }`}
               >
                 <span>Gateway Server (Python Async)</span>
@@ -807,9 +809,9 @@ export default function Home() {
           </div>
 
           {/* High-fidelity Editor Window on right (8 cols) */}
-          <div className="lg:col-span-8 rounded-2xl border border-border/80 bg-neutral-950 p-1 shadow-2xl flex flex-col justify-between">
+          <div className="lg:col-span-8 rounded-2xl border border-border/80 bg-neutral-100 dark:bg-neutral-950 p-1 shadow-2xl flex flex-col justify-between">
             {/* Header / Editor Toolbar */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border/40 bg-neutral-900/50 rounded-t-xl">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border/40 bg-neutral-200/50 dark:bg-neutral-900/50 rounded-t-xl">
               <div className="flex items-center gap-2">
                 {/* Mac buttons */}
                 <div className="flex gap-1.5">
@@ -817,7 +819,7 @@ export default function Home() {
                   <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
                   <span className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
                 </div>
-                <span className="text-[11px] font-mono text-neutral-400 ml-3">
+                <span className="text-[11px] font-mono text-neutral-600 dark:text-neutral-400 ml-3">
                   {activeCodeTab === 'esp32' ? 'main.c' : activeCodeTab === 'arduino' ? 'device_node.ino' : 'server.py'}
                 </span>
               </div>
@@ -826,7 +828,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => copyToClipboard(codeSnippets[activeCodeTab])}
-                className="flex items-center gap-1 text-[10px] font-mono text-neutral-400 hover:text-white bg-neutral-800 hover:bg-neutral-700 px-2.5 py-1 rounded transition-colors"
+                className="flex items-center gap-1 text-[10px] font-mono text-neutral-600 dark:text-neutral-400 hover:text-foreground dark:hover:text-white bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 px-2.5 py-1 rounded transition-colors"
               >
                 {copiedCode ? (
                   <>
@@ -841,7 +843,7 @@ export default function Home() {
             </div>
 
             {/* Code Body */}
-            <div className="p-6 overflow-auto bg-neutral-950 font-mono text-xs md:text-sm leading-6 md:leading-7 text-neutral-300 rounded-b-xl flex-1 max-h-[350px]">
+            <div className="p-6 overflow-auto bg-neutral-50 dark:bg-neutral-950 font-mono text-xs md:text-sm leading-6 md:leading-7 text-neutral-800 dark:text-neutral-300 rounded-b-xl flex-1 max-h-[350px]">
               <pre>
                 <code>{codeSnippets[activeCodeTab]}</code>
               </pre>
@@ -859,25 +861,27 @@ export default function Home() {
               <span className="text-xs font-mono font-bold tracking-widest text-emerald-500 uppercase">
                 RESOURCE BENCHMARKS
               </span>
-              <div className="flex gap-1.5 rounded-lg bg-neutral-900 p-1 border border-border/35">
+              <div className="flex gap-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-900 p-1 border border-border">
                 <button
                   type="button"
+                  id="benchmark-toggle-rom"
                   onClick={() => setBenchmarkMetric('rom')}
                   className={`px-3 py-1.5 text-[10px] font-mono font-semibold rounded transition-all ${
                     benchmarkMetric === 'rom'
-                      ? 'bg-neutral-800 text-white shadow-sm'
-                      : 'text-neutral-400 hover:text-white'
+                      ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-sm border border-border/20 dark:border-none'
+                      : 'text-neutral-600 dark:text-neutral-400 hover:text-foreground dark:hover:text-white'
                   }`}
                 >
                   Flash Footprint
                 </button>
                 <button
                   type="button"
+                  id="benchmark-toggle-ram"
                   onClick={() => setBenchmarkMetric('ram')}
                   className={`px-3 py-1.5 text-[10px] font-mono font-semibold rounded transition-all ${
                     benchmarkMetric === 'ram'
-                      ? 'bg-neutral-800 text-white shadow-sm'
-                      : 'text-neutral-400 hover:text-white'
+                      ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-sm border border-border/20 dark:border-none'
+                      : 'text-neutral-600 dark:text-neutral-400 hover:text-foreground dark:hover:text-white'
                   }`}
                 >
                   Persistent RAM
@@ -1093,14 +1097,14 @@ export default function Home() {
           </p>
 
           {/* Interactive Install Widget */}
-          <div className="mt-10 w-full max-w-lg bg-black rounded-xl border border-border/40 overflow-hidden">
+          <div className="mt-10 w-full max-w-lg bg-neutral-100 dark:bg-black rounded-xl border border-border/80 overflow-hidden">
             {/* Tabs Header */}
-            <div className="flex border-b border-border/30 bg-neutral-900/60 p-1.5 gap-1.5">
+            <div className="flex border-b border-border/40 bg-neutral-200/50 dark:bg-neutral-900/60 p-1.5 gap-1.5">
               <button
                 type="button"
                 onClick={() => setActiveCliPlatform('python')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
-                  activeCliPlatform === 'python' ? 'bg-neutral-800 text-white' : 'text-neutral-400 hover:text-white'
+                  activeCliPlatform === 'python' ? 'bg-neutral-300 dark:bg-neutral-800 text-neutral-900 dark:text-white' : 'text-neutral-600 dark:text-neutral-400 hover:text-foreground dark:hover:text-white'
                 }`}
               >
                 Python Server
@@ -1109,7 +1113,7 @@ export default function Home() {
                 type="button"
                 onClick={() => setActiveCliPlatform('esp32')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
-                  activeCliPlatform === 'esp32' ? 'bg-neutral-800 text-white' : 'text-neutral-400 hover:text-white'
+                  activeCliPlatform === 'esp32' ? 'bg-neutral-300 dark:bg-neutral-800 text-neutral-900 dark:text-white' : 'text-neutral-600 dark:text-neutral-400 hover:text-foreground dark:hover:text-white'
                 }`}
               >
                 ESP-IDF
@@ -1118,7 +1122,7 @@ export default function Home() {
                 type="button"
                 onClick={() => setActiveCliPlatform('arduino')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
-                  activeCliPlatform === 'arduino' ? 'bg-neutral-800 text-white' : 'text-neutral-400 hover:text-white'
+                  activeCliPlatform === 'arduino' ? 'bg-neutral-300 dark:bg-neutral-800 text-neutral-900 dark:text-white' : 'text-neutral-600 dark:text-neutral-400 hover:text-foreground dark:hover:text-white'
                 }`}
               >
                 Arduino
@@ -1126,15 +1130,15 @@ export default function Home() {
             </div>
 
             {/* CLI Command Line */}
-            <div className="p-5 flex justify-between items-center text-xs font-mono text-neutral-300 text-left">
+            <div className="p-5 flex justify-between items-center text-xs font-mono text-neutral-800 dark:text-neutral-300 text-left">
               {activeCliPlatform === 'python' && (
                 <>
-                  <span className="text-emerald-400 select-none mr-2">$</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 select-none mr-2">$</span>
                   <span className="flex-1">pip install usmp</span>
                   <button
                     type="button"
                     onClick={() => copyCliCommand('pip install usmp', 'python')}
-                    className="ml-3 text-[10px] text-neutral-400 hover:text-white bg-neutral-800 px-2 py-1 rounded shrink-0 transition-colors"
+                    className="ml-3 text-[10px] text-neutral-600 dark:text-neutral-400 hover:text-foreground dark:hover:text-white bg-neutral-200 dark:bg-neutral-800 px-2 py-1 rounded shrink-0 transition-colors"
                   >
                     {copiedCli === 'python' ? 'Copied' : 'Copy'}
                   </button>
@@ -1143,12 +1147,12 @@ export default function Home() {
 
               {activeCliPlatform === 'esp32' && (
                 <>
-                  <span className="text-emerald-400 select-none mr-2">$</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 select-none mr-2">$</span>
                   <span className="flex-1 break-all">idf.py add-dependency "metaloomlabs/usmp"</span>
                   <button
                     type="button"
                     onClick={() => copyCliCommand('idf.py add-dependency "metaloomlabs/usmp"', 'esp32')}
-                    className="ml-3 text-[10px] text-neutral-400 hover:text-white bg-neutral-800 px-2 py-1 rounded shrink-0 transition-colors"
+                    className="ml-3 text-[10px] text-neutral-600 dark:text-neutral-400 hover:text-foreground dark:hover:text-white bg-neutral-200 dark:bg-neutral-800 px-2 py-1 rounded shrink-0 transition-colors"
                   >
                     {copiedCli === 'esp32' ? 'Copied' : 'Copy'}
                   </button>
@@ -1158,14 +1162,14 @@ export default function Home() {
               {activeCliPlatform === 'arduino' && (
                 <>
                   <span className="flex-1 flex items-center gap-2">
-                    <LuDownload className="size-4 text-emerald-500" />
+                    <LuDownload className="size-4 text-emerald-600 dark:text-emerald-500" />
                     <span>Download standard ZIP library package</span>
                   </span>
                   <a
                     href="https://github.com/metaloomlabs/usmp/archive/refs/tags/v1.0.0.zip"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="ml-3 text-[10px] text-emerald-400 font-bold hover:text-emerald-300 bg-neutral-800 px-2 py-1 rounded shrink-0 transition-colors"
+                    className="ml-3 text-[10px] text-emerald-600 dark:text-emerald-400 font-bold hover:text-emerald-500 bg-neutral-200 dark:bg-neutral-800 px-2 py-1 rounded shrink-0 transition-colors"
                   >
                     Download ZIP
                   </a>
