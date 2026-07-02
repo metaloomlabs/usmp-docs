@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { FaDiscord } from 'react-icons/fa6'
 import { LuArrowUpRight, LuGithub } from 'react-icons/lu'
 
 import { Anchor } from '@/components/anchor'
@@ -10,7 +11,7 @@ import { SheetLeft } from '@/components/sidebar'
 import { buttonVariants } from '@/components/ui/button'
 import { SheetClose } from '@/components/ui/sheet'
 import { ModeToggle } from '@/components/ui/theme-toggle'
-import { GitHubLink, Navigations } from '@/settings/navigation'
+import { DiscordLink, GitHubLink, Navigations } from '@/settings/navigation'
 
 export function Navbar() {
   return (
@@ -36,6 +37,18 @@ export function Navbar() {
               aria-label="View the repository on GitHub"
             >
               <LuGithub className="size-4" />
+            </Link>
+          )}
+          {DiscordLink.href && (
+            <Link
+              href={DiscordLink.href}
+              className={buttonVariants({ variant: 'outline', size: 'icon-lg' })}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Join our Discord community"
+              aria-label="Join our Discord community"
+            >
+              <FaDiscord className="size-4 text-[#5865F2]" />
             </Link>
           )}
           <ModeToggle />
