@@ -1,0 +1,62 @@
+# USMP (Unified Secure Multi-transport Protocol)
+
+USMP is a secure, lightweight, and transport-agnostic session-layer communication protocol designed for resource-constrained microcontrollers (like ESP32, Arduino) and server gateways (Python).
+
+## Key Specifications
+
+- **Mutual Authentication**: HMAC-SHA256 key-verification handshake parameter bounds (master PSK is never sent over the wire).
+- **Perfect Forward Secrecy**: Ephemeral Curve25519 (X25519) key exchange at the start of every session.
+- **Confidentiality**: Post-handshake telemetry encrypted via symmetric AES-256-GCM.
+- **Microcontroller Overhead**: 
+  - **Flash ROM**: < 10 KB (Stripped Xtensa size).
+  - **Persistent RAM**: exactly 112 Bytes (Zero heap allocations, preventing memory fragmentation).
+  - **Handshake Speed**: 10-30 ms (4-step packet flow).
+- **Fragmentation**: Automatic chunking of payloads up to 1.8 KB into 452-byte frames.
+
+## Quick Installation
+
+- **Python (Gateway Server)**: `pip install usmp`
+- **ESP-IDF (C SDK)**: `idf.py add-dependency "metaloomlabs/usmp"`
+- **Arduino (C++)**: Download ZIP library and import standard headers.
+
+## Symmetrical Code Examples
+
+### 1. ESP32 (C / ESP-IDF)
+```c
+usmp_transport_tcp_init(&transport, "gateway.io", 9000);
+ctx.psk = my_secure_psk;
+ctx.psk_len = 32;
+usmp_connect(&ctx, &transport);
+usmp_send(&ctx, (uint8_t *)"hello", 5);
+```
+
+### 2. Arduino (C++)
+```cpp
+#include <USMP.h>
+USMPClient usmp("my-secure-psk");
+void setup() {
+    usmp.begin(USMP::TCP("gateway.io"));
+    usmp.send("Hello from Arduino!");
+}
+void loop() {
+    usmp.maintain();
+}
+```
+
+### 3. Gateway Server (Python Async)
+```python
+from usmp import USMPServer
+server = USMPServer(host="0.0.0.0", port=9000, psk=b"my-secure-psk")
+@server.on_session
+async def handle_device(session):
+    payload = await session.recv()
+    await session.send(b"Decrypted successfully!")
+```
+
+## Documentation Map
+
+- [Installation Guide](https://metaloomlabs.github.io/usmp/docs/getting-started/installation)
+- [Protocol Specifications](https://metaloomlabs.github.io/usmp/docs/protocol/overview)
+- [ESP-IDF Porting Notes](https://metaloomlabs.github.io/usmp/docs/ports/esp32)
+- [Python SDK Reference](https://metaloomlabs.github.io/usmp/docs/sdk/python)
+- [Github Repository](https://github.com/metaloomlabs/usmp)

@@ -232,8 +232,80 @@ export default function Home() {
     setOpenFaq(openFaq === index ? null : index)
   }
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'SoftwareApplication',
+        '@id': 'https://metaloomlabs.github.io/usmp/#software',
+        'name': 'USMP (Unified Secure Multi-transport Protocol)',
+        'description': 'A secure, lightweight, and transport-agnostic session-layer communication protocol for resource-constrained microcontrollers (ESP32, Arduino) and Python.',
+        'applicationCategory': 'DeveloperApplication',
+        'operatingSystem': 'ESP32, Arduino, Linux, Windows, macOS',
+        'license': 'https://github.com/metaloomlabs/usmp/blob/main/LICENSE',
+        'offers': {
+          '@type': 'Offer',
+          'price': '0',
+          'priceCurrency': 'USD'
+        }
+      },
+      {
+        '@type': 'FAQPage',
+        '@id': 'https://metaloomlabs.github.io/usmp/#faq',
+        'mainEntity': [
+          {
+            '@type': 'Question',
+            'name': 'Why not just use TLS / DTLS?',
+            'acceptedAnswer': {
+              '@type': 'Answer',
+              'text': 'TLS is excellent but too heavy for resource-constrained controllers. It occupies 60–100 KB of Flash and requires up to 40 KB of active RAM, along with complex root certificate (CA) verification. USMP was built specifically for microcontrollers, requiring under 10 KB of Flash and exactly 112 bytes of persistent RAM while maintaining comparable cryptographic guarantees.'
+            }
+          },
+          {
+            '@type': 'Question',
+            'name': 'Is it secure without asymmetric certificates?',
+            'acceptedAnswer': {
+              '@type': 'Answer',
+              'text': 'Yes. USMP uses Mutual Pre-Shared Key (PSK) authentication via HMAC-SHA256. To ensure secrecy, an ephemeral X25519 key exchange occurs at the start of each session. Even if the pre-shared key is leaked later, past sessions cannot be decrypted (Perfect Forward Secrecy).'
+            }
+          },
+          {
+            '@type': 'Question',
+            'name': 'How should I provision the PSK in production?',
+            'acceptedAnswer': {
+              '@type': 'Answer',
+              'text': 'Do not hardcode the PSK in your source code. We recommend writing the PSK to the ESP32\'s secure, encrypted Non-Volatile Storage (NVS) partition or a dedicated hardware security module (HSM) during manufacturing.'
+            }
+          },
+          {
+            '@type': 'Question',
+            'name': 'What is the battery/power consumption impact?',
+            'acceptedAnswer': {
+              '@type': 'Answer',
+              'text': 'Extremely low. Once the 4-step handshake completes, USMP uses symmetric AES-256-GCM encryption. The ESP32\'s on-chip hardware cryptographic engines accelerate this math, allowing packets to be encrypted/decrypted in under 1 millisecond with negligible battery draw.'
+            }
+          },
+          {
+            '@type': 'Question',
+            'name': 'Does it support packet fragmentation?',
+            'acceptedAnswer': {
+              '@type': 'Answer',
+              'text': 'Yes. USMP automatically fragments payloads larger than 452 bytes into up to 4 sequential frames (maxing out at ~1.8 KB) and reassembles them transparently on the receiving side.'
+            }
+          }
+        ]
+      }
+    ]
+  }
+
   return (
     <div className="relative isolate min-h-screen overflow-x-hidden bg-background">
+      {/* Structured SEO Data for AI & Search Engines */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* Premium background grid visual */}
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,oklch(var(--border)/0.25)_1px,transparent_1px),linear-gradient(to_bottom,oklch(var(--border)/0.25)_1px,transparent_1px)] bg-[size:4.5rem_4.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_80%,transparent_100%)] opacity-35" />
 
