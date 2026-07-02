@@ -1,4 +1,4 @@
-# USMP Documentation Portal
+# USMP Documentation Portal.
 
 The official documentation portal for the **Unified Secure Multi-transport Protocol (USMP)**. Built with **Next.js**, **React**, **Tailwind CSS**, and **TypeScript** to deliver high-fidelity, interactive, and search-indexed product documentation for the USMP protocol suite.
 
