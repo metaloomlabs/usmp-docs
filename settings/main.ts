@@ -1,4 +1,4 @@
-export const url = 'https://metaloomlabs.github.io/usmp'
+export const url = 'https://usmp.metaloom.in'
 export const siteicon = '/logo.png'
 
 export const gtm = 'GTM-XXXXXXX'

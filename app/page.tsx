@@ -237,7 +237,7 @@ export default function Home() {
     '@graph': [
       {
         '@type': 'SoftwareApplication',
-        '@id': 'https://metaloomlabs.github.io/usmp/#software',
+        '@id': `${Settings.metadataBase}/#software`,
         'name': 'USMP (Unified Secure Multi-transport Protocol)',
         'description': 'A secure, lightweight, and transport-agnostic session-layer communication protocol for resource-constrained microcontrollers (ESP32, Arduino) and Python.',
         'applicationCategory': 'DeveloperApplication',
@@ -251,7 +251,7 @@ export default function Home() {
       },
       {
         '@type': 'FAQPage',
-        '@id': 'https://metaloomlabs.github.io/usmp/#faq',
+        '@id': `${Settings.metadataBase}/#faq`,
         'mainEntity': [
           {
             '@type': 'Question',

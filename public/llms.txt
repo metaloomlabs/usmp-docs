@@ -55,8 +55,8 @@ async def handle_device(session):
 
 ## Documentation Map
 
-- [Installation Guide](https://metaloomlabs.github.io/usmp/docs/getting-started/installation)
-- [Protocol Specifications](https://metaloomlabs.github.io/usmp/docs/protocol/overview)
-- [ESP-IDF Porting Notes](https://metaloomlabs.github.io/usmp/docs/ports/esp32)
-- [Python SDK Reference](https://metaloomlabs.github.io/usmp/docs/sdk/python)
+- [Installation Guide](https://usmp.metaloom.in/docs/getting-started/installation)
+- [Protocol Specifications](https://usmp.metaloom.in/docs/protocol/overview)
+- [ESP-IDF Porting Notes](https://usmp.metaloom.in/docs/ports/esp32)
+- [Python SDK Reference](https://usmp.metaloom.in/docs/sdk/python)
 - [Github Repository](https://github.com/metaloomlabs/usmp)
