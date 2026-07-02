@@ -525,53 +525,53 @@ export default function Home() {
           </div>
 
           {/* Matrix table container */}
-          <div className="lg:col-span-7 rounded-2xl border border-border/80 bg-neutral-950/40 p-1 shadow-xl overflow-hidden">
+          <div className="lg:col-span-7 rounded-2xl border border-border/80 bg-neutral-50 dark:bg-neutral-950/40 p-1 shadow-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-left text-xs font-mono">
                 <thead>
-                  <tr className="border-b border-border/60 bg-neutral-900/60 text-neutral-300">
-                    <th className="p-4 font-bold text-neutral-200">Feature</th>
+                  <tr className="border-b border-border/60 bg-neutral-100 dark:bg-neutral-900/60 text-neutral-700 dark:text-neutral-300">
+                    <th className="p-4 font-bold text-neutral-900 dark:text-neutral-200">Feature</th>
                     <th className="p-4 font-semibold">Raw Sockets</th>
                     <th className="p-4 font-semibold">TLS / DTLS</th>
-                    <th className="p-4 font-bold text-emerald-400 bg-emerald-500/5">USMP</th>
+                    <th className="p-4 font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/5">USMP</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/40 text-neutral-400">
+                <tbody className="divide-y divide-border/40 text-neutral-600 dark:text-neutral-400">
                   <tr>
                     <td className="p-4 font-bold text-foreground font-sans">Authentication</td>
-                    <td className="p-4 text-red-500/95 font-medium">None (Vulnerable)</td>
+                    <td className="p-4 text-red-600 dark:text-red-400 font-medium">None (Vulnerable)</td>
                     <td className="p-4">Certificate-based (Complex CA)</td>
-                    <td className="p-4 text-emerald-400 font-bold bg-emerald-500/5 border-l border-r border-emerald-500/10">Mutual Pre-Shared Key (HMAC-SHA256)</td>
+                    <td className="p-4 text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/5 border-l border-r border-emerald-500/10">Mutual Pre-Shared Key (HMAC-SHA256)</td>
                   </tr>
                   <tr>
                     <td className="p-4 font-bold text-foreground font-sans">Confidentiality</td>
-                    <td className="p-4 text-red-500/95 font-medium">None (Plaintext)</td>
+                    <td className="p-4 text-red-600 dark:text-red-400 font-medium">None (Plaintext)</td>
                     <td className="p-4">Enforced</td>
-                    <td className="p-4 text-emerald-400 font-bold bg-emerald-500/5 border-l border-r border-emerald-500/10">Enforced (AES-256-GCM)</td>
+                    <td className="p-4 text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/5 border-l border-r border-emerald-500/10">Enforced (AES-256-GCM)</td>
                   </tr>
                   <tr>
                     <td className="p-4 font-bold text-foreground font-sans">Flash Footprint</td>
                     <td className="p-4">~0 KB</td>
                     <td className="p-4">60 - 100 KB</td>
-                    <td className="p-4 text-emerald-400 font-bold bg-emerald-500/5 border-l border-r border-emerald-500/10 text-sm">&lt; 10 KB</td>
+                    <td className="p-4 text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/5 border-l border-r border-emerald-500/10 text-sm">&lt; 10 KB</td>
                   </tr>
                   <tr>
                     <td className="p-4 font-bold text-foreground font-sans">Persistent RAM</td>
                     <td className="p-4">~0 KB</td>
                     <td className="p-4">20 - 40 KB</td>
-                    <td className="p-4 text-emerald-400 font-bold bg-emerald-500/5 border-l border-r border-emerald-500/10 text-sm">112 Bytes</td>
+                    <td className="p-4 text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/5 border-l border-r border-emerald-500/10 text-sm">112 Bytes</td>
                   </tr>
                   <tr>
                     <td className="p-4 font-bold text-foreground font-sans">Handshake Speed</td>
                     <td className="p-4">Instant</td>
-                    <td className="p-4 font-sans text-neutral-500">Slow (Multiple Roundtrips)</td>
-                    <td className="p-4 text-emerald-400 font-bold bg-emerald-500/5 border-l border-r border-emerald-500/10">Fast (4-step, 10-30ms)</td>
+                    <td className="p-4 font-sans text-neutral-600 dark:text-neutral-500">Slow (Multiple Roundtrips)</td>
+                    <td className="p-4 text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/5 border-l border-r border-emerald-500/10">Fast (4-step, 10-30ms)</td>
                   </tr>
                   <tr className="border-b-0">
                     <td className="p-4 font-bold text-foreground font-sans">Forward Secrecy</td>
-                    <td className="p-4 text-red-500/95">No</td>
+                    <td className="p-4 text-red-600 dark:text-red-400">No</td>
                     <td className="p-4">Yes</td>
-                    <td className="p-4 text-emerald-400 font-bold bg-emerald-500/5 border-l border-r border-emerald-500/10">Yes (X25519)</td>
+                    <td className="p-4 text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/5 border-l border-r border-emerald-500/10">Yes (X25519)</td>
                   </tr>
                 </tbody>
               </table>
@@ -886,10 +886,10 @@ export default function Home() {
             </div>
 
             {/* Benchmark display box */}
-            <div className="p-6 rounded-2xl border border-border/60 bg-neutral-950/40 space-y-6">
+            <div className="p-6 rounded-2xl border border-border/60 bg-neutral-50 dark:bg-neutral-950/40 space-y-6">
               {benchmarkMetric === 'rom' ? (
                 <>
-                  <h4 className="text-xs font-bold text-neutral-300 font-mono tracking-wider">
+                  <h4 className="text-xs font-bold text-neutral-700 dark:text-neutral-300 font-mono tracking-wider">
                     Compiled Binary Size on MCU (Flash bytes)
                   </h4>
                   {/* Bar 1: USMP */}
@@ -898,34 +898,34 @@ export default function Home() {
                       <span>USMP Core Driver</span>
                       <span className="text-emerald-500">&lt; 10 KB</span>
                     </div>
-                    <div className="h-2.5 w-full rounded-full bg-neutral-900 overflow-hidden border border-border/30">
+                    <div className="h-2.5 w-full rounded-full bg-neutral-200 dark:bg-neutral-900 overflow-hidden border border-border/30">
                       <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: '8%' }} />
                     </div>
                   </div>
                   {/* Bar 2: TinyDTLS */}
                   <div className="space-y-2">
-                    <div className="flex justify-between text-xs text-neutral-400 font-mono">
+                    <div className="flex justify-between text-xs text-neutral-600 dark:text-neutral-400 font-mono">
                       <span>TinyDTLS Stack</span>
                       <span>48 KB</span>
                     </div>
-                    <div className="h-2.5 w-full rounded-full bg-neutral-900 overflow-hidden">
-                      <div className="h-full bg-neutral-700 rounded-full transition-all duration-500" style={{ width: '48%' }} />
+                    <div className="h-2.5 w-full rounded-full bg-neutral-200 dark:bg-neutral-900 overflow-hidden">
+                      <div className="h-full bg-neutral-400 dark:bg-neutral-700 rounded-full transition-all duration-500" style={{ width: '48%' }} />
                     </div>
                   </div>
                   {/* Bar 3: Standard TLS */}
                   <div className="space-y-2">
-                    <div className="flex justify-between text-xs text-neutral-400 font-mono">
+                    <div className="flex justify-between text-xs text-neutral-600 dark:text-neutral-400 font-mono">
                       <span>MbedTLS Stack (Full TLS Client)</span>
                       <span>100 KB</span>
                     </div>
-                    <div className="h-2.5 w-full rounded-full bg-neutral-900 overflow-hidden">
-                      <div className="h-full bg-neutral-800 rounded-full transition-all duration-500" style={{ width: '100%' }} />
+                    <div className="h-2.5 w-full rounded-full bg-neutral-200 dark:bg-neutral-900 overflow-hidden">
+                      <div className="h-full bg-neutral-500 dark:bg-neutral-800 rounded-full transition-all duration-500" style={{ width: '100%' }} />
                     </div>
                   </div>
                 </>
               ) : (
                 <>
-                  <h4 className="text-xs font-bold text-neutral-300 font-mono tracking-wider">
+                  <h4 className="text-xs font-bold text-neutral-700 dark:text-neutral-300 font-mono tracking-wider">
                     Persistent Stack/Heap Memory Overhead (Active RAM)
                   </h4>
                   {/* Bar 1: USMP */}
@@ -934,28 +934,28 @@ export default function Home() {
                       <span>USMP Session State Context</span>
                       <span className="text-emerald-500">112 Bytes (0 dynamic allocations)</span>
                     </div>
-                    <div className="h-2.5 w-full rounded-full bg-neutral-900 overflow-hidden border border-border/30">
+                    <div className="h-2.5 w-full rounded-full bg-neutral-200 dark:bg-neutral-900 overflow-hidden border border-border/30">
                       <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: '2.5%' }} />
                     </div>
                   </div>
                   {/* Bar 2: TinyDTLS */}
                   <div className="space-y-2">
-                    <div className="flex justify-between text-xs text-neutral-400 font-mono">
+                    <div className="flex justify-between text-xs text-neutral-600 dark:text-neutral-400 font-mono">
                       <span>TinyDTLS Context (Handshake buffers)</span>
                       <span>8 KB</span>
                     </div>
-                    <div className="h-2.5 w-full rounded-full bg-neutral-900 overflow-hidden">
-                      <div className="h-full bg-neutral-700 rounded-full transition-all duration-500" style={{ width: '25%' }} />
+                    <div className="h-2.5 w-full rounded-full bg-neutral-200 dark:bg-neutral-900 overflow-hidden">
+                      <div className="h-full bg-neutral-400 dark:bg-neutral-700 rounded-full transition-all duration-500" style={{ width: '25%' }} />
                     </div>
                   </div>
                   {/* Bar 3: Standard TLS */}
                   <div className="space-y-2">
-                    <div className="flex justify-between text-xs text-neutral-400 font-mono">
+                    <div className="flex justify-between text-xs text-neutral-600 dark:text-neutral-400 font-mono">
                       <span>MbedTLS (Min Handshake Allocation)</span>
                       <span>40 KB</span>
                     </div>
-                    <div className="h-2.5 w-full rounded-full bg-neutral-900 overflow-hidden">
-                      <div className="h-full bg-neutral-800 rounded-full transition-all duration-500" style={{ width: '100%' }} />
+                    <div className="h-2.5 w-full rounded-full bg-neutral-200 dark:bg-neutral-900 overflow-hidden">
+                      <div className="h-full bg-neutral-500 dark:bg-neutral-800 rounded-full transition-all duration-500" style={{ width: '100%' }} />
                     </div>
                   </div>
                 </>
@@ -1067,7 +1067,7 @@ export default function Home() {
               <div
                 className={`transition-all duration-300 ease-in-out ${
                   openFaq === idx ? 'max-h-60 border-t border-border/30 p-5' : 'max-h-0'
-                } overflow-hidden bg-neutral-950/20 text-sm text-muted-foreground leading-relaxed`}
+                } overflow-hidden bg-neutral-50 dark:bg-neutral-950/20 text-sm text-muted-foreground leading-relaxed`}
               >
                 {item.a}
               </div>
@@ -1078,7 +1078,7 @@ export default function Home() {
 
       {/* 8. INTEGRATION & CALL-TO-ACTION */}
       <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8 border-t border-border/30 relative text-center">
-        <div className="p-8 sm:p-16 rounded-3xl bg-neutral-950 border border-border/80 relative overflow-hidden flex flex-col items-center">
+        <div className="p-8 sm:p-16 rounded-3xl bg-neutral-50 dark:bg-neutral-950 border border-border relative overflow-hidden flex flex-col items-center">
           <div className="absolute -bottom-48 -left-48 h-96 w-96 rounded-full bg-emerald-500/5 blur-3xl" />
           <div className="absolute -top-48 -right-48 h-96 w-96 rounded-full bg-emerald-500/5 blur-3xl" />
 
@@ -1190,7 +1190,7 @@ export default function Home() {
           </div>
 
           {/* Symmetrical footer-like layout for integration links */}
-          <div className="mt-12 pt-6 border-t border-border/20 w-full flex flex-wrap justify-center gap-6 text-xs text-neutral-400 font-mono">
+          <div className="mt-12 pt-6 border-t border-border/20 w-full flex flex-wrap justify-center gap-6 text-xs text-neutral-600 dark:text-neutral-400 font-mono">
             <a
               href="https://github.com/metaloomlabs/usmp"
               target="_blank"
@@ -1199,21 +1199,21 @@ export default function Home() {
             >
               <LuGithub className="size-3.5" /> Github Repository
             </a>
-            <span className="text-neutral-800 select-none">|</span>
+            <span className="text-neutral-350 dark:text-neutral-800 select-none">|</span>
             <Link
               href="/docs/sdk/python"
               className="hover:text-emerald-500 transition-colors"
             >
               API Reference
             </Link>
-            <span className="text-neutral-800 select-none">|</span>
+            <span className="text-neutral-350 dark:text-neutral-800 select-none">|</span>
             <Link
               href="/docs/protocol/overview"
               className="hover:text-emerald-500 transition-colors"
             >
               Security Whitepaper
             </Link>
-            <span className="text-neutral-800 select-none">|</span>
+            <span className="text-neutral-350 dark:text-neutral-800 select-none">|</span>
             <a
               href="https://github.com/metaloomlabs/usmp/blob/main/LICENSE"
               target="_blank"
