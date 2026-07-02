@@ -1,4 +1,5 @@
-import { LuCompass, LuGithub, LuLinkedin, LuSlack, LuYoutube } from 'react-icons/lu'
+import { FaDiscord } from 'react-icons/fa6'
+import { LuCompass, LuGithub, LuLinkedin, LuYoutube } from 'react-icons/lu'
 
 import { Logo } from '@/components/navigation/logo'
 import { Link } from '@/lib/transition'
@@ -167,13 +168,13 @@ export function Footer() {
           {/* Right Side Social icons */}
           <div className="flex space-x-5 text-muted-foreground">
             <a
-              href="https://slack.com"
+              href="https://discord.gg/NsNzt6Psj5"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-foreground transition-colors"
-              aria-label="Slack"
+              aria-label="Discord"
             >
-              <LuSlack className="size-5" />
+              <FaDiscord className="size-5" />
             </a>
             <a
               href="https://github.com/metaloomlabs/usmp"

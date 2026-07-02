@@ -26,8 +26,10 @@ import {
   LuLayers,
 } from 'react-icons/lu'
 
+import { FaDiscord } from 'react-icons/fa6'
 import { buttonVariants } from '@/components/ui/button'
 import { PageRoutes } from '@/lib/pageroutes'
+import { cn } from '@/lib/utils'
 import { Link } from '@/lib/transition'
 import { Settings } from '@/types/settings'
 
@@ -339,15 +341,26 @@ export default function Home() {
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
           <Link
             href={`/docs${PageRoutes[0].href}`}
-            className={buttonVariants({
-              className:
-                'gap-2 px-8 py-6 bg-emerald-500 text-neutral-950 hover:bg-emerald-400 font-bold transition-all duration-200 shadow-lg shadow-emerald-500/10 text-base rounded-xl border border-emerald-400/20 active:translate-y-px',
-              size: 'lg',
-            })}
+            className={cn(
+              buttonVariants({ size: 'lg' }),
+              'gap-2 px-8 py-6 bg-black dark:bg-white text-white dark:text-neutral-950 hover:bg-neutral-800 dark:hover:bg-neutral-100 font-bold transition-all duration-200 shadow-lg shadow-black/10 dark:shadow-white/10 text-base rounded-xl border border-black dark:border-white active:translate-y-px'
+            )}
           >
             Get Started with SDKs
             <LuArrowRight className="size-5" />
           </Link>
+          <a
+            href="https://discord.gg/NsNzt6Psj5"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              buttonVariants({ size: 'lg' }),
+              'gap-2 px-8 py-6 bg-black dark:bg-white text-white dark:text-neutral-950 hover:bg-neutral-800 dark:hover:bg-neutral-100 font-bold transition-all duration-200 shadow-lg shadow-black/10 dark:shadow-white/10 text-base rounded-xl border border-black dark:border-white active:translate-y-px'
+            )}
+          >
+            <FaDiscord className="size-5 text-white dark:text-[#5865F2]" />
+            Join Community
+          </a>
           <Link
             href="/docs/protocol/overview"
             className={buttonVariants({

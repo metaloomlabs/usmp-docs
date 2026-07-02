@@ -18,6 +18,7 @@ export function Logo() {
         aria-label={`${Settings.title} main logo`}
         width={34}
         height={34}
+        className="rounded-lg"
         priority
         decoding="async"
       />

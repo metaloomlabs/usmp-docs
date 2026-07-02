@@ -1,5 +1,5 @@
 export const url = 'https://usmp.metaloom.in'
-export const siteicon = '/logo.png'
+export const siteicon = '/logo-new.png'
 
 export const gtm = 'GTM-XXXXXXX'
 export const gtmconnected = false
@@ -20,7 +20,7 @@ export const keywords = [
   'secure UART BLE serial',
   'zero-heap security library'
 ]
-export const urlimage = '/logo.png'
+export const urlimage = '/logo-new.png'
 export const imagealt = 'USMP - Unified Secure Multi-transport Protocol Logo'
 export const twitterhandle = '@metaloomlabs'
 
