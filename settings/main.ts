@@ -4,7 +4,7 @@ export const siteicon = '/logo.png'
 export const gtm = 'GTM-XXXXXXX'
 export const gtmconnected = false
 
-export const sitename = 'USMP - Unified Secure Multi-transport Protocol'
+export const sitename = 'USMP'
 export const description = 'USMP brings lightweight, end-to-end encrypted, mutually authenticated, and forward-secret communication tunnels (AES-256-GCM, X25519) to ESP32, Arduino, and Python without the memory overhead of TLS.'
 export const keywords = [
   'USMP',

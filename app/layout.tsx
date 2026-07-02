@@ -21,7 +21,10 @@ const inter = Inter({
 const baseUrl = Settings.metadataBase
 
 export const metadata: Metadata = {
-  title: Settings.title,
+  title: {
+    default: 'USMP - Unified Secure Multi-transport Protocol',
+    template: '%s - USMP',
+  },
   metadataBase: new URL(baseUrl),
   description: Settings.description,
   keywords: Settings.keywords,
