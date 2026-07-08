@@ -1,6 +1,6 @@
-# USMP Technical Specification | Version v0.5.1
+# USMP Technical Specification | Version v1.0.0
 
-Welcome to the official technical specification for the **Unified Secure Multi-transport Protocol (USMP) v0.5.1**.
+Welcome to the official technical specification for the **Unified Secure Multi-transport Protocol (USMP) v1.0.0**.
 
 This document serves as the canonical reference for developers implementing USMP client libraries, server SDKs, or alternative transport adapters. It covers frame layouts, cryptographic sequences, state machine rules, and resource limits.
 
