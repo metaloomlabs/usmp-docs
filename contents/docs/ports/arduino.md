@@ -8,7 +8,7 @@ Welcome, Arduino developers! The Arduino port of USMP wraps the core C protocol 
 
 USMP is packaged as a standard offline ZIP library to keep private repository references out of your builds:
 
-1. Download the **[usmp-0.5.1-arduino.zip](/usmp-0.5.1-arduino.zip)** package.
+1. Download the **[usmp-1.0.0-arduino.zip](/usmp-1.0.0-arduino.zip)** package.
 2. Open **Arduino IDE**.
 3. Go to **Sketch** ➔ **Include Library** ➔ **Add .ZIP Library...**
 4. Choose the downloaded zip file to complete the import.
