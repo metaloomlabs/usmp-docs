@@ -1,23 +1,23 @@
-import { type MetadataRoute } from 'next/types'
+import type { MetadataRoute } from "next";
 
-import { PageRoutes } from '@/lib/pageroutes'
-import { Settings } from '@/types/settings'
+import { PageRoutes } from "@/lib/pageroutes";
+import { Settings } from "@/types/settings";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes: MetadataRoute.Sitemap = PageRoutes.map((page) => ({
-    url: `${Settings.metadataBase}/docs${page.href}`,
-    lastModified: new Date().toISOString(),
-    changeFrequency: 'monthly',
-    priority: 0.8,
-  }))
+  const lastModified = new Date();
 
-  // Prepend root landing page /
-  routes.unshift({
-    url: `${Settings.metadataBase}`,
-    lastModified: new Date().toISOString(),
-    changeFrequency: 'weekly',
-    priority: 1.0,
-  })
-
-  return routes
+  return [
+    {
+      url: Settings.metadataBase,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 1,
+    },
+    ...PageRoutes.map((page) => ({
+      url: new URL(`/docs${page.href}`, Settings.metadataBase).toString(),
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
+  ];
 }
