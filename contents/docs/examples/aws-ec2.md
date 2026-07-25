@@ -83,7 +83,7 @@ Below is the Arduino IDE sketch configured for connecting across the public Inte
 #include <USMP.h>
 
 // Enter your AWS EC2 Public IP and Wi-Fi Details
-#define EC2_PUBLIC_IP "13.62.222.96"  // Replace with your EC2 Public IPv4
+#define EC2_PUBLIC_IP "203.0.113.10"  // Replace with your EC2 Public IPv4
 #define EC2_PORT 9000
 #define WIFI_SSID "YOUR_WIFI_SSID"
 #define WIFI_PASS "YOUR_WIFI_PASSWORD"
@@ -162,7 +162,7 @@ Below is the ESP-IDF client source file `main/app.c`:
 #include "usmp_transport_tcp.h"
 
 static const char *TAG = "EC2_CLIENT";
-#define EC2_PUBLIC_IP "13.62.222.96"  // Replace with your EC2 Public IPv4
+#define EC2_PUBLIC_IP "203.0.113.10"  // Replace with your EC2 Public IPv4
 #define EC2_PORT 9000
 #define DEV_PSK "usmp-dev-psk-change-me-before-prod"
 
@@ -222,7 +222,7 @@ idf.py -p COMx flash monitor
 ### 4. Verify Output Logs
 Upon boot, your ESP32 serial monitor will display:
 ```text
-Connecting to USMP EC2 Server: 13.62.222.96:9000
+Connecting to USMP EC2 Server: 203.0.113.10:9000
 [SUCCESS] Secure USMP session established!
 Sending: ESP32 Ping #1 (Uptime: 5s)
 Received from EC2: Echo from EC2: ESP32 Ping #1 (Uptime: 5s)
