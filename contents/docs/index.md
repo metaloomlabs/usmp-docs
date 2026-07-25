@@ -38,6 +38,19 @@ USMP does not support an "insecure mode." Every session is strictly hardened out
 * **Mandatory Encryption**: All session data frames are encrypted using AES-256-GCM, ensuring absolute confidentiality and tamper-proof message integrity.
 * **Replay Protection**: Strict, monotonic 32-bit sequence numbers and deterministic nonces prevent attackers from capturing and replaying packets.
 
+!!! warning "Known Limitation: PSK Offline Cracking"
+
+    USMP uses Pre-Shared Key (PSK) authentication, which **does not protect against offline
+    brute-force attacks** on captured handshake transcripts (unlike PAKE protocols such as
+    SPAKE2 or CPace).
+
+    **You must use cryptographically random PSKs** (`os.urandom(32)` in Python, or a hardware
+    RNG on embedded devices). Human-readable passphrases — even long ones — are vulnerable.
+    Store PSKs in secure storage (encrypted NVS, secure elements, HSMs), never in source code.
+
+    See [SECURITY.md](https://github.com/metaloomlabs/usmp/blob/main/SECURITY.md) for full details.
+    A PAKE upgrade is planned for a future release.
+
 ---
 
 ## Supported Transports & Roadmap
@@ -68,11 +81,10 @@ USMP is packaged and published directly to official package managers, keeping yo
     ```
 
 === "Arduino Library"
-    Available as a packaged offline ZIP archive (**[usmp-1.0.0-arduino.zip](/usmp-1.0.0-arduino.zip)**) for import into Arduino IDE or PlatformIO.
+    Available as a packaged offline ZIP archive (`usmp-0.5.1-arduino.zip`) for import into Arduino IDE or PlatformIO.
 
-    1. Download the **[usmp-1.0.0-arduino.zip](/usmp-1.0.0-arduino.zip)** archive.
-    2. Go to **Sketch** ➔ **Include Library** ➔ **Add .ZIP Library...**
-    3. Select the downloaded ZIP archive.
+    1. Go to **Sketch** ➔ **Include Library** ➔ **Add .ZIP Library...**
+    2. Select the packaged ZIP archive.
 
 ---
 

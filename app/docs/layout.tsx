@@ -8,9 +8,9 @@ interface DocumentsProps {
 
 export default function Documents({ children }: DocumentsProps) {
   return (
-    <div className="flex items-start gap-10 pt-10">
+    <div className="flex w-full min-w-0 max-w-full items-start gap-0 md:gap-8 pt-4 md:pt-8">
       <Sidebar />
-      <div className="flex-1 md:flex-6">{children}</div>
+      <div className="flex-1 w-full min-w-0 max-w-full">{children}</div>
     </div>
   )
 }

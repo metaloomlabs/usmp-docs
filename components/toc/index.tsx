@@ -15,17 +15,19 @@ export function TableOfContents({ tocs, pathName, frontmatter, relativeFilePath 
     <>
       {Settings.rightbar && (
         <aside
-          className="toc sticky top-26 hidden h-screen min-w-57.5 gap-3 xl:flex xl:flex-col"
+          className="toc sticky top-20 hidden h-fit max-h-[calc(100vh-6rem)] w-64 shrink-0 flex-col overflow-y-auto pb-8 pr-2 xl:flex border-l border-border/40 pl-4 space-y-6 scrollbar-thin"
           aria-label="Table of contents"
         >
-          {Settings.toc && <TableAnchor tocs={tocs.tocs} />}
-          {Settings.feedback && (
-            <Feedback
-              slug={pathName}
-              title={frontmatter.title}
-              relativeFilePath={relativeFilePath}
-            />
-          )}
+          <div className="space-y-6 pt-2">
+            {Settings.toc && <TableAnchor tocs={tocs.tocs} />}
+            {Settings.feedback && (
+              <Feedback
+                slug={pathName}
+                title={frontmatter.title}
+                relativeFilePath={relativeFilePath}
+              />
+            )}
+          </div>
         </aside>
       )}
       {Settings.totop && <BackToTop />}

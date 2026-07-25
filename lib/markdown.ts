@@ -265,13 +265,21 @@ export function getPreviousNext(path: string) {
   return { prev, next }
 }
 
+function extractNodeText(node: any): string {
+  if (!node) return ''
+  if (node.type === 'text') return node.value || ''
+  if (Array.isArray(node.children)) {
+    return node.children.map(extractNodeText).join('')
+  }
+  return ''
+}
+
 const preCopy = () => (tree: Node) => {
   visit(tree, 'element', (node: Element) => {
     if (node.tagName === 'pre') {
-      const [codeEl] = node.children as Element[]
+      const [codeEl] = (node.children || []) as Element[]
       if (codeEl?.tagName === 'code') {
-        const textNode = codeEl.children?.[0] as Text
-        node.raw = textNode?.value || ''
+        node.raw = extractNodeText(codeEl)
       }
     }
   })

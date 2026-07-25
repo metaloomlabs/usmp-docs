@@ -58,7 +58,7 @@ This document lists common issues encountered when deploying, testing, or develo
   * Open port `9000` (or your custom port) on the host machine's firewall.
   * On Windows, run the following command in an **elevated Command Prompt (Admin)** to allow incoming TCP traffic on port `9000` for both Public and Private networks:
 
-    ```shell
+    ```powershell
     netsh advfirewall firewall add rule name="USMP TCP 9000" dir=in action=allow protocol=TCP localport=9000 profile=any
     ```
 

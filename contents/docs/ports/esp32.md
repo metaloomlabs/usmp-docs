@@ -46,20 +46,22 @@ USMP is designed to be completely platform-agnostic. The core state machine requ
 
 ### 1. TCP Transport
 
-The TCP transport uses native BSD sockets provided by lwIP. To minimize handshake round-trip times and telemetry latency, we configure the socket with the `TCP_NODELAY` flag enabled.
+The TCP transport uses native BSD sockets provided by lwIP. To minimize handshake round-trip times and telemetry latency, we configure the socket with the `TCP_NODELAY` flag enabled. Both numeric IPv4 addresses and DNS hostnames are supported.
 
 ```c
 usmp_transport_t transport;
-usmp_transport_tcp_init(&transport, "192.168.1.100", 9000);
+// Supports both numeric IPs and DNS hostnames (resolved via getaddrinfo)
+usmp_transport_tcp_init(&transport, "usmp.mycompany.com", 9000);
 ```
 
 ### 2. UDP Transport
 
-The UDP transport is connectionless and lightweight. It binds a local socket and routes packets to the target IP. USMP automatically handles sequence numbers, reliability, and frame validation.
+The UDP transport is connectionless and lightweight. It binds a local socket and routes packets to the target IP. USMP automatically handles sequence numbers, reliability, and frame validation. Both numeric IPv4 addresses and DNS hostnames are supported.
 
 ```c
 usmp_transport_t transport;
-usmp_transport_udp_init(&transport, "192.168.1.100", 9000);
+// Supports both numeric IPs and DNS hostnames (resolved via getaddrinfo)
+usmp_transport_udp_init(&transport, "usmp.mycompany.com", 9000);
 ```
 
 ---
@@ -70,7 +72,7 @@ USMP is optimized for resource-constrained environments. Once a session is activ
 
 | Context / Phase | RAM Consumption | Lifetime |
 | :--- | :--- | :--- |
-| **`usmp_t` Session Context** | ~108 bytes | Persistent (lives as long as the session is open). |
+| **`usmp_t` Session Context** | ~112 bytes | Persistent (lives as long as the session is open). |
 | **Transmit & Receive Buffers** | ~1 KB | Temporary stack memory (allocated only during send/recv calls). |
 | **Handshake Buffers** | ~1 KB | Transient heap memory (freed immediately after handshake completes). |
 | **mbedTLS Handshake Tasks** | ~2 KB – 4 KB | Transient stack memory (allocated during key exchange and signing). |
