@@ -23,16 +23,16 @@ export default async function Pages({ params }: PageProps) {
   const { frontmatter, content, tocs, relativeFilePath } = res
 
   return (
-    <div className="flex items-start gap-10">
-      <section className="flex-3 px-6 lg:px-10">
+    <div className="flex w-full min-w-0 max-w-full items-start gap-0 xl:gap-8">
+      <section className="flex-1 w-full min-w-0 max-w-full px-1 sm:px-4 lg:px-6">
         <ArticleBreadcrumb paths={slug} />
         <div className="space-y-4">
           <h1 className="text-3xl font-semibold">{frontmatter.title}</h1>
-          <p className="text-sm">{frontmatter.description}</p>
+          <p className="text-sm text-muted-foreground">{frontmatter.description}</p>
           <Separator />
         </div>
         <Typography>
-          <section>{content}</section>
+          <section className="w-full min-w-0 max-w-full overflow-x-clip">{content}</section>
           <Pagination pathname={pathName} />
         </Typography>
       </section>

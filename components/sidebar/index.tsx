@@ -19,7 +19,7 @@ import {
 export function Sidebar() {
   return (
     <aside
-      className="sticky top-26 hidden h-[calc(100vh-7.5rem)] min-w-57.5 flex-1 flex-col md:flex"
+      className="sticky top-20 hidden h-[calc(100vh-6rem)] w-64 shrink-0 flex-col md:flex"
       aria-label="Page navigation"
     >
       <ScrollArea className="h-full pr-3">

@@ -62,7 +62,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       <body className={`${inter.variable} font-regular antialiased`}>
         <Providers>
           <Navbar />
-          <main className="h-auto px-5 sm:px-8">{children}</main>
+          <main className="h-auto w-full min-w-0 max-w-full px-3 sm:px-6 lg:px-8 overflow-x-clip">{children}</main>
           <Footer />
         </Providers>
       </body>

@@ -16,14 +16,14 @@ export function Pre({ children, raw, ...rest }: ComponentProps<'pre'> & { raw?: 
   }, [raw, children])
 
   return (
-    <div className="group relative my-5">
+    <div className="group relative my-5 max-w-full min-w-0 overflow-hidden rounded-lg border border-border bg-card">
       {content ? (
         <div className="absolute top-3 right-2.5 z-10 opacity-80 group-hover:opacity-100 transition-opacity">
           <Copy content={content} />
         </div>
       ) : null}
-      <div className="relative">
-        <pre ref={preRef} {...rest}>
+      <div className="relative max-w-full overflow-x-auto">
+        <pre ref={preRef} className="max-w-full overflow-x-auto p-4 text-sm font-mono" {...rest}>
           {children}
         </pre>
       </div>
