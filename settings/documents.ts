@@ -39,6 +39,32 @@ export const Documents: Paths[] = [
     spacer: true,
   },
   {
+    title: 'Code Examples & Demos',
+    href: '/examples',
+    noLink: true,
+    items: [
+      {
+        title: 'Overview',
+        href: '/index',
+      },
+      {
+        title: 'TCP Echo Demo',
+        href: '/tcp',
+      },
+      {
+        title: 'UDP Reliability Demo',
+        href: '/udp',
+      },
+      {
+        title: 'AWS EC2 Deployment',
+        href: '/aws-ec2',
+      },
+    ],
+  },
+  {
+    spacer: true,
+  },
+  {
     title: 'Porting & Custom Transports',
     href: '/ports',
     noLink: true,
