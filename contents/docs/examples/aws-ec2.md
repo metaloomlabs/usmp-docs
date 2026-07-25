@@ -16,145 +16,214 @@ This guide walks you through setting up a public test server on an **AWS EC2** i
 
 ---
 
-## Directory Structure
+## 1. AWS EC2 Server Code (`server.py`)
 
-```text
-examples/aws_ec2_test/
-├── README.md               # Setup and deployment guide
-├── server/
-│   └── server.py           # Python server running on EC2
-├── arduino/
-│   └── arduino.ino         # Arduino IDE client sketch for ESP32
-└── esp32/                  # ESP-IDF project files for ESP32
-    ├── CMakeLists.txt
-    └── main/
-        ├── app.c           # Main ESP-IDF client logic
-        └── wifi.c          # Wi-Fi helper implementation
+Save the following Python script as `server.py` on your Ubuntu EC2 instance:
+
+```python
+import asyncio
+import logging
+from usmp import USMPServer, USMPSession, USMPProtocol
+
+logging.basicConfig(level=logging.INFO, format="[%(asctime)s] [%(levelname)s] %(message)s")
+
+DEV_PSK = b"usmp-dev-psk-change-me-before-prod"
+
+server = USMPServer(
+    host="0.0.0.0",
+    port=9000,
+    psk=DEV_PSK,
+    protocol=USMPProtocol.TCP
+)
+
+@server.on_session
+async def handle_ec2_client(session: USMPSession):
+    print("=" * 60)
+    print("                USMP SECURE SERVER (EC2)")
+    print("=" * 60)
+    print(f"[SESSION ESTABLISHED]")
+    print(f"  Device ID:  {session.device_id}")
+    print(f"  Session ID: {session.session_id}")
+    print("=" * 60)
+
+    try:
+        async for data in session:
+            text = data.decode("utf-8", errors="replace")
+            print(f"[RX from {session.device_id}]: {text}")
+
+            reply = f"Echo from EC2: {text}"
+            await session.send(reply.encode("utf-8"))
+            print(f"[TX to {session.device_id}]: {reply}")
+
+    except Exception as err:
+        print(f"[SESSION EXCEPTION] {session.device_id}: {err}")
+
+async function main():
+    print("============================================================")
+    print("                USMP SECURE SERVER (EC2)")
+    print("============================================================")
+    print("Listening on: 0.0.0.0:9000")
+    print("Protocol:     TCP")
+    print("============================================================")
+    print("Starting server... Press Ctrl+C to stop.\n")
+    await server.serve()
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
 ---
 
-## Prerequisites
+## 2. Arduino IDE Client Code (`arduino.ino`)
 
-Before starting, make sure you have:
+Below is the Arduino IDE sketch configured for connecting across the public Internet to your EC2 instance:
 
-1. An active **AWS Account**.
-2. An **ESP32 development board** connected to your local machine.
-3. Depending on your preferred framework:
-   - **Arduino IDE**: Install the IDE and download the prepackaged Arduino library zip `usmp-1.1.0-arduino.zip` from our [Downloads](/downloads) page.
-   - **ESP-IDF**: Install the ESP-IDF toolchain (v5.0+) and make sure `idf.py` is available in your path.
+```cpp
+#include <WiFi.h>
+#include <USMP.h>
 
----
+// Enter your AWS EC2 Public IP and Wi-Fi Details
+#define EC2_PUBLIC_IP "13.62.222.96"  // Replace with your EC2 Public IPv4
+#define EC2_PORT 9000
+#define WIFI_SSID "YOUR_WIFI_SSID"
+#define WIFI_PASS "YOUR_WIFI_PASSWORD"
 
-## Step 1: Launch an AWS EC2 Instance
+const char *DEV_PSK = "usmp-dev-psk-change-me-before-prod";
 
-1. Log in to the [AWS Management Console](https://aws.amazon.com/console/).
-2. Navigate to the **EC2 Dashboard** and click **Launch instance**.
-3. Configure the following settings:
-   - **Name**: `usmp-test-server`
-   - **Application and OS Image (AMI)**: Select **Ubuntu** (e.g., *Ubuntu Server 24.04 LTS*, Free tier eligible).
-   - **Architecture**: `x86_64` (default).
-   - **Instance type**: `t2.micro` or `t3.micro` (Free tier eligible).
-   - **Key pair (login)**: Choose an existing key pair or click **Create new key pair** (download and save the `.pem` file safely).
-4. Click **Launch instance**.
+USMPClient usmp(DEV_PSK);
+unsigned long lastPing = 0;
+int pingCount = 0;
 
----
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
 
-## Step 2: Configure Security Group (Port 9000)
+  Serial.println("\n==========================================");
+  Serial.println("   ESP32 USMP EC2 Public Cloud Client");
+  Serial.println("==========================================");
 
-By default, AWS blocks all incoming traffic to your EC2 instance except SSH (Port 22). To allow the ESP32 to communicate with the USMP server, you must open TCP port `9000`.
+  Serial.printf("Connecting to Wi-Fi: %s\n", WIFI_SSID);
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.printf("\nWi-Fi Connected! IP: %s\n", WiFi.localIP().toString().c_str());
 
-1. In the EC2 Dashboard, select your running instance `usmp-test-server`.
-2. Select the **Security** tab and click on the **Security groups** link.
-3. Click **Edit inbound rules**.
-4. Click **Add rule** and configure:
-   - **Rule 1 (SSH)**: Type `SSH`, Port `22`, Source `My IP` or `0.0.0.0/0`.
-   - **Rule 2 (USMP Server)**: Type `Custom TCP`, Port `9000`, Source `Anywhere-IPv4` (`0.0.0.0/0`).
-5. Click **Save rules**.
+  Serial.printf("Connecting to USMP EC2 Server: %s:%d\n", EC2_PUBLIC_IP, EC2_PORT);
+  USMPTCPTransport transport = USMP::TCP(EC2_PUBLIC_IP, EC2_PORT);
 
----
+  usmp.onConnect([]() {
+    Serial.println("\n[SUCCESS] Secure USMP session established with AWS EC2!");
+  });
 
-## Step 3: Prepare the EC2 Instance
+  usmp.onMessage([](const uint8_t *data, size_t len) {
+    String msg = String((char*)data).substring(0, len);
+    Serial.printf("Received from EC2: %s\n", msg.c_str());
+  });
 
-Connect to your EC2 instance via SSH:
+  if (!usmp.begin(transport)) {
+    Serial.println("[ERROR] Failed to connect to AWS EC2.");
+  }
+}
 
-```bash
-ssh -i your-key.pem ubuntu@your-ec2-public-ip
+void loop() {
+  usmp.loop();
+
+  if (millis() - lastPing > 5000) {
+    lastPing = millis();
+    pingCount++;
+
+    if (usmp.isConnected()) {
+      String msg = "ESP32 Ping #" + String(pingCount) + " (Uptime: " + String(millis()/1000) + "s)";
+      Serial.printf("Sending: %s\n", msg.c_str());
+      usmp.send((const uint8_t*)msg.c_str(), msg.length());
+    }
+  }
+}
 ```
 
-Install Python 3:
+---
 
-```bash
-sudo apt update && sudo apt upgrade -y
-sudo apt install python3 python3-pip python3-venv git -y
+## 3. ESP-IDF Native Client Code (`main/app.c`)
+
+Below is the ESP-IDF client source file `main/app.c`:
+
+```c
+#include <stdio.h>
+#include <string.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_log.h"
+#include "esp_wifi.h"
+#include "nvs_flash.h"
+
+#include "usmp.h"
+#include "usmp_transport_tcp.h"
+
+static const char *TAG = "EC2_CLIENT";
+#define EC2_PUBLIC_IP "13.62.222.96"  // Replace with your EC2 Public IPv4
+#define EC2_PORT 9000
+#define DEV_PSK "usmp-dev-psk-change-me-before-prod"
+
+void app_main(void) {
+    ESP_ERROR_CHECK(nvs_flash_init());
+
+    ESP_LOGI(TAG, "Starting EC2 Client application...");
+
+    usmp_context_t ctx;
+    usmp_transport_t transport;
+
+    usmp_init(&ctx, DEV_PSK);
+    usmp_transport_tcp_init(&transport, EC2_PUBLIC_IP, EC2_PORT);
+
+    ESP_LOGI(TAG, "Connecting to EC2 server %s:%d...", EC2_PUBLIC_IP, EC2_PORT);
+    if (usmp_connect(&ctx, &transport) != USMP_OK) {
+        ESP_LOGE(TAG, "Failed to connect to EC2!");
+        return;
+    }
+
+    ESP_LOGI(TAG, "[SUCCESS] Secure USMP session established with EC2!");
+
+    char ping_msg[64] = "Hello EC2, this is ESP32 via USMP!";
+    if (usmp_send(&ctx, &transport, (const uint8_t*)ping_msg, strlen(ping_msg)) == USMP_OK) {
+        uint8_t rx_buf[256];
+        size_t rx_len = 0;
+
+        if (usmp_recv(&ctx, &transport, rx_buf, sizeof(rx_buf), &rx_len, 5000) == USMP_OK) {
+            rx_buf[rx_len] = '\0';
+            ESP_LOGI(TAG, "Received from EC2: %s", (char*)rx_buf);
+        }
+    }
+
+    usmp_close(&ctx, &transport);
+}
 ```
 
 ---
 
-## Step 4: Run the USMP Server on EC2
+## Deployment & Execution Steps
 
-Create a directory and virtual environment, install `usmp`, and start the server:
+### 1. Configure Inbound Rules on AWS EC2
+In the AWS EC2 Console, open your Security Group inbound rules and add a rule allowing **Custom TCP**, Port **9000**, Source `0.0.0.0/0`.
 
+### 2. Run the EC2 Server
 ```bash
-mkdir usmp-server && cd usmp-server
-python3 -m venv .venv
-source .venv/bin/activate
 pip install usmp
-```
-
-Create `server.py` and run it:
-
-```bash
 python3 server.py
 ```
 
-*You should see a message indicating the server is listening on port 9000.*
-
----
-
-## Step 5: Configure and Upload Client Firmware
-
-### Option A: Using Arduino IDE
-
-1. Download `usmp-1.1.0-arduino.zip` from our [Downloads](/downloads) page.
-2. In **Arduino IDE**, click **Sketch** ➔ **Include Library** ➔ **Add .ZIP Library...** and select `usmp-1.1.0-arduino.zip`.
-3. Set your parameters:
-   - **`EC2_PUBLIC_IP`**: Put the **Public IPv4 address** of your running EC2 instance.
-   - **`WIFI_SSID`**: Enter your local Wi-Fi name.
-   - **`WIFI_PASS`**: Enter your local Wi-Fi password.
-   - **`PSK`**: Match this with your server key (default: `usmp-dev-psk-change-me-before-prod`).
-4. Select your ESP32 board and click **Upload**.
-
----
-
-## Step 6: Verify Connection & Logs
-
-### ESP32 Serial Monitor Output
-
-```text
-Connecting to Wi-Fi: YourNetwork
-Connecting to USMP EC2 Server: 13.62.222.96:9000
-[INFO] Connecting to 13.62.222.96 on port 9000...
-[INFO] Socket connected. Sending handshake initiator...
-[INFO] Handshake response received. Validating peer...
-[SUCCESS] Secure USMP session established!
-  Device ID:  device_xxxxxxxxxxxx
-  Session ID: session_xxxxxxxxxxxx
-Sending: ESP32 Ping #1 (Uptime: 5s)
+### 3. Flash and Monitor Microcontroller
+Upload `arduino.ino` in Arduino IDE or flash `app.c` in ESP-IDF:
+```bash
+idf.py -p COMx flash monitor
 ```
 
-### EC2 Terminal Output
-
+### 4. Verify Output Logs
+Upon boot, your ESP32 serial monitor will display:
 ```text
-============================================================
-                USMP SECURE SERVER (EC2)
-============================================================
-Listening on: 0.0.0.0:9000
-Protocol:     TCP
-============================================================
-[SESSION ESTABLISHED]
-  Device ID:  device_xxxxxxxxxxxx
-  Session ID: session_xxxxxxxxxxxx
-  Client IP:  73.14.XX.XX
-[RX from device_xxxxxxxxxxxx]: Hello EC2, this is ESP32 via USMP!
+Connecting to USMP EC2 Server: 13.62.222.96:9000
+[SUCCESS] Secure USMP session established!
+Sending: ESP32 Ping #1 (Uptime: 5s)
+Received from EC2: Echo from EC2: ESP32 Ping #1 (Uptime: 5s)
 ```
