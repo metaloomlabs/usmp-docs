@@ -72,10 +72,15 @@ USMP is optimized for resource-constrained environments. Once a session is activ
 
 | Context / Phase | RAM Consumption | Lifetime |
 | :--- | :--- | :--- |
-| **`usmp_t` Session Context** | ~112 bytes | Persistent (lives as long as the session is open). |
+| **`usmp_t` Session Context** | ~168 bytes (32-bit) | Persistent (lives as long as the session is open). |
 | **Transmit & Receive Buffers** | ~1 KB | Temporary stack memory (allocated only during send/recv calls). |
 | **Handshake Buffers** | ~1 KB | Transient heap memory (freed immediately after handshake completes). |
 | **mbedTLS Handshake Tasks** | ~2 KB – 4 KB | Transient stack memory (allocated during key exchange and signing). |
+
+> [!CAUTION]
+> **Runtime PSK Provisioning Required (No Compile-time `USMP_PSK`)**
+> Defining `USMP_PSK` as a compile-time macro is no longer supported and will produce a build `#error` in `usmp.h`.
+> You must assign `ctx.psk` and `ctx.psk_len` at runtime (loaded from secure storage or NVS) before invoking `usmp_connect()`.
 
 > [!IMPORTANT]
 > **Task Stack Configurations**

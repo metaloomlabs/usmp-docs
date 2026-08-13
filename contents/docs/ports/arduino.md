@@ -87,6 +87,32 @@ bool alive();
 
 Checks if your secure session is currently connected and active.
 
+#### `deviceId` & `sessionId`
+
+```cpp
+String deviceId();
+String sessionId();
+```
+
+* **`deviceId()`**: Returns the station MAC device identifier formatted as a hex string.
+* **`sessionId()`**: Returns the active 128-bit session identifier as a hex string (or empty string if disconnected).
+
+#### `setLogLevel`
+
+```cpp
+void setLogLevel(usmp_log_level_t level);
+```
+
+Configures internal protocol logging thresholds (`USMP_LOG_NONE`, `USMP_LOG_ERROR`, `USMP_LOG_WARN`, `USMP_LOG_INFO`, `USMP_LOG_DEBUG`).
+
+#### `reconnect`
+
+```cpp
+bool reconnect();
+```
+
+Manually initiates a socket reconnection and executes a fresh cryptographic handshake.
+
 #### `close`
 
 ```cpp

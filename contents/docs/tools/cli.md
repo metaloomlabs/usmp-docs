@@ -1,7 +1,8 @@
 # CLI Tool
 
-!!! warning "Coming soon"
-    The USMP CLI tool is under active development.
+> [!WARNING]
+> **Coming soon**
+> The USMP CLI tool is under active development.
 
 The `usmp` CLI tool lets you interact with USMP devices on your LAN
 directly from the terminal — like SSH for IoT devices.
@@ -30,8 +31,8 @@ usmp monitor
 ```bash
 $ usmp scan
 Scanning LAN for USMP devices...
-  aa:bb:cc:dd:ee:ff  192.168.1.60  ESP32  USMP v0.1  online
-  aa:bb:cc:dd:ee:00  192.168.1.61  ESP32  USMP v0.1  online
+  aa:bb:cc:dd:ee:ff  192.168.1.60  ESP32  USMP v1.1  online
+  aa:bb:cc:dd:ee:00  192.168.1.61  ESP32  USMP v1.1  online
 
 $ usmp connect aa:bb:cc:dd:ee:ff
 Connecting to aa:bb:cc:dd:ee:ff (192.168.1.60)...
