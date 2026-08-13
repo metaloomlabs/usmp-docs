@@ -1,6 +1,6 @@
-# USMP Technical Specification | Version v1.0.0
+# USMP Technical Specification | Version v1.1.0
 
-Welcome to the official technical specification for the **Unified Secure Multi-transport Protocol (USMP) v1.0.0**.
+Welcome to the official technical specification for the **Unified Secure Multi-transport Protocol (USMP) v1.1.0**.
 
 This document serves as the canonical reference for developers implementing USMP client libraries, server SDKs, or alternative transport adapters. It covers frame layouts, cryptographic sequences, state machine rules, and resource limits.
 
@@ -273,4 +273,4 @@ USMP uses **zero heap allocations** once a session is established.
 
 ---
 
-*USMP v1.0.0 — Released 2026-07-05. Licensed under Apache-2.0.*
+*USMP v1.1.0 — Released 2026-08-13. Licensed under Apache-2.0.*

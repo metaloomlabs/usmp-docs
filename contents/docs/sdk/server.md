@@ -12,11 +12,13 @@ from usmp import USMPServer
 server = USMPServer(
     host: str = "0.0.0.0",
     port: int = 9000,
-    psk: bytes | dict[bytes, bytes] | Callable[[bytes], bytes] = b"",
+    psk: bytes | dict[bytes, bytes] | Callable[[bytes], bytes | Awaitable[bytes]] = b"",
     handshake_timeout: float = 10.0,
     session_timeout: float = 60.0,
     on_timeout: Callable[[str, str], Awaitable[None]] | None = None,
-    protocol: USMPProtocol | str = USMPProtocol.TCP
+    protocol: USMPProtocol | str = USMPProtocol.TCP,
+    max_connections: int = 100,
+    max_connections_per_ip: int = 5
 )
 ```
 
@@ -27,7 +29,7 @@ server = USMPServer(
 * **`psk`** *(bytes | dict | Callable)*: The Pre-Shared Key configuration. This parameter is highly flexible:
   * **Single Key (`bytes`)**: All connecting devices share the exact same key. Great for simple setups.
   * **Registry Map (`dict`)**: A dictionary mapping individual device IDs (`bytes`) to unique PSKs.
-  * **Dynamic Lookup (`Callable`)**: An asynchronous or synchronous function matching the signature `def get_psk(device_id: bytes) -> bytes`. The server invokes this dynamically during handshakes to query your database or key vault.
+  * **Dynamic Lookup (`Callable`)**: An asynchronous (`async def`) or synchronous function matching the signature `def get_psk(device_id: bytes) -> bytes | Awaitable[bytes]`. The server invokes this dynamically during handshakes to query your database or key vault.
 * **`handshake_timeout`** *(float)*: The maximum time (in seconds) allowed for a client to complete the 4-step handshake. If a client stalls, the connection is closed.
 * **`session_timeout`** *(float)*: Inactivity watchdog timer. If a connected device fails to send a `PING` or `DATA` frame within this window, the session is terminated.
 * **`on_timeout`** *(Callable)*: An optional async hook triggered when a session watchdog fires:
@@ -40,6 +42,8 @@ server = USMPServer(
 * **`protocol`** *(USMPProtocol | str, optional)*: The transport protocol to run (default is `"tcp"` or `USMPProtocol.TCP`):
   * `"tcp"` (or `USMPProtocol.TCP`): Spawns a standard asyncio TCP listener.
   * `"udp"` (or `USMPProtocol.UDP`): Spawns an asyncio datagram endpoint, managing multiple UDP clients on the same port using their IP/port addresses.
+* **`max_connections`** *(int, optional)*: Maximum total active connections allowed globally across the server (default `100`). Excess connection attempts are rejected immediately to prevent DoS resource exhaustion.
+* **`max_connections_per_ip`** *(int, optional)*: Maximum active connections allowed per remote IP address (default `5`). Prevents single IP socket-exhaustion attacks.
 
 ## The `@on_session` Decorator
 
