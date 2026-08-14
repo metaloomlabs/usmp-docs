@@ -58,7 +58,7 @@ Every USMP packet is serialized into a single binary frame. The header occupies 
 ## 4. Packet Types
 
 | Value | Name | Direction | Encrypted? | Description / Role |
-|:---|:---|:---|:---|:---|
+| :--- | :--- | :--- | :--- | :--- |
 | `0x01` | `PKT_HELLO` | Client → Server | No | Announces Device ID and client public key `pub_C`. Over UDP, may include a return-routability cookie (see Section 5.1). |
 | `0x02` | `PKT_CHALLENGE` | Server → Client | No | Pushes server challenge `nonce` and public key `pub_S`. |
 | `0x03` | `PKT_HELLO_ACK` | Client → Server | No | Proves client identity via HMAC, binding handshake keys. |
@@ -238,7 +238,7 @@ USMP authenticates both endpoints using a **Pre-Shared Key (PSK)** that must be 
 When a session terminates due to an error, a `PKT_ERROR` frame is defined to carry a 1-byte code and a 2-byte details field:
 
 | Code | Name | Description / Trigger |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | `0x01` | `ERR_VERSION` | Received an unsupported protocol version number. |
 | `0x02` | `ERR_AUTH` | HMAC verification failed during handshake validation. |
 | `0x03` | `ERR_SEQ` | Monotonic sequence number mismatch or interleaving error. |
@@ -265,7 +265,7 @@ USMP uses **zero heap allocations** once a session is established.
 ## 12. Transport Layer Summary
 
 | Transport | Reliability | Handshake | Replay Protection | Session Cap |
-|:---|:---|:---|:---|:---|
+| :--- | :--- | :--- | :--- | :--- |
 | **TCP** | Stream-ordered | 4-step (Section 5) | Strict monotonic `seq` | Per-IP + global |
 | **UDP** | Datagram, unordered | 5-step with cookie (Section 5.6) | 64-bit sliding window (Section 8.2) | Per-IP + global |
 | **Serial/UART** | Stream-ordered | 4-step (Section 5) | Strict monotonic `seq` | N/A (point-to-point) |
