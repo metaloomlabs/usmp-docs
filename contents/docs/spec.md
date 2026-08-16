@@ -1,6 +1,6 @@
-# USMP Technical Specification | Version v1.1.0
+# USMP Technical Specification | Version v1.2.0
 
-Welcome to the official technical specification for the **Unified Secure Multi-transport Protocol (USMP) v1.1.0**.
+Welcome to the official technical specification for the **Unified Secure Multi-transport Protocol (USMP) v1.2.0**.
 
 This document serves as the canonical reference for developers implementing USMP client libraries, server SDKs, or alternative transport adapters. It covers frame layouts, cryptographic sequences, state machine rules, and resource limits.
 
@@ -69,6 +69,7 @@ Every USMP packet is serialized into a single binary frame. The header occupies 
 | `0x08` | `PKT_BYE` | Both | Yes | Graceful connection exit. |
 | `0x09` | `PKT_DATA_FRAG` | Both | Yes | Payload fragment (initial/middle chunks). |
 | `0x0A` | `PKT_HELLO_RETRY` | Server → Client | No | UDP return-routability cookie challenge (see Section 5.6). |
+| `0x0B` | `PKT_REKEY` | Both | Yes | In-band session key rotation salt exchange (see Section 5.7). |
 | `0xFF` | `PKT_ERROR` | Both | No | Reserved (unused diagnostic telemetry). |
 
 ## 5. The Handshake Sequence
@@ -155,9 +156,34 @@ Client (Device)                                      Server (Gateway)
 * **Structure**:
   * `0..15` (16 bytes): `cookie` — a server-generated stateless HMAC-based token binding the client's address and `device_id`. The server does **not** allocate any state until the cookie is returned.
 
-## 6. Authenticated Encryption (AES-GCM)
+### 5.7 In-Band Session Rekeying (`PKT_REKEY`, 0x0B)
 
-All packets after the handshake are protected with AES-256-GCM.
+USMP v1.2.0 supports in-band key rotation, allowing either peer to refresh active session keys without disconnecting or re-running the X25519 handshake.
+
+```text
+Initiator (Client or Server)                         Peer (Server or Client)
+      │                                                         │
+      │ ─── 1. PKT_REKEY (salt: 32 bytes) ────────────────────> │
+      │                                                         │
+      │   [Both derive new_tx_key, new_rx_key via HKDF-SHA256]  │
+      │   [Reset sequence numbers: tx_seq = 0, rx_seq = 0]      │
+      │   [Reset sliding replay window: rx_window_bitmap = 0]   │
+      │                                                         │
+      └──────────────── REKEYED Session ────────────────────────┘
+```
+
+* **Payload**: Exactly 32 bytes of cryptographically secure random entropy (`salt`).
+* **Key Derivation**:
+  $$\text{secret} = \begin{cases} \text{tx\_key} \parallel \text{rx\_key} & \text{if initiator} \\ \text{rx\_key} \parallel \text{tx\_key} & \text{if peer} \end{cases}$$
+  $$\text{key\_material} = \text{HKDF-SHA256}(\text{ikm}=\text{secret}, \text{salt}=\text{salt}, \text{info}=\text{"usmp-rekey"} \parallel \text{session\_id}, \text{len}=64)$$
+* **Sequence Counter & Bitmap Reset**: Following key update, both sequence numbers (`tx_seq`, `rx_seq`) and the 64-bit sliding anti-replay bitmap are reset to `0`.
+
+## 6. Authenticated Encryption (AES-256-GCM & ChaCha20-Poly1305)
+
+All packets after the handshake are protected using an Authenticated Encryption with Associated Data (AEAD) cipher suite. USMP v1.2.0 supports two standardized cipher suites:
+
+* **`USMP_CIPHER_AES_256_GCM` (`0x01`, Default)**: Hardware-accelerated AES-256 in Galois/Counter Mode.
+* **`USMP_CIPHER_CHACHA20_POLY1305` (`0x02`)**: High-performance ChaCha20 stream cipher with Poly1305 authenticator, ideal for platforms without dedicated AES hardware.
 
 ### 6.1 Nonce Construction
 
@@ -220,6 +246,18 @@ Over connectionless transports, strict monotonic sequence enforcement is impract
 
 To mitigate CPU exhaustion from floods of malformed or unauthenticated packets, `usmp_recv` limits the number of receive-and-parse attempts to **10 per call**. If 10 consecutive packets fail validation (parse error, decryption failure, replay duplicate), the call returns 0 (no data) rather than looping indefinitely. This bounds worst-case CPU time on UDP transports.
 
+### 8.4 Adaptive UDP RTT Estimation & Exponential Backoff
+
+Over connectionless UDP transport, USMP implements Karn's algorithm to compute smooth round-trip times and handle packet loss transparently:
+
+* **RTT Estimation**: Tracked via smoothed RTT ($\text{SRTT}$, default 200 ms) and RTT variation ($\text{RTTVAR}$, default 100 ms) updated strictly on first-attempt ACKs:
+  $$\text{err} = \text{sample\_rtt} - \text{SRTT}$$
+  $$\text{RTTVAR} = \text{RTTVAR} + 0.25 \times (|\text{err}| - \text{RTTVAR})$$
+  $$\text{SRTT} = \text{SRTT} + 0.125 \times \text{err}$$
+* **Dynamic RTO Bounds**: Retransmission Timeout ($\text{RTO}$) is clamped between 0.1s and 5.0s:
+  $$\text{RTO} = \max\left(0.1, \min\left(5.0, \text{SRTT} + 4.0 \times \text{RTTVAR}\right)\right)$$
+* **Exponential Backoff**: Up to 5 transmission attempts are executed per frame, doubling the timeout on each timeout up to 5.0s max before raising a transport error.
+
 ## 9. Pre-Shared Key (PSK) Requirements
 
 USMP authenticates both endpoints using a **Pre-Shared Key (PSK)** that must be provisioned at runtime:
@@ -273,4 +311,4 @@ USMP uses **zero heap allocations** once a session is established.
 
 ---
 
-*USMP v1.1.0 — Released 2026-08-13. Licensed under Apache-2.0.*
+*USMP v1.2.0 — Released 2026-08-15. Licensed under Apache-2.0.*

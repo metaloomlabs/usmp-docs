@@ -2,7 +2,7 @@
 
 > **Bridging the IoT Security Gap with zero-friction, end-to-end encrypted tunnels.**
 
-USMP is a lightweight, transport-agnostic binary session protocol designed for resource-constrained embedded microcontrollers (ESP32, Arduino) and gateways (Python). It provides iron-clad mutual authentication and AES-256-GCM encryption with just three function calls.
+USMP is a lightweight, transport-agnostic binary session protocol designed for resource-constrained embedded microcontrollers (ESP32, Arduino) and gateways (Python). It provides iron-clad mutual authentication and AEAD encryption (AES-256-GCM or ChaCha20-Poly1305) with just three function calls.
 
 ```c
 // 1. Initialize your choice of transport (TCP or UDP)
@@ -35,7 +35,8 @@ USMP does not support an "insecure mode." Every session is strictly hardened out
 
 * **Mutual Authentication**: Both client (device) and server (gateway) prove their identity using a Pre-Shared Key (PSK) and HMAC-SHA256 proofs before exchanging payload data.
 * **Perfect Forward Secrecy**: An ephemeral X25519 Diffie-Hellman key exchange is performed for every session. Even if the Pre-Shared Key is compromised in the future, past captured traffic cannot be decrypted.
-* **Mandatory Encryption**: All session data frames are encrypted using AES-256-GCM, ensuring absolute confidentiality and tamper-proof message integrity.
+* **Mandatory AEAD Encryption**: All session data frames are encrypted using AES-256-GCM or ChaCha20-Poly1305, ensuring absolute confidentiality and tamper-proof message integrity.
+* **In-Band Session Rekeying**: Transparently rotate session keys on active connections via `PKT_REKEY` without terminating sockets.
 * **Replay Protection**: Strict, monotonic 32-bit sequence numbers and deterministic nonces prevent attackers from capturing and replaying packets.
 
 > [!WARNING]
@@ -76,7 +77,7 @@ USMP is packaged and published directly to official package managers, keeping yo
     ```
 
 === "Arduino Library"
-    Available as a packaged offline ZIP archive (`usmp-1.1.0-arduino.zip`) for import into Arduino IDE or PlatformIO.
+    Available as a packaged offline ZIP archive (`usmp-1.2.0-arduino.zip`) for import into Arduino IDE or PlatformIO.
 
     1. Go to **Sketch** ➔ **Include Library** ➔ **Add .ZIP Library...**
     2. Select the packaged ZIP archive.

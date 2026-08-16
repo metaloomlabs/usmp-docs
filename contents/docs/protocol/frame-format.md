@@ -30,7 +30,7 @@ Here is how a frame is packed on the wire:
 
 * **Total Header Size**: Exactly 12 bytes.
 * **Maximum Payload Capacity**: 480 bytes.
-  * For encrypted messages, this space holds a 12-byte nonce, the encrypted text, and a 16-byte GCM authentication tag.
+  * For encrypted messages, this space holds a 12-byte nonce, the encrypted text, and a 16-byte AEAD authentication tag (GCM or Poly1305).
   * This means the **maximum plaintext message** you can send in a single frame is **452 bytes**.
 * **Maximum Total Frame Size**: 492 bytes. (This fits comfortably inside standard 512-byte network buffers!)
 
@@ -51,7 +51,7 @@ Let’s look at why each of these fields is there and how they work.
 ### 3. Packet Type (`type`)
 
 * **Size**: 1 byte
-* **Why it's here**: Tells the receiver what this frame is meant for (e.g. is it a handshake greeting, a normal data frame, a keepalive ping, or a disconnect signal?).
+* **Why it's here**: Tells the receiver what this frame is meant for (e.g. is it a handshake greeting, a normal data frame, a keepalive ping, a session rekey request, or a disconnect signal?).
 * *See the [Protocol Overview](overview.md#packet-types-knowing-whats-in-the-box) for a full list of packet types.*
 
 ### 4. Sequence Number (`seq`)
@@ -90,7 +90,7 @@ def crc16(data: bytes) -> int:
 Depending on whether a session has been established, payloads are either plain or encrypted:
 
 1. **Before Handshake (Plaintext)**: The payload is raw binary bytes (like ephemeral keys during the handshake).
-2. **After Handshake (Encrypted)**: The payload uses AES-256-GCM. On the wire, it is organized like this:
+2. **After Handshake (Encrypted)**: The payload uses AEAD encryption (AES-256-GCM or ChaCha20-Poly1305). On the wire, it is organized like this:
 
    ```
    [ 12-byte Nonce ] [ Ciphertext ] [ 16-byte Auth Tag ]
