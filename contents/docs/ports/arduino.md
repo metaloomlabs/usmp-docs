@@ -8,10 +8,10 @@ Welcome, Arduino developers! The Arduino port of USMP wraps the core C protocol 
 
 USMP is packaged as a standard offline ZIP library to keep private repository references out of your builds:
 
-1. Locate `usmp-X.Y.Z-arduino.zip` in your releases archive.
+1. Locate `usmp-1.2.0-arduino.zip` in your releases archive.
 2. Open **Arduino IDE**.
 3. Go to **Sketch** ➔ **Include Library** ➔ **Add .ZIP Library...**
-4. Choose the zip file to complete the import.
+4. Choose `usmp-1.2.0-arduino.zip` to complete the import.
 
 To include it in your sketch:
 
@@ -65,7 +65,7 @@ void maintain();
 
 Performs background driver tasks. **You must call this inside your main `loop()` function.**
 
-* Checks for incoming data, triggers registered callbacks, handles keepalive pings, and automatically reconnects if the socket drops.
+* Checks for incoming data, drains control frames (`PING`, `PONG`, `REKEY`) automatically in the background, triggers registered callbacks, handles keepalive pings, and automatically reconnects if the socket drops.
 
 #### `keepalive`
 
@@ -146,12 +146,14 @@ If you prefer a simple sequential flow, you can query the client inside your `lo
 ```cpp
 if (usmp.available()) {
     String msg = usmp.read();
-    Serial.println(msg);
+    if (msg.length() > 0) {
+        Serial.println("Received: " + msg);
+    }
 }
 ```
 
-* **`available()`**: Returns `true` if a decrypted packet is ready.
-* **`read()`**: Reads the next decrypted packet as a `String`.
+* **`available()`**: Drains background control frames (`PING`, `PONG`, `REKEY`) automatically and returns `true` if a decrypted application packet is ready in the buffer.
+* **`read()`**: Reads the next decrypted packet as a `String`. Guard printing with `if (msg.length() > 0)` to avoid empty line prints.
 * **`read(buf, max_len)`**: Copies raw decrypted bytes into a buffer and returns the length.
 
 ---

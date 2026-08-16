@@ -32,7 +32,7 @@ import {
 } from '@/components/ui/accordion'
 import { cn } from '@/lib/utils'
 
-const V110_SHA256 = '54aa90c05e2729d5f3f9cc8974340f043de29e082d18babe542f04604fcf7278'
+const V120_SHA256 = 'da2fa37225e84d987a7ad13ec7bfc9d64a29b2cdee899e77ae497e6d8f50eb28'
 
 export function DownloadsView() {
   const [copiedKey, setCopiedKey] = useState<string | null>(null)
@@ -51,7 +51,7 @@ export function DownloadsView() {
       <div className="text-center space-y-4 max-w-3xl mx-auto pt-4">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20 shadow-xs">
           <LuSparkles className="w-3.5 h-3.5 shrink-0" />
-          <span>v1.1.0 • Recommended Production Release</span>
+          <span>v1.2.0 • Recommended Production Release</span>
         </div>
         
         <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-foreground via-foreground/90 to-muted-foreground bg-clip-text text-transparent">
@@ -68,7 +68,7 @@ export function DownloadsView() {
             href="#featured-release"
             className="px-3 py-1 rounded-md bg-muted hover:bg-muted/80 border border-border text-foreground transition-colors"
           >
-            v1.1.0 Latest Release
+            v1.2.0 Latest Release
           </a>
           <a
             href="#package-managers"
@@ -91,7 +91,7 @@ export function DownloadsView() {
         </div>
       </div>
 
-      {/* Featured Flagship Release Banner - v1.1.0 */}
+      {/* Featured Flagship Release Banner - v1.2.0 */}
       <section
         id="featured-release"
         className="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-b from-card via-card to-primary/5 p-6 sm:p-8 shadow-md transition-all hover:border-primary/50"
@@ -106,11 +106,11 @@ export function DownloadsView() {
                 RECOMMENDED STABLE
               </span>
               <span className="flex items-center gap-1.5 text-sm font-bold text-foreground">
-                <LuTag className="w-4 h-4 text-primary" /> v1.1.0
+                <LuTag className="w-4 h-4 text-primary" /> v1.2.0
               </span>
               <span className="text-muted-foreground text-xs">•</span>
               <span className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
-                <LuCalendar className="w-3.5 h-3.5" /> Released July 25, 2026
+                <LuCalendar className="w-3.5 h-3.5" /> Released August 15, 2026
               </span>
               <span className="text-muted-foreground text-xs">•</span>
               <span className="text-xs font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded border border-border">
@@ -119,30 +119,30 @@ export function DownloadsView() {
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
-              USMP v1.1.0 — Reliable UDP & Enhanced Hardware Support
+              USMP v1.2.0 — ChaCha20-Poly1305, In-Band Rekeying & Adaptive RTT
             </h2>
 
             <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-              <strong>v1.1.0</strong> is the recommended stable release line (v1.1.0). It introduces reliable connectionless UDP transport layer support with automatic sliding-window acknowledgments, key rotation safety enhancements, and updated Arduino wrapper libraries without breaking API changes.
+              <strong>v1.2.0</strong> is the recommended stable release line. It introduces ChaCha20-Poly1305 cipher suite support, transparent in-band session key rotation (<code>PKT_REKEY</code>), adaptive UDP RTT estimation with Karn's algorithm, and decoupled background control frame handling in Arduino libraries.
             </p>
 
             {/* Feature Highlights Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-sm text-foreground/90 font-medium">
               <div className="flex items-center gap-2.5 p-2 rounded-lg bg-background/60 border border-border/60">
-                <LuZap className="w-4 h-4 text-primary shrink-0" />
-                <span className="text-xs sm:text-sm">Reliable UDP Session Demultiplexing</span>
+                <LuLock className="w-4 h-4 text-primary shrink-0" />
+                <span className="text-xs sm:text-sm">ChaCha20-Poly1305 AEAD Cipher Suite</span>
               </div>
               <div className="flex items-center gap-2.5 p-2 rounded-lg bg-background/60 border border-border/60">
-                <LuCpu className="w-4 h-4 text-primary shrink-0" />
-                <span className="text-xs sm:text-sm">ESP32 Hardware AES-GCM Acceleration</span>
+                <LuZap className="w-4 h-4 text-primary shrink-0" />
+                <span className="text-xs sm:text-sm">In-Band Session Key Rotation (PKT_REKEY)</span>
               </div>
               <div className="flex items-center gap-2.5 p-2 rounded-lg bg-background/60 border border-border/60">
                 <LuShieldCheck className="w-4 h-4 text-primary shrink-0" />
-                <span className="text-xs sm:text-sm">Zero-Dynamic-Allocation Memory Footprint</span>
+                <span className="text-xs sm:text-sm">Adaptive UDP RTT & Exponential Backoff</span>
               </div>
               <div className="flex items-center gap-2.5 p-2 rounded-lg bg-background/60 border border-border/60">
                 <LuBox className="w-4 h-4 text-primary shrink-0" />
-                <span className="text-xs sm:text-sm">ESP-IDF v5.x Native Component Support</span>
+                <span className="text-xs sm:text-sm">Arduino Control Frame Background Draining</span>
               </div>
             </div>
           </div>
@@ -154,7 +154,7 @@ export function DownloadsView() {
             </div>
             
             <a
-              href="/usmp-1.1.0-arduino.zip"
+              href="/usmp-1.2.0-arduino.zip"
               download
               className={buttonVariants({
                 variant: 'default',
@@ -163,11 +163,11 @@ export function DownloadsView() {
               })}
             >
               <LuDownload className="w-5 h-5" />
-              <span>Download v1.1.0 ZIP</span>
+              <span>Download v1.2.0 ZIP</span>
             </a>
 
             <div className="text-center text-xs text-muted-foreground font-medium">
-              Arduino & PlatformIO Offline Library (35.0 KB)
+              Arduino & PlatformIO Offline Library (36.5 KB)
             </div>
 
             <div className="border-t border-border pt-3 mt-1 space-y-2">
@@ -177,7 +177,7 @@ export function DownloadsView() {
                 </span>
                 <button
                   type="button"
-                  onClick={() => copyToClipboard(V110_SHA256, 'hero-sha')}
+                  onClick={() => copyToClipboard(V120_SHA256, 'hero-sha')}
                   className="text-xs text-primary hover:underline font-mono inline-flex items-center gap-1 cursor-pointer"
                 >
                   {copiedKey === 'hero-sha' ? (
@@ -193,7 +193,7 @@ export function DownloadsView() {
               </div>
 
               <div className="p-2 rounded bg-muted/80 font-mono text-[11px] text-foreground break-all border border-border select-all">
-                {V110_SHA256}
+                {V120_SHA256}
               </div>
             </div>
           </div>
@@ -208,7 +208,7 @@ export function DownloadsView() {
             <h2 className="text-2xl font-bold tracking-tight">Package Managers & Integration</h2>
           </div>
           <p className="text-muted-foreground text-sm mt-1">
-            Integrate USMP v1.1.0 into your build system or package environment with standard dependency commands.
+            Integrate USMP v1.2.0 into your build system or package environment with standard dependency commands.
           </p>
         </div>
 
@@ -233,26 +233,26 @@ export function DownloadsView() {
             <div className="rounded-xl border border-border bg-card p-6 space-y-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-4">
                 <div>
-                  <h3 className="text-lg font-bold text-foreground">Arduino IDE Offline Library (v1.1.0)</h3>
+                  <h3 className="text-lg font-bold text-foreground">Arduino IDE Offline Library (v1.2.0)</h3>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     For ESP32, ESP8266, and SAMD microcontrollers using Arduino IDE 1.8.x or 2.x.
                   </p>
                 </div>
                 <a
-                  href="/usmp-1.1.0-arduino.zip"
+                  href="/usmp-1.2.0-arduino.zip"
                   download
                   className={buttonVariants({ variant: 'default', size: 'sm', className: 'gap-2 font-semibold shrink-0' })}
                 >
-                  <LuDownload className="w-4 h-4" /> Download v1.1.0 ZIP (35 KB)
+                  <LuDownload className="w-4 h-4" /> Download v1.2.0 ZIP (36.5 KB)
                 </a>
               </div>
 
               <div className="space-y-3 text-sm text-muted-foreground">
                 <div className="font-semibold text-foreground text-sm">Installation Steps:</div>
                 <ol className="list-decimal list-inside space-y-2 text-xs sm:text-sm">
-                  <li>Download <strong>usmp-1.1.0-arduino.zip</strong> using the button above.</li>
+                  <li>Download <strong>usmp-1.2.0-arduino.zip</strong> using the button above.</li>
                   <li>In Arduino IDE, go to menu: <code>Sketch</code> ➔ <code>Include Library</code> ➔ <code>Add .ZIP Library...</code></li>
-                  <li>Select the downloaded <code>usmp-1.1.0-arduino.zip</code> archive.</li>
+                  <li>Select the downloaded <code>usmp-1.2.0-arduino.zip</code> archive.</li>
                   <li>Include header in your code: <code>#include &lt;USMP.h&gt;</code>.</li>
                 </ol>
               </div>
@@ -262,7 +262,7 @@ export function DownloadsView() {
                   <span>Quick Test Sketch Header</span>
                   <button
                     type="button"
-                    onClick={() => copyToClipboard(`#include <USMP.h>\n\nUSMPNode node;\nvoid setup() {\n  Serial.begin(115200);\n  node.begin("DEVICE_SECRET_KEY");\n}`, 'code-arduino')}
+                    onClick={() => copyToClipboard(`#include <USMP.h>\n\nUSMPClient usmp("DEVICE_PSK");\nvoid setup() {\n  Serial.begin(115200);\n  usmp.begin(USMP::TCP("192.168.1.100"));\n}`, 'code-arduino')}
                     className="text-xs text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
                   >
                     {copiedKey === 'code-arduino' ? <LuCheck className="w-3.5 h-3.5 text-emerald-500" /> : <LuCopy className="w-3.5 h-3.5" />}
@@ -272,11 +272,11 @@ export function DownloadsView() {
                 <pre className="font-mono text-xs text-foreground overflow-x-auto p-2 rounded bg-background border border-border">
 {`#include <USMP.h>
 
-USMPNode node;
+USMPClient usmp("DEVICE_PSK");
 
 void setup() {
   Serial.begin(115200);
-  node.begin("DEVICE_SECRET_KEY");
+  usmp.begin(USMP::TCP("192.168.1.100"));
 }`}
                 </pre>
               </div>
@@ -288,9 +288,9 @@ void setup() {
             <div className="rounded-xl border border-border bg-card p-6 space-y-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-4">
                 <div>
-                  <h3 className="text-lg font-bold text-foreground">Python PyPI Package (v1.1.0)</h3>
+                  <h3 className="text-lg font-bold text-foreground">Python PyPI Package (v1.2.0)</h3>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Asynchronous Python client/gateway library supporting Python 3.9 through 3.13.
+                    Asynchronous Python client/gateway library supporting Python 3.11 through 3.13.
                   </p>
                 </div>
                 <a
@@ -322,7 +322,7 @@ void setup() {
                   <span>Python Integration Example</span>
                   <button
                     type="button"
-                    onClick={() => copyToClipboard(`import asyncio\nfrom usmp import USMPGateway\n\nasync def main():\n    gw = USMPGateway(port=9000)\n    await gw.start()\n\nasyncio.run(main())`, 'code-pypi')}
+                    onClick={() => copyToClipboard(`import asyncio\nfrom usmp import USMPServer\n\nasync def main():\n    server = USMPServer(port=9000, psk=b"my-psk")\n    await server.serve()\n\nasyncio.run(main())`, 'code-pypi')}
                     className="text-xs text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
                   >
                     {copiedKey === 'code-pypi' ? <LuCheck className="w-3.5 h-3.5 text-emerald-500" /> : <LuCopy className="w-3.5 h-3.5" />}
@@ -331,11 +331,11 @@ void setup() {
                 </div>
                 <pre className="font-mono text-xs text-foreground overflow-x-auto p-2 rounded bg-background border border-border">
 {`import asyncio
-from usmp import USMPGateway
+from usmp import USMPServer
 
 async def main():
-    gw = USMPGateway(port=9000)
-    await gw.start()
+    server = USMPServer(port=9000, psk=b"my-psk")
+    await server.serve()
 
 asyncio.run(main())`}
                 </pre>
@@ -348,7 +348,7 @@ asyncio.run(main())`}
             <div className="rounded-xl border border-border bg-card p-6 space-y-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-4">
                 <div>
-                  <h3 className="text-lg font-bold text-foreground">ESP-IDF Component Registry (v1.1.0)</h3>
+                  <h3 className="text-lg font-bold text-foreground">ESP-IDF Component Registry (v1.2.0)</h3>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     Native C component for ESP-IDF v5.0+ development with hardware acceleration support.
                   </p>
@@ -442,7 +442,7 @@ asyncio.run(main())`}
 
           <div className="text-xs text-muted-foreground font-medium flex items-center gap-1.5 bg-muted px-3 py-1.5 rounded-lg border border-border w-fit">
             <LuShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-            <span>v1.1.0 is the active stable release</span>
+            <span>v1.2.0 is the active stable release</span>
           </div>
         </div>
 
@@ -460,25 +460,25 @@ asyncio.run(main())`}
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
-                {/* v1.1.0 */}
+                {/* v1.2.0 */}
                 <tr className="bg-primary/5 hover:bg-primary/10 transition-colors">
                   <td className="py-4 px-5 font-bold text-foreground">
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
                         <span className="px-2.5 py-0.5 rounded text-xs font-extrabold bg-primary text-primary-foreground shadow-xs">
-                          v1.1.0
+                          v1.2.0
                         </span>
                         <span className="text-[11px] font-semibold text-primary">
                           (Latest Stable)
                         </span>
                       </div>
                       <span className="text-xs font-normal text-muted-foreground">
-                        UDP Reliability & Hardware ACC
+                        ChaCha20-Poly1305 & Rekeying
                       </span>
                     </div>
                   </td>
                   <td className="py-4 px-5 text-xs font-medium text-foreground whitespace-nowrap">
-                    July 25, 2026
+                    August 15, 2026
                   </td>
                   <td className="py-4 px-5">
                     <div className="flex items-center gap-1.5">
@@ -487,11 +487,11 @@ asyncio.run(main())`}
                       </code>
                       <button
                         type="button"
-                        onClick={() => copyToClipboard('pip install usmp', 'tbl-pip-110')}
+                        onClick={() => copyToClipboard('pip install usmp', 'tbl-pip-120')}
                         className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                         title="Copy pip command"
                       >
-                        {copiedKey === 'tbl-pip-110' ? <LuCheck className="w-3.5 h-3.5 text-emerald-500" /> : <LuCopy className="w-3.5 h-3.5" />}
+                        {copiedKey === 'tbl-pip-120' ? <LuCheck className="w-3.5 h-3.5 text-emerald-500" /> : <LuCopy className="w-3.5 h-3.5" />}
                       </button>
                     </div>
                   </td>
@@ -502,25 +502,25 @@ asyncio.run(main())`}
                       </code>
                       <button
                         type="button"
-                        onClick={() => copyToClipboard('metaloomlabs/usmp', 'tbl-idf-110')}
+                        onClick={() => copyToClipboard('metaloomlabs/usmp', 'tbl-idf-120')}
                         className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                         title="Copy ESP-IDF spec"
                       >
-                        {copiedKey === 'tbl-idf-110' ? <LuCheck className="w-3.5 h-3.5 text-emerald-500" /> : <LuCopy className="w-3.5 h-3.5" />}
+                        {copiedKey === 'tbl-idf-120' ? <LuCheck className="w-3.5 h-3.5 text-emerald-500" /> : <LuCopy className="w-3.5 h-3.5" />}
                       </button>
                     </div>
                   </td>
                   <td className="py-4 px-5">
                     <div className="flex flex-col">
                       <span className="font-mono text-xs font-semibold text-foreground">
-                        usmp-1.1.0-arduino.zip
+                        usmp-1.2.0-arduino.zip
                       </span>
-                      <span className="text-[11px] text-muted-foreground">35.0 KB</span>
+                      <span className="text-[11px] text-muted-foreground">36.5 KB</span>
                     </div>
                   </td>
                   <td className="py-4 px-5 text-right">
                     <a
-                      href="/usmp-1.1.0-arduino.zip"
+                      href="/usmp-1.2.0-arduino.zip"
                       download
                       className={buttonVariants({
                         variant: 'default',
@@ -541,9 +541,9 @@ asyncio.run(main())`}
       {/* Release Notes & Highlights Accordion */}
       <section className="space-y-6">
         <div className="border-b pb-4">
-          <h2 className="text-2xl font-bold tracking-tight">What's New in v1.1.0</h2>
+          <h2 className="text-2xl font-bold tracking-tight">What's New in v1.2.0</h2>
           <p className="text-muted-foreground text-sm mt-1">
-            Detailed release notes for the v1.1.0 update.
+            Detailed release notes for the v1.2.0 feature release.
           </p>
         </div>
 
@@ -551,13 +551,13 @@ asyncio.run(main())`}
           <AccordionItem value="item-1" className="rounded-xl border border-border bg-card px-5">
             <AccordionTrigger className="hover:no-underline font-bold text-base">
               <span className="flex items-center gap-2.5">
-                <LuZap className="w-5 h-5 text-primary" />
-                Reliable UDP Transport Layer (Sliding-Window ACKs)
+                <LuLock className="w-5 h-5 text-primary" />
+                ChaCha20-Poly1305 AEAD Cipher Suite Support
               </span>
             </AccordionTrigger>
             <AccordionContent className="text-sm text-muted-foreground leading-relaxed space-y-2 pt-2">
               <p>
-                v1.1.0 adds connectionless reliable transmission over UDP. Includes dynamic RTT (Round Trip Time) calculation, exponential backoff retransmission, and sliding-window selective acknowledgments designed specifically for lossy LPWAN and cellular IoT networks.
+                v1.2.0 introduces support for the ChaCha20-Poly1305 AEAD cipher suite (<code>USMP_CIPHER_CHACHA20_POLY1305 = 2</code>) alongside AES-256-GCM. Provides high-speed authenticated encryption on low-power microcontrollers lacking hardware AES acceleration.
               </p>
             </AccordionContent>
           </AccordionItem>
@@ -565,13 +565,13 @@ asyncio.run(main())`}
           <AccordionItem value="item-2" className="rounded-xl border border-border bg-card px-5">
             <AccordionTrigger className="hover:no-underline font-bold text-base">
               <span className="flex items-center gap-2.5">
-                <LuShieldCheck className="w-5 h-5 text-primary" />
-                Zero-Heap Memory Allocation Hardening
+                <LuZap className="w-5 h-5 text-primary" />
+                In-Band Session Key Rotation (PKT_REKEY)
               </span>
             </AccordionTrigger>
             <AccordionContent className="text-sm text-muted-foreground leading-relaxed space-y-2 pt-2">
               <p>
-                All packet serialization, nonce derivation, and cipher contexts now operate on statically allocated ring buffers. This eliminates heap fragmentation risks on constrained microcontrollers like ESP32 and STM32.
+                Transparent session key rotation via <code>PKT_REKEY</code> (<code>0x0B</code>). Either peer can initiate key updates dynamically using HKDF-SHA256 derivation over a 32-byte salt exchange, resetting sequence numbers and replay bitmaps without closing transport sockets.
               </p>
             </AccordionContent>
           </AccordionItem>
@@ -579,13 +579,27 @@ asyncio.run(main())`}
           <AccordionItem value="item-3" className="rounded-xl border border-border bg-card px-5">
             <AccordionTrigger className="hover:no-underline font-bold text-base">
               <span className="flex items-center gap-2.5">
-                <LuCpu className="w-5 h-5 text-primary" />
-                ESP32 Hardware AES-GCM & ECDH Acceleration
+                <LuShieldCheck className="w-5 h-5 text-primary" />
+                Adaptive UDP RTT Estimation & Exponential Backoff
               </span>
             </AccordionTrigger>
             <AccordionContent className="text-sm text-muted-foreground leading-relaxed space-y-2 pt-2">
               <p>
-                Direct hardware binding for Espressif ESP32-S3 and ESP32-C3 hardware crypto accelerators. Achieves 4x throughput improvement on AES-256-GCM encryption with lower CPU utilization.
+                Integrated Karn's algorithm to track smoothed RTT (<code>_srtt</code>) and RTT variation (<code>_rttvar</code>) on UDP ARQ retransmissions, dynamically adjusting Retransmission Timeouts (RTO) between 0.1s and 5.0s with exponential backoff logic.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="item-4" className="rounded-xl border border-border bg-card px-5">
+            <AccordionTrigger className="hover:no-underline font-bold text-base">
+              <span className="flex items-center gap-2.5">
+                <LuBox className="w-5 h-5 text-primary" />
+                Arduino Control Frame Background Draining
+              </span>
+            </AccordionTrigger>
+            <AccordionContent className="text-sm text-muted-foreground leading-relaxed space-y-2 pt-2">
+              <p>
+                Decoupled decrypted application message buffering from control frame processing in the Arduino port, automatically draining <code>PING</code>, <code>PONG</code>, and <code>REKEY</code> frames in the background without polluting user receive buffers.
               </p>
             </AccordionContent>
           </AccordionItem>
@@ -613,7 +627,7 @@ asyncio.run(main())`}
               <span>Windows PowerShell Verification</span>
               <button
                 type="button"
-                onClick={() => copyToClipboard('Get-FileHash .\\usmp-1.1.0-arduino.zip -Algorithm SHA256', 'cmd-win-hash')}
+                onClick={() => copyToClipboard('Get-FileHash .\\usmp-1.2.0-arduino.zip -Algorithm SHA256', 'cmd-win-hash')}
                 className="text-xs text-primary hover:underline flex items-center gap-1 cursor-pointer font-sans"
               >
                 {copiedKey === 'cmd-win-hash' ? <LuCheck className="w-3 h-3 text-emerald-500" /> : <LuCopy className="w-3 h-3" />}
@@ -621,7 +635,7 @@ asyncio.run(main())`}
               </button>
             </div>
             <pre className="font-mono text-xs text-foreground p-3 rounded bg-background border border-border overflow-x-auto">
-              Get-FileHash .\usmp-1.1.0-arduino.zip -Algorithm SHA256
+              Get-FileHash .\usmp-1.2.0-arduino.zip -Algorithm SHA256
             </pre>
           </div>
 
@@ -631,7 +645,7 @@ asyncio.run(main())`}
               <span>Linux / macOS Terminal Verification</span>
               <button
                 type="button"
-                onClick={() => copyToClipboard('sha256sum usmp-1.1.0-arduino.zip', 'cmd-nix-hash')}
+                onClick={() => copyToClipboard('sha256sum usmp-1.2.0-arduino.zip', 'cmd-nix-hash')}
                 className="text-xs text-primary hover:underline flex items-center gap-1 cursor-pointer font-sans"
               >
                 {copiedKey === 'cmd-nix-hash' ? <LuCheck className="w-3 h-3 text-emerald-500" /> : <LuCopy className="w-3 h-3" />}
@@ -639,21 +653,21 @@ asyncio.run(main())`}
               </button>
             </div>
             <pre className="font-mono text-xs text-foreground p-3 rounded bg-background border border-border overflow-x-auto">
-              sha256sum usmp-1.1.0-arduino.zip
+              sha256sum usmp-1.2.0-arduino.zip
             </pre>
           </div>
         </div>
 
         <div className="p-4 rounded-xl bg-background border border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1">
-            <span className="text-xs font-bold text-foreground">v1.1.0 Expected SHA-256 Output:</span>
+            <span className="text-xs font-bold text-foreground">v1.2.0 Expected SHA-256 Output:</span>
             <div className="font-mono text-xs text-primary break-all">
-              {V110_SHA256}
+              {V120_SHA256}
             </div>
           </div>
           <button
             type="button"
-            onClick={() => copyToClipboard(V110_SHA256, 'bottom-sha')}
+            onClick={() => copyToClipboard(V120_SHA256, 'bottom-sha')}
             className={buttonVariants({ variant: 'outline', size: 'sm', className: 'gap-1.5 text-xs font-semibold shrink-0 cursor-pointer' })}
           >
             {copiedKey === 'bottom-sha' ? <LuCheck className="w-4 h-4 text-emerald-500" /> : <LuCopy className="w-4 h-4" />}

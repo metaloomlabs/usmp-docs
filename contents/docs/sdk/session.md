@@ -35,6 +35,14 @@ Blocks until the next decrypted message payload is received and verified.
 
 Pushes an encrypted `PKT_PING` frame to the device. This is useful for checking if a device is still online and resetting the socket watchdog.
 
+### `await session.rekey()`
+
+Performs transparent in-band session key rotation.
+
+* **Key Derivation**: Generates 32 bytes of random entropy (`salt`), sends an encrypted `PKT_REKEY` (`0x0B`) frame, and derives fresh transmit and receive keys using `HKDF-SHA256`.
+* **State Reset**: Resets both sequence numbers (`tx_seq = 0`, `rx_seq = 0`) and the 64-bit sliding anti-replay bitmap to `0`.
+* **Non-Disruptive**: Rotates keys while keeping the socket established, eliminating the overhead of a full X25519 handshake.
+
 ### `await session.bye()`
 
 Sends an encrypted `PKT_BYE` frame to notify the device of a clean shutdown, then closes the TCP connection.

@@ -79,7 +79,7 @@ export function Feedback({ slug, title, relativeFilePath }: FeedbackProps) {
       <div className="rounded-xl border border-border bg-card p-3.5 space-y-2.5 shadow-sm backdrop-blur-sm">
         <div className="flex items-center justify-between">
           <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
-            <LuSparkles className="w-3 h-3" /> USMP v1.1.0
+            <LuSparkles className="w-3 h-3" /> USMP v1.2.0
           </span>
           <span className="text-[10px] text-muted-foreground font-medium">Public</span>
         </div>

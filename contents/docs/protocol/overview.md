@@ -12,8 +12,8 @@ Think of each layer as a worker in a postal delivery line. Every worker has one 
 │               Session Layer                 │  ← The tracking number (checks for missing/reordered mail)
 │   Sequence numbers · Replay protection      │
 ├─────────────────────────────────────────────┤
-│               Crypto Layer                  │  ← The tamper-proof wax seal (AES-256-GCM + X25519)
-│   AES-256-GCM · X25519 · HKDF · HMAC        │
+│               Crypto Layer                  │  ← The tamper-proof wax seal (AES-256-GCM / ChaCha20-Poly1305 + X25519)
+│   AES-256-GCM / ChaCha20 · X25519 · HKDF    │
 ├─────────────────────────────────────────────┤
 │               Frame Layer                   │  ← The standard-sized cardboard shipping box (Magic, CRC)
 │   Binary encoding · CRC-16 · Magic bytes    │
@@ -28,7 +28,7 @@ Think of each layer as a worker in a postal delivery line. Every worker has one 
 To keep overhead low, USMP uses a simple 1-byte packet type identifier. Handshake frames are sent in plaintext (since we don't have a shared key yet!), but once the handshake completes, **every single data frame is locked tight with encryption.**
 
 | Value | Name | Direction | Encrypted? | Purpose |
-|:---|:---|:---|:---|:---|
+| :--- | :--- | :--- | :--- | :--- |
 | `0x01` | `PKT_HELLO` | Client → Server | No | "Hi server, here's my device ID and my public key." |
 | `0x02` | `PKT_CHALLENGE` | Server → Client | No | "Hi client, here's my public key and a random salt." |
 | `0x03` | `PKT_HELLO_ACK` | Client → Server | No | "I've computed our session keys and signed the keys using our PSK." |
@@ -38,6 +38,8 @@ To keep overhead low, USMP uses a simple 1-byte packet type identifier. Handshak
 | `0x07` | `PKT_PONG` | Both | Yes | Keepalive replies. "Yep, still here!" |
 | `0x08` | `PKT_BYE` | Both | Yes | Graceful disconnect. "I'm heading offline now, goodbye." |
 | `0x09` | `PKT_DATA_FRAG` | Both | Yes | Initial fragments of a payload larger than 452 bytes. |
+| `0x0A` | `PKT_HELLO_RETRY` | Server → Client | No | UDP return-routability cookie challenge. |
+| `0x0B` | `PKT_REKEY` | Both | Yes | In-band session key rotation salt exchange. |
 | `0xFF` | `PKT_ERROR` | Both | No | Reserved (unused diagnostic telemetry). |
 
 ## Connection Lifecycle
@@ -50,7 +52,7 @@ stateDiagram-v2
     DISCONNECTED --> HANDSHAKING : Transport dials (e.g. TCP connect)
     HANDSHAKING --> ESTABLISHED : Handshake succeeds (SESSION_OK received)
     HANDSHAKING --> DISCONNECTED : Authentication or Key-verification fails
-    ESTABLISHED --> ESTABLISHED : Send/Recv DATA, PING, or PONG
+    ESTABLISHED --> ESTABLISHED : Send/Recv DATA, PING, PONG, or REKEY
     ESTABLISHED --> DISCONNECTED : Clean exit (BYE) or link timeout
 ```
 
