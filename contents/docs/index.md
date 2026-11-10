@@ -80,7 +80,7 @@ USMP is packaged and published directly to official package managers, keeping yo
     ```
 
 === "Arduino Library"
-    Available as a packaged offline ZIP archive (`usmp-1.3.0-arduino.zip`) for import into Arduino IDE or PlatformIO.
+    Available via the official **Arduino Library Manager** (search for `USMP`) or as a packaged offline ZIP archive (`usmp-1.3.0-arduino.zip`) for import into Arduino IDE or PlatformIO.
 
     1. Go to **Sketch** ➔ **Include Library** ➔ **Add .ZIP Library...**
     2. Select the packaged ZIP archive.

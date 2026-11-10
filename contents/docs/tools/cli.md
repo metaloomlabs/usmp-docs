@@ -36,6 +36,7 @@ python -m usmp.server --protocol udp --echo --port 9000 --psk hex:2a8d56b3e410ff
 ### PSK Format Flexibility
 
 The `--psk` argument automatically recognizes three input formats:
+
 * **Plain text string**: `--psk "my-secret-key-16b"` (encoded as UTF-8 bytes).
 * **Explicit raw string**: `--psk raw:my-raw-string`
 * **Hex-encoded bytes**: `--psk hex:a1b2c3d4...` or any raw 64-character hex string.
@@ -81,4 +82,29 @@ usmp logs aa:bb:cc:dd:ee:ff
 
 # Send a one-shot command
 usmp send aa:bb:cc:dd:ee:ff "reboot"
+
+# Monitor all devices
+usmp monitor
+```
+
+### Planned Output
+
+```bash
+$ usmp scan
+Scanning LAN for USMP devices...
+  aa:bb:cc:dd:ee:ff  192.168.1.60  ESP32  USMP v1.3  online
+  aa:bb:cc:dd:ee:00  192.168.1.61  ESP32  USMP v1.3  online
+
+$ usmp connect aa:bb:cc:dd:ee:ff
+Connecting to aa:bb:cc:dd:ee:ff (192.168.1.60)...
+[USMP] Handshake complete — session a3f1b2c4
+> get_sensor
+temperature: 23.4C
+> exit
+```
+
+### Installation (when available)
+
+```bash
+pip install usmp-cli
 ```

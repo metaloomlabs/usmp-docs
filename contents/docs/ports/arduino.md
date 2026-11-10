@@ -15,6 +15,7 @@ You can install the USMP Arduino library either through the official Arduino Lib
 3. Click **Install** on the `USMP` library by MetaLoom Labs (version `1.3.0`).
 
 Or install via the Arduino CLI:
+
 ```bash
 arduino-cli lib install "USMP"
 ```
@@ -90,6 +91,7 @@ bool begin(USMPUDPTransport transport, USMPArduinoUdpCtx* static_ctx = nullptr);
 ```
 
 Establishes the connection and executes the handshake synchronously.
+
 * Passing `static_ctx` binds a caller-managed static transport context, avoiding heap `new`/`malloc`.
 
 #### `beginAsync` (Non-Blocking Handshake)
