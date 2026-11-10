@@ -20,31 +20,37 @@ Client (TX: 1, RX: 1)  ====== DATA (seq=1) =====>  Server (TX: 1, RX: 2)
 Client (TX: 2, RX: 1)  <===== DATA (seq=1) ======  Server (TX: 2, RX: 2)
 ```
 
-## Why Strict Equality? (No Windows allowed)
+## Transport Ordering Modes
 
-Many internet protocols (like IPSec or DTLS) use a sliding "window" to accept out-of-order packets. This is because they run over unreliable networks (like UDP) where packets can naturally get reordered or dropped.
+USMP adapts sequence number verification to match the characteristics of the underlying transport layer:
 
-**USMP is different.** It is designed to run over reliable transport streams:
+### 1. Stream Transports (TCP & UART): Strict Monotonic Equality
 
-1. **TCP Sockets**: TCP guarantees that packets arrive in the exact order they were sent.
-2. **UART Serial (with COBS + ACKs)**: The USMP serial port wrapper handles acknowledgments and retransmissions under the hood, presenting a reliable, in-order stream to the core protocol.
+Over reliable stream transports (TCP sockets and UART with COBS), the physical layer guarantees in-order delivery. Therefore, **any out-of-order sequence number is a critical error**:
 
-Because the underlying transport guarantees order, **any out-of-order sequence number is a critical error.** If a frame arrives with `seq = 5` when the receiver is expecting `seq = 4`, it means one of three things:
+* If a frame arrives with `seq = 5` when the receiver is expecting `seq = 4`, it indicates a replay attack, a corrupted socket stream, or a fatal counter bug.
+* Rather than trying to guess or patch up the stream, USMP immediately tears down the session keys and resets the connection.
 
-* **A replay attack** is underway.
-* There is a **software bug** in the sequence tracking logic.
-* The transport layer is **corrupted** or desynchronized.
+### 2. Connectionless Transports (UDP): 64-Bit Sliding Anti-Replay Window
 
-Rather than trying to recover from this corrupted state, USMP follows a "fail-fast" safety philosophy: the receiver immediately closes the connection, throws away the session keys, and forces a clean reconnect.
+Over UDP, network routing can cause valid datagrams to be delayed or arrive slightly out-of-order. USMP uses an efficient **64-bit sliding replay window**:
 
-```c
-if (frame.seq != expected_rx_seq) {
-    // Security violation or critical desync! Reject immediately.
-    usmp_close(ctx);
-    return USMP_ERR_SEQ;
-}
-expected_rx_seq++;
-```
+* The receiver maintains the highest authenticated sequence number (`rx_seq`) and a 64-bit bitmask (`rx_window_bitmap`).
+* **Frame Acceptance Rules**:
+  * **Ahead of window (`seq > rx_seq`)**: Accept the packet, slide the bitmap window forward by `seq - rx_seq`, and set bit 0.
+  * **Inside window (`rx_seq - 63 <= seq <= rx_seq`)**: Check bit `rx_seq - seq`. If unset, mark as received and accept. If already set, drop silently as a duplicate.
+  * **Behind window (`seq < rx_seq - 63`)**: Packet is too old; drop silently.
+* **Integrity Guard**: The replay bitmap is updated **only after** successful AEAD authentication, preventing unauthenticated packets from shifting the window.
+
+---
+
+## CoAP RTT Estimation & UDP ARQ Retransmissions
+
+In USMP v1.3.0, UDP transport reliability implements RFC 7252 (CoAP) / Jacobson-Karn smoothed round-trip time tracking:
+
+* **Smoothed RTT ($\text{SRTT}$) & Variation ($\text{RTTVAR}$)**: Dynamically calculated using first-attempt frame acknowledgments.
+* **Dynamic Timeout ($\text{RTO}$)**: Clamped between **100 ms** and **5000 ms** with binary exponential backoff on packet loss.
+* **Watchdog Protection**: In-flight ARQ wait loops service `usmp_port_wdt_feed()` regularly to protect against MCU watchdog timer resets during poor link conditions.
 
 ## Cryptographic Binding
 

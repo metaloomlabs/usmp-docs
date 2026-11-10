@@ -197,3 +197,69 @@ The server authenticates itself by sending back a unique `session_id` and a serv
 > [!IMPORTANT]
 > **Constant-Time Verification**
 > Both sides MUST perform constant-time comparisons (`hmac.compare_digest` in Python, `mbedtls_ct_memcmp` in C) when validating handshakes. Traditional string or buffer comparisons exit early upon finding the first mismatching byte, exposing the handshake to timing attacks.
+
+---
+
+## UDP Return-Routability Cookie (`PKT_HELLO_RETRY`, 0x0A)
+
+Over connectionless UDP transport, attackers can spoof IP source addresses to trigger expensive Curve25519 calculations. USMP guards against spoofed DoS amplification by executing a stateless cookie exchange before allocating session state:
+
+```text
+Client (Device)                                      Server (Gateway)
+      │                                                     │
+      │ ─── 1. PKT_HELLO (device_id, pub_C) ──────────────> │
+      │                                                     │  (server computes
+      │ <── 2. PKT_HELLO_RETRY (cookie: 16B) ────────────── │   stateless cookie)
+      │                                                     │
+      │ ─── 3. PKT_HELLO (device_id, pub_C, cookie) ──────> │
+      │                                                     │  (server verifies
+      │ <── 4. PKT_CHALLENGE (nonce, pub_S) ─────────────── │   cookie, proceeds)
+      │                                                     │
+      │       ... continues as TCP steps 3–4 ...            │
+```
+
+* **Stateless Cookie**: The 16-byte cookie binds the client IP, port, and `device_id` via a server secret token. The server allocates **zero session memory** until the client returns the valid cookie in its retried `HELLO` frame.
+
+---
+
+## Non-Blocking Handshake State Machine (`usmp_step`, `beginAsync`)
+
+In USMP v1.3.0, handshakes can run asynchronously without blocking application tasks for 2–5 seconds:
+
+```text
+USMP_STATE_IDLE
+       │  usmp_connect_async() / beginAsync()
+       ▼
+USMP_STATE_CONNECTING_SOCKET
+       │  Socket connected, sends PKT_HELLO
+       ▼
+USMP_STATE_AWAITING_CHALLENGE
+       │  Inbound PKT_CHALLENGE parsed
+       ▼
+USMP_STATE_CALCULATING_ECDH
+       │  X25519 & HKDF computed, sends PKT_HELLO_ACK
+       ▼
+USMP_STATE_AWAITING_SESSION_OK
+       │  Inbound PKT_SESSION_OK verified
+       ▼
+USMP_STATE_ESTABLISHED
+```
+
+* **Tick Progression**: Each call to `usmp_step(&ctx)` (or `usmp.maintain()` in Arduino) advances the state machine by reading incoming bytes, processing transitions, and servicing the hardware watchdog timer (`usmp_port_wdt_feed()`).
+* **Zero CPU Freezes**: Allows microcontrollers to continue running display refreshes, sensor sampling, or network event loops uninterrupted during connection negotiation.
+
+---
+
+## Zero-Heap Handshake Scratchpad
+
+Embedded systems with strict memory requirements can configure caller-managed scratchpad memory to execute the handshake with **0 dynamic heap allocations**:
+
+```c
+static uint8_t s_scratch[USMP_HANDSHAKE_SCRATCH_LEN]; // 2048 bytes
+ctx.scratch = s_scratch;
+ctx.scratch_len = sizeof(s_scratch);
+```
+
+* Slices memory into the handshake state machine context and 1024-byte TX/RX frame buffers.
+* Contents are wiped upon session establishment using `mbedtls_platform_zeroize()` to eliminate lingering cryptographic artifacts.
+* Preserved across reconnects with strict static enforcement under `-DUSMP_ZERO_HEAP`.
