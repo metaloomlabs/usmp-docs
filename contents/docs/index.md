@@ -37,7 +37,10 @@ USMP does not support an "insecure mode." Every session is strictly hardened out
 * **Perfect Forward Secrecy**: An ephemeral X25519 Diffie-Hellman key exchange is performed for every session. Even if the Pre-Shared Key is compromised in the future, past captured traffic cannot be decrypted.
 * **Mandatory AEAD Encryption**: All session data frames are encrypted using AES-256-GCM or ChaCha20-Poly1305, ensuring absolute confidentiality and tamper-proof message integrity.
 * **In-Band Session Rekeying**: Transparently rotate session keys on active connections via `PKT_REKEY` without terminating sockets.
-* **Replay Protection**: Strict, monotonic 32-bit sequence numbers and deterministic nonces prevent attackers from capturing and replaying packets.
+* **Replay Protection & CoAP RTT**: Strict monotonic 32-bit sequence numbers on TCP, 64-bit sliding anti-replay bitmap on UDP, and RFC 7252 / Jacobson-Karn dynamic RTT estimation with watchdog protection.
+* **Split RTOS Concurrency Architecture**: Dedicated transmission and reception mutex handles (`tx_mutex` & `rx_mutex`) eliminate full-duplex socket deadlocks and strictly prevent AES-GCM nonce reuse under concurrent sender tasks.
+* **Non-Blocking Handshake FSM**: Explicit non-blocking state machine (`usmp_step`, `beginAsync`) with hardware watchdog timer servicing (`usmp_port_wdt_feed`), eliminating multi-second CPU freezes.
+* **Zero-Heap Embedded Memory**: 100% static memory allocation via caller-managed handshake scratchpads (`USMP_HANDSHAKE_SCRATCH_LEN`), static transport initializers, and `USMPClientStatic`.
 
 > [!WARNING]
 > **Known Limitation: PSK Offline Cracking**
@@ -77,7 +80,7 @@ USMP is packaged and published directly to official package managers, keeping yo
     ```
 
 === "Arduino Library"
-    Available as a packaged offline ZIP archive (`usmp-1.2.0-arduino.zip`) for import into Arduino IDE or PlatformIO.
+    Available as a packaged offline ZIP archive (`usmp-1.3.0-arduino.zip`) for import into Arduino IDE or PlatformIO.
 
     1. Go to **Sketch** ➔ **Include Library** ➔ **Add .ZIP Library...**
     2. Select the packaged ZIP archive.

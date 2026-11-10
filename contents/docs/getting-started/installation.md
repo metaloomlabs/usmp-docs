@@ -47,15 +47,33 @@ This will automatically download and append USMP to your project's `main/idf_com
 
 ## 3. Install the Arduino Library (ESP32 Cores)
 
-For Arduino C++ development, the USMP library is packaged as an offline ZIP archive.
+For Arduino C++ development, you can install USMP directly via the official Arduino Library Manager (recommended) or import the offline ZIP archive.
 
-1. Locate the pre-built ZIP package: `usmp-1.2.0-arduino.zip` (found in your workspace artifacts/releases folder).
-2. Open the **Arduino IDE** (v2.0 or later).
-3. Go to **Sketch** ➔ **Include Library** ➔ **Add .ZIP Library...**
-4. Navigate to and select the `usmp-1.2.0-arduino.zip` file.
-5. Click **Open** to import the library.
+### Option A: Via Arduino Library Manager (Recommended)
 
-To verify installation, you can inspect your libraries folder. The IDE will now recognize the `#include <USMP.h>` header.
+1. Open the **Arduino IDE** (v1.8.x or v2.x).
+2. Open the Library Manager: go to **Tools** ➔ **Manage Libraries...** (or click the Library Manager icon on the left sidebar in Arduino IDE 2.x).
+3. In the search bar, type `USMP`.
+4. Locate the **USMP** library by MetaLoom Labs and click **Install** (select version `1.3.0`).
+
+Alternatively, install via the **Arduino CLI**:
+
+```bash
+arduino-cli lib install "USMP"
+```
+
+### Option B: Via Offline ZIP Archive
+
+1. Download the pre-built ZIP package: `usmp-1.3.0-arduino.zip` (available on the [Downloads Portal](/downloads)).
+2. In Arduino IDE, go to **Sketch** ➔ **Include Library** ➔ **Add .ZIP Library...**
+3. Navigate to and select the `usmp-1.3.0-arduino.zip` file.
+4. Click **Open** to import the library.
+
+To verify installation in your sketch:
+
+```cpp
+#include <USMP.h>
+```
 
 ---
 
@@ -67,7 +85,21 @@ USMP requires both the client device and the server to share a Pre-Shared Key (P
 > **Never use generic or weak keys (such as `123456` or `my-psk`) in production.**
 > Use cryptographically strong random bytes.
 
-You can quickly generate a secure 32-byte (256-bit) hexadecimal key using Python's built-in `secrets` module:
+### Option A: Using the USMP Built-in CLI (Recommended)
+
+```bash
+python -m usmp.server --generate-psk
+```
+
+This outputs both the raw hex string and formatted Python literal:
+
+```text
+Generated random 32-byte (256-bit) Pre-Shared Key (PSK):
+  Hex:    2a8d56b3e410ff02ad84620ea1901a88b50df3651c4a0910bc4f794d21e8e4bc
+  Python: b'*\x8dV\xb3\xe4\x10\xff\x02\xad\x84b\x0e\xa1\x90\x1a\x88\xb5\r\xf3e\x1cJa\t\x10\xb4OyM!\xe8\xe4\xbc'
+```
+
+### Option B: Using Python's Secrets Module
 
 ```bash
 python -c "import secrets; print(secrets.token_hex(32))"

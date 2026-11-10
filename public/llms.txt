@@ -1,29 +1,32 @@
-# USMP (Unified Secure Multi-transport Protocol)
+# USMP (Unified Secure Multi-transport Protocol) v1.3.0
 
 USMP is a secure, lightweight, and transport-agnostic session-layer communication protocol designed for resource-constrained microcontrollers (like ESP32, Arduino) and server gateways (Python).
 
-## Key Specifications
+## Key Specifications (v1.3.0)
 
 - **Mutual Authentication**: HMAC-SHA256 key-verification handshake parameter bounds (master PSK is never sent over the wire).
 - **Perfect Forward Secrecy**: Ephemeral Curve25519 (X25519) key exchange at the start of every session.
 - **Confidentiality**: Post-handshake telemetry encrypted via symmetric AES-256-GCM.
+- **Zero-Heap Static Memory**: Eliminates dynamic allocations via static transports (`usmp_transport_*_init_static`, `USMPClientStatic`) and zeroized stack scratchpads (`USMP_HANDSHAKE_SCRATCH_LEN = 2048`).
+- **Split RTOS Concurrency**: Independent `tx_mutex` and `rx_mutex` locks decoupling full-duplex transmission and reception, preventing AES-GCM nonce collisions.
+- **Non-Blocking Handshake FSM**: State machine driven by `usmp_connect_async()` and `usmp_step()` with bounded timeouts and watchdog feeding (`usmp_port_wdt_feed`).
 - **Microcontroller Overhead**: 
-  - **Flash ROM**: < 10 KB (Stripped Xtensa size).
-  - **Persistent RAM**: exactly 112 Bytes (Zero heap allocations, preventing memory fragmentation).
-  - **Handshake Speed**: 10-30 ms (4-step packet flow).
+  - **Flash ROM**: < 10 KB (Stripped Xtensa / ARM Cortex).
+  - **Persistent RAM**: ~144 Bytes (`usmp_t` core context).
+  - **Handshake Speed**: 10-30 ms (4-step packet flow with CoAP RFC 7252 dynamic RTO).
 - **Fragmentation**: Automatic chunking of payloads up to 1.8 KB into 452-byte frames.
 
 ## Quick Installation
 
-- **Python (Gateway Server)**: `pip install usmp`
+- **Python (Gateway Server & CLI)**: `pip install usmp`
 - **ESP-IDF (C SDK)**: `idf.py add-dependency "metaloomlabs/usmp"`
-- **Arduino (C++)**: Download ZIP library and import standard headers.
+- **Arduino (C++)**: Download `usmp-1.3.0-arduino.zip` and import via Arduino Library Manager.
 
 ## Symmetrical Code Examples
 
 ### 1. ESP32 (C / ESP-IDF)
 ```c
-usmp_transport_tcp_init(&transport, "gateway.io", 9000);
+usmp_transport_tcp_init_static(&transport, &tcp_ctx, "gateway.io", 8443);
 ctx.psk = my_secure_psk;
 ctx.psk_len = 32;
 usmp_connect(&ctx, &transport);
@@ -33,30 +36,37 @@ usmp_send(&ctx, (uint8_t *)"hello", 5);
 ### 2. Arduino (C++)
 ```cpp
 #include <USMP.h>
-USMPClient usmp("my-secure-psk");
+USMPClient usmp("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
 void setup() {
-    usmp.begin(USMP::TCP("gateway.io"));
-    usmp.send("Hello from Arduino!");
+    usmp.beginAsync(USMP::TCP("gateway.io", 8443));
 }
 void loop() {
     usmp.maintain();
+    if (usmp.connected()) {
+        usmp.println("Hello from Arduino v1.3.0!");
+    }
 }
 ```
 
-### 3. Gateway Server (Python Async)
+### 3. Gateway Server (Python Async & CLI)
 ```python
 from usmp import USMPServer
-server = USMPServer(host="0.0.0.0", port=9000, psk=b"my-secure-psk")
+server = USMPServer(host="0.0.0.0", port=8443, psk=b"0123456789abcdef0123456789abcdef")
 @server.on_session
 async def handle_device(session):
-    payload = await session.recv()
-    await session.send(b"Decrypted successfully!")
+    payload = await session.recv_str()
+    await session.send(f"Echo: {payload}")
 ```
+CLI Echo Server: `python -m usmp.server --echo --port 8443`
 
 ## Documentation Map
 
+- [Downloads & Releases](https://usmp.metaloom.in/downloads)
 - [Installation Guide](https://usmp.metaloom.in/docs/getting-started/installation)
 - [Protocol Specifications](https://usmp.metaloom.in/docs/protocol/overview)
+- [Technical Specification](https://usmp.metaloom.in/docs/spec)
 - [ESP-IDF Porting Notes](https://usmp.metaloom.in/docs/ports/esp32)
+- [Arduino Port Notes](https://usmp.metaloom.in/docs/ports/arduino)
 - [Python SDK Reference](https://usmp.metaloom.in/docs/sdk/python)
+- [CLI Tools & Dev Server](https://usmp.metaloom.in/docs/tools/cli)
 - [Github Repository](https://github.com/metaloomlabs/usmp)
