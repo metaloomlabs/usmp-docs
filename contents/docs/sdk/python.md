@@ -28,9 +28,10 @@ The SDK is designed using asynchronous I/O (`asyncio`) to handle multiple concur
 
 **Key Components:**
 
-* **[USMPServer](server.md)**: Listens for incoming TCP connections and performs the server-side handshake.
+* **[USMPServer](server.md)**: Listens for incoming TCP/UDP connections and manages concurrent device sessions.
 * **[USMPClient](client.md)**: Connects to a remote gateway and performs the client-side handshake.
-* **[USMPSession](session.md)**: Manages an active, authenticated session (encryption, decryption, keepalives, sequence number tracking).
+* **[USMPSession](session.md)**: Manages an active, authenticated session (encryption, decryption, payload inspection, sequence tracking).
+* **[CLI Dev Server](../tools/cli.md)**: Instant development echo server (`python -m usmp.server`) with ANSI logs.
 
 ## 3. Minimal Echo Server Example
 
