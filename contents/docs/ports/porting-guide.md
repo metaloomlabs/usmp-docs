@@ -6,14 +6,14 @@ One of USMP's core design values is **extreme portability**. The entire cryptogr
 
 To bring USMP to your target platform, you only need to build two things:
 
-1. **Platform Hooks**: 5 simple system adapter functions.
+1. **Platform HAL Hooks**: System adapter functions for entropy, timers, watchdog servicing, and RTOS mutexes.
 2. **A Transport Adapter**: A wrapper that teaches USMP how to write and read bytes from your physical interfaces (TCP, UART, BLE, etc.).
 
 Let's walk through the porting process step-by-step!
 
 ## Step 1: Implement Platform Hooks
 
-First, create a new port file, e.g., `usmp_port_<myplatform>.c`, and implement the 5 system hooks declared in `usmp_port.h`:
+First, create a new port file, e.g., `usmp_port_<myplatform>.c`, and implement the system hooks declared in `usmp_port.h`:
 
 ```c
 #include "usmp_port.h"
@@ -40,9 +40,32 @@ uint32_t usmp_port_millis(void) {
     // Return the number of milliseconds elapsed since system boot.
 }
 
-// 5. Route protocol logs
+// 5. Feed the platform hardware watchdog timer (WDT)
+void usmp_port_wdt_feed(void) {
+    // Reset hardware or RTOS task watchdog (e.g., esp_task_wdt_reset(), yield()).
+}
+
+// 6. Mutex lifecycle & locking primitives (for Split RTOS concurrency)
+int usmp_port_mutex_create(usmp_mutex_t* mutex) {
+    // Initialize OS mutex (e.g., xSemaphoreCreateMutex(), pthread_mutex_init()).
+    // Single-threaded/bare-metal targets can use a no-op stub returning 0.
+}
+
+int usmp_port_mutex_lock(usmp_mutex_t mutex) {
+    // Acquire mutex (blocking wait). Return 0 on success, -1 on failure.
+}
+
+int usmp_port_mutex_unlock(usmp_mutex_t mutex) {
+    // Release mutex. Return 0 on success, -1 on failure.
+}
+
+void usmp_port_mutex_destroy(usmp_mutex_t mutex) {
+    // Destroy mutex and release any system handles.
+}
+
+// 7. Route protocol logs
 void usmp_port_log(char level, const char *tag, const char *msg) {
-    // 'level' can be 'I' (Info), 'W' (Warning), or 'E' (Error).
+    // 'level' can be 'I' (Info), 'W' (Warning), 'E' (Error), 'D' (Debug).
     // Print this data to your serial output, console, or logging daemon.
 }
 ```

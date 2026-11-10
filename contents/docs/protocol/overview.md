@@ -67,7 +67,21 @@ USMP does not tolerate gaps or loops. To prevent an attacker from capturing encr
 * Each direction (TX and RX) maintains its own independent 32-bit counter.
 * Both counters start at `0` upon a successful handshake.
 * Every sent frame increments the TX counter.
-* The receiver expects the incoming packet to match `expected_rx_sequence` exactly. If it does not, the packet is thrown out and the session is terminated.
+* On stream transports (TCP/Serial), the receiver expects the incoming packet to match `expected_rx_sequence` exactly. On connectionless transports (UDP), a 64-bit sliding anti-replay bitmap window accepts frames within range while discarding duplicates and out-of-order stale packets.
+
+## Concurrency & Split RTOS Architecture
+
+In USMP v1.3.0, session contexts embed dedicated synchronization handles:
+
+* **`tx_mutex`**: Guards TX sequence number reservation, AEAD payload encryption, and egress transmission. Concurrent sender threads are safely serialized, guaranteeing that deterministic nonces are never reused.
+* **`rx_mutex`**: Guards RX sequence validation, replay bitmap updates, and payload defragmentation.
+* **Full-Duplex Freedom**: Ingress reads and egress sends run concurrently without thread contention or socket deadlocks. Rekeying and close operations enforce strict hierarchical lock order (`tx_mutex` then `rx_mutex`).
+
+## Zero-Heap Memory Model
+
+USMP operates with strict bounded memory requirements:
+* Caller-managed scratchpads (`USMP_HANDSHAKE_SCRATCH_LEN = 2048`) eliminate heap allocation during key exchange, securely zeroizing state on completion.
+* Static transport contexts (`usmp_tcp_ctx_t`, `usmp_udp_ctx_t`) and C++ wrappers (`USMPClientStatic`) ensure zero heap usage in `.bss` embedded targets.
 
 ## Deep Dives
 

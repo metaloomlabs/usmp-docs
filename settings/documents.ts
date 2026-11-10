@@ -174,7 +174,7 @@ export const Documents: Paths[] = [
     noLink: true,
     items: [
       {
-        title: 'CLI Tools (coming soon)',
+        title: 'CLI Tools & Dev Server',
         href: '/cli',
       },
     ],

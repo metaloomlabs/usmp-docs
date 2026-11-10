@@ -47,53 +47,87 @@ Here is exactly how the client and server react to various protocol violations:
 | **Control Packet during Fragmentation** | Discard frame. Close connection instantly without sending `PKT_ERROR`. | Interleaving standard packets while reassembling a fragmented payload is a protocol violation. |
 | **Max Fragments Exceeded** | Discard frame. Close connection instantly without sending `PKT_ERROR`. | Plaintext payloads are capped at 452 bytes per frame, up to a maximum of 4 frames. |
 
+## Programmatic Status Codes (`usmp_err_t` & `USMPErrorCode`)
+
+USMP operations return strongly typed status codes across the C core, Arduino port, and Python SDK:
+
+| Value | C Enum (`usmp_err_t`) | Python Enum (`USMPErrorCode`) | Description |
+| :--- | :--- | :--- | :--- |
+| `0` | `USMP_OK` | `OK` | Success. |
+| `-1` | `USMP_ERR_INVALID_ARG` | `INVALID_ARG` | NULL argument, buffer too small, or bad parameter. |
+| `-2` | `USMP_ERR_TRANSPORT_FAILED` | `TRANSPORT_FAILED` | Socket or underlying interface write/read failure. |
+| `-3` | `USMP_ERR_AUTH_FAILED` | `AUTH_FAILED` | PSK HMAC verification mismatch. |
+| `-4` | `USMP_ERR_TIMEOUT` | `TIMEOUT` | Inactivity watchdog or handshake timer expired. |
+| `-5` | `USMP_ERR_REPLAY_DETECTED` | `REPLAY_DETECTED` | Replayed sequence number detected by sliding window. |
+| `-6` | `USMP_ERR_BUFFER_OVERFLOW` | `BUFFER_OVERFLOW` | Declared payload length exceeds buffer allocation. |
+| `-7` | `USMP_ERR_SEQ_EXHAUSTED` | `SEQ_EXHAUSTED` | 32-bit sequence counter reached `0xFFFFFFFF`. |
+| `-8` | `USMP_ERR_CRYPTO_FAILED` | `CRYPTO_FAILED` | AEAD decryption or authentication tag mismatch. |
+| `-9` | `USMP_ERR_NOT_CONNECTED` | `NOT_CONNECTED` | Operation attempted before session was established. |
+| `-10` | `USMP_ERR_MUTEX_FAILED` | `MUTEX_FAILED` | FreeRTOS / platform mutex lock or unlock failed. |
+| `-11` | `USMP_ERR_PEER_CLOSED` | `PEER_CLOSED` | Peer sent an authenticated `PKT_BYE` for graceful exit. |
+
+---
+
 ## Developer Implementation
 
-### C Client Library (ESP-IDF & Arduino)
+### C Client Library (ESP-IDF & Core)
 
-On the microcontroller, USMP logs the error description and tears down the local session context:
+On microcontrollers, functions return `usmp_err_t` status codes directly. Translate any code to a human-readable string with `usmp_strerror()`:
 
 ```c
-if (pkt.seq != ctx->rx_seq) {
-    USMP_LOGE(TAG, "Sequence mismatch detected!");
-    
-    // Invalidate the session locally; transport is closed by usmp_recv returning error
-    ctx->established = false;
-    return -1;
+usmp_err_t err = usmp_send(&ctx, data, len);
+if (err != USMP_OK) {
+    ESP_LOGE(TAG, "Transmission failed: %s (code %d)", usmp_strerror(err), err);
+    if (err == USMP_ERR_PEER_CLOSED) {
+        ESP_LOGI(TAG, "Server shut down gracefully.");
+    }
+}
+```
+
+### Arduino Port
+
+`USMPClient` automatically captures status codes and provides helper getters:
+
+```cpp
+if (!usmp.begin(transport)) {
+    Serial.printf("Connection failed: %s (error %d)\n",
+                  usmp.lastErrorString(), usmp.lastError());
 }
 ```
 
 ### Python SDK Exceptions
 
-The Python SDK maps these binary error codes directly into standard Python exceptions. This makes it incredibly easy to write error-handling logic:
+The Python SDK maps errors into rich exception classes, each providing a `.code: USMPErrorCode` attribute:
 
 ```python
 from usmp import USMPSession
-from usmp.errors import ConnectionClosedError, CryptoError
+from usmp.errors import ConnectionClosedError, CryptoError, USMPTimeoutError, USMPError
 
 async def handle_telemetry(session: USMPSession):
     try:
         while True:
             data = await session.recv()
-            print(f"Received data: {data}")
+            session.print(data)
     except ConnectionClosedError:
-        print(f"Device {session.device_id} disconnected cleanly.")
-    except CryptoError:
-        # This will fire if someone tries to send data with a bad PSK or session key!
-        print(f"Decryption failed for device {session.device_id}! Key mismatch or tampering.")
-    except Exception as e:
-        print(f"Unexpected error: {e}")
+        print(f"Device {session.device_id} disconnected cleanly (sent BYE).")
+    except CryptoError as e:
+        print(f"Decryption failed ({e.code}): Key mismatch or tampering.")
+    except USMPTimeoutError:
+        print(f"Session timed out waiting for device heartbeat.")
+    except USMPError as e:
+        print(f"USMP error ({e.code}): {e}")
 ```
 
 Here are the exception classes you can catch:
 
-* `USMPError` — Base exception for all USMP errors.
-* `FrameError` — Malformed binary structure.
+* `USMPError` — Base exception for all USMP errors. Carries `.code: USMPErrorCode`.
+* `FrameError` — Malformed binary structure (`ERR_BAD_FRAME`).
 * `CRCError` — CRC check failed.
-* `MagicError` — Magic bytes (0xABCD) mismatch.
-* `VersionError` — Unsupported version.
+* `MagicError` — Magic bytes (`0xABCD`) mismatch.
+* `VersionError` — Unsupported version (`ERR_VERSION`).
 * `HandshakeError` — Key negotiation failed.
-* `AuthError` — PSK verification failed.
-* `CryptoError` — Decryption or GCM authentication tag failed.
-* `SequenceError` — Replay protection triggered (sequence number mismatch).
-* `TimeoutError` — Keepalive watchdog timer expired.
+* `AuthError` — PSK verification failed (`ERR_AUTH`).
+* `CryptoError` — Decryption or GCM authentication tag failed (`ERR_CRYPTO`).
+* `SequenceError` — Replay protection triggered or sequence overflow (`ERR_SEQ`).
+* `USMPTimeoutError` — Keepalive watchdog timer expired (`TimeoutError` alias provided for backward compatibility).
+* `ConnectionClosedError` — Remote peer closed or sent `PKT_BYE` (`USMPErrorCode.PEER_CLOSED`).

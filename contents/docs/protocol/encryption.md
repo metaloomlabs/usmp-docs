@@ -2,7 +2,7 @@
 
 Once the handshake is complete, USMP shifts into lock-down mode. Every single post-handshake packet (`DATA`, `PING`, `PONG`, `BYE`, `REKEY`) is protected using an Authenticated Encryption with Associated Data (AEAD) cipher suite.
 
-USMP v1.2.0 supports two standardized cipher suites:
+USMP v1.3.0 supports two standardized cipher suites:
 
 1. **`USMP_CIPHER_AES_256_GCM` (`0x01`, Default)**: Hardware-accelerated AES-256 in Galois/Counter Mode.
 2. **`USMP_CIPHER_CHACHA20_POLY1305` (`0x02`)**: High-performance ChaCha20 stream cipher with Poly1305 authentication tag, ideal for microcontrollers lacking dedicated hardware AES acceleration.
@@ -147,7 +147,7 @@ When a packet is received, the receiver doesn't just decrypt it—it performs **
 
 ## In-Band Session Rekeying
 
-USMP v1.2.0 supports transparent in-band session key rotation using `PKT_REKEY` (`0x0B`).
+USMP supports transparent in-band session key rotation using `PKT_REKEY` (`0x0B`).
 
 ### Why Rekey?
 
@@ -169,3 +169,18 @@ Long-lived sessions transmitting large amounts of data increase the risk of key 
    * The first 32 bytes of `key_material` become the new transmit key, and the next 32 bytes become the new receive key (swapped for the recipient).
    * Both sequence counters are reset: `tx_seq = 0`, `rx_seq = 0`.
    * The 64-bit sliding anti-replay bitmap is reset: `rx_window_bitmap = 0`.
+
+---
+
+## Split RTOS Concurrency & Nonce Reuse Protection
+
+In AEAD protocols (AES-GCM and ChaCha20-Poly1305), reusing a nonce under the same key completely breaks confidentiality and exposes the underlying authentication key.
+
+USMP v1.3.0 enforces strict synchronization guarantees:
+
+1. **Dedicated Transmission Mutex (`tx_mutex`)**:
+   Every transmission acquires `tx_mutex` before reading `tx_seq`, reserving the sequence number, and invoking the AEAD encryption engine. Even under high-concurrency multi-threaded RTOS tasks, nonce generation is strictly serialized.
+2. **Pre-Allocation of Sequence Numbers**:
+   `tx_seq` is reserved and incremented **before** attempting to write the frame to the wire. If a transport write fails (e.g. UDP ARQ exhaustion), the sequence number is burned and never reused.
+3. **Hierarchical Lock Ordering**:
+   When performing in-band rekeying or teardown, the implementation acquires `tx_mutex` first, followed by `rx_mutex`. This strict hierarchy eliminates deadlocks across full-duplex socket threads.

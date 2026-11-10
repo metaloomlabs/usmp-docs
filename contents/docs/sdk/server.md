@@ -56,7 +56,9 @@ async def handle_new_device(session: USMPSession):
     print(f"Device {session.device_id} is online.")
 ```
 
-## Starting the Server
+## Starting & Stopping the Server
+
+### Starting the Server (`serve`)
 
 Call the awaitable `serve()` function inside your main event loop to start listening:
 
@@ -69,13 +71,37 @@ async def main():
     
     @server.on_session
     async def handler(session):
-        print("Device connected!")
+        print(f"Device connected: {session.device_id}")
         
     await server.serve()
 
 if __name__ == "__main__":
     asyncio.run(main())
 ```
+
+### Graceful Teardown (`stop`) & Signal Handling
+
+To cleanly shut down the server without leaking open sockets or leaving client tasks suspended in event loops, invoke `await server.stop()`:
+
+```python
+import asyncio
+import signal
+from usmp import USMPServer
+
+server = USMPServer(port=9000, psk=b"my-secure-psk")
+
+async def main():
+    loop = asyncio.get_running_loop()
+    
+    # Catch termination signals
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        loop.add_signal_handler(sig, lambda: asyncio.create_task(server.stop()))
+        
+    await server.serve()
+```
+
+* **Immediate Socket Rebinding**: `TCPListener` configures `SO_REUSEADDR`, allowing immediate server restarts without encountering `EADDRINUSE` errors while previous sockets linger in `TIME_WAIT`.
+* **Clean Task Draining**: `stop()` gracefully cancels all active device session handler tasks, closes transport streams, and awaits connection closures before returning.
 
 ## Built-in Rate Limiting & DoS Hardening
 

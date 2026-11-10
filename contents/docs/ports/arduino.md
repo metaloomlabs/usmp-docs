@@ -6,12 +6,26 @@ Welcome, Arduino developers! The Arduino port of USMP wraps the core C protocol 
 
 ## Installation
 
-USMP is packaged as a standard offline ZIP library to keep private repository references out of your builds:
+You can install the USMP Arduino library either through the official Arduino Library Manager (recommended) or as an offline ZIP package:
 
-1. Locate `usmp-1.2.0-arduino.zip` in your releases archive.
+### Method 1: Arduino Library Manager (Recommended)
+
+1. In Arduino IDE (1.8.x or 2.x), open **Tools** ➔ **Manage Libraries...** (or click the Library Manager icon on the left sidebar).
+2. Search for `USMP`.
+3. Click **Install** on the `USMP` library by MetaLoom Labs (version `1.3.0`).
+
+Or install via the Arduino CLI:
+
+```bash
+arduino-cli lib install "USMP"
+```
+
+### Method 2: Offline ZIP Import
+
+1. Download `usmp-1.3.0-arduino.zip` from the [Downloads Portal](/downloads).
 2. Open **Arduino IDE**.
 3. Go to **Sketch** ➔ **Include Library** ➔ **Add .ZIP Library...**
-4. Choose `usmp-1.2.0-arduino.zip` to complete the import.
+4. Choose `usmp-1.3.0-arduino.zip` to complete the import.
 
 To include it in your sketch:
 
@@ -23,39 +37,85 @@ To include it in your sketch:
 
 ## API Reference
 
-### Constructor
+### Constructors
+
+USMP supports string passphrases, explicit binary key buffers (for high-entropy keys with null bytes), and caller-provided RX memory:
 
 ```cpp
-USMPClient(const char *psk);
+// 1. Standard string PSK constructor (dynamic internal RX buffer)
+explicit USMPClient(const char* psk);
+
+// 2. String PSK with external/static RX buffer (zero dynamic RX allocation)
+USMPClient(const char* psk, uint8_t* rx_buffer, size_t rx_buffer_size);
+
+// 3. Binary PSK constructor (prevents strlen truncation on 0x00 bytes)
+USMPClient(const uint8_t* psk, size_t psk_len);
+
+// 4. Binary PSK with external/static RX buffer
+USMPClient(const uint8_t* psk, size_t psk_len, uint8_t* rx_buffer, size_t rx_buffer_size);
 ```
 
-Creates a new USMP client instance.
+* **Binary PSK Support**: When provisioning cryptographically random 256-bit keys (e.g. `os.urandom(32)`), the binary constructors ensure random `0x00` bytes do not prematurely truncate the key.
 
-* **`psk`**: The Pre-Shared Key. This must match the key configured on your gateway.
+---
+
+### Zero-Heap Architecture: `USMPClientStatic`
+
+For safety-critical or zero-fragmentation embedded targets, USMP v1.3.0 provides the `USMPClientStatic` template wrapper. It embeds both the receive buffer and cryptographic handshake scratchpad directly inside `.bss` memory:
+
+```cpp
+template <size_t RxBufferSize = USMP_MAX_DATA_LEN * USMP_MAX_FRAMES,
+          size_t ScratchBufferSize = USMP_HANDSHAKE_SCRATCH_LEN>
+class USMPClientStatic : public USMPClient;
+```
+
+**Usage Example:**
+
+```cpp
+#include <USMP.h>
+
+// Embeds all buffers in object memory (0 bytes heap allocated)
+static const uint8_t PSK[32] = { /* 32 cryptographically random bytes */ };
+USMPClientStatic<1808, 2048> usmp(PSK, sizeof(PSK));
+```
 
 ---
 
 ### Connection Management
 
-#### `begin` (TCP)
+#### `begin` (Synchronous)
 
 ```cpp
-bool begin(USMPTCPTransport transport);
+bool begin(USMPTCPTransport transport, USMPArduinoTcpCtx* static_ctx = nullptr);
+bool begin(USMPUDPTransport transport, USMPArduinoUdpCtx* static_ctx = nullptr);
 ```
 
-Establishes the connection and performs the handshake over TCP.
+Establishes the connection and executes the handshake synchronously.
 
-* If Wi-Fi SSID and password are configured on the transport, `begin()` automatically connects to Wi-Fi first.
+* Passing `static_ctx` binds a caller-managed static transport context, avoiding heap `new`/`malloc`.
 
-#### `begin` (UDP)
+#### `beginAsync` (Non-Blocking Handshake)
 
 ```cpp
-bool begin(USMPUDPTransport transport);
+bool beginAsync(USMPTCPTransport transport, USMPArduinoTcpCtx* static_ctx = nullptr);
+bool beginAsync(USMPUDPTransport transport, USMPArduinoUdpCtx* static_ctx = nullptr);
 ```
 
-Establishes the connection and performs the handshake over UDP.
+Initiates an asynchronous, non-blocking connection. The handshake progresses incrementally inside subsequent `maintain()` calls, eliminating 2–5 second CPU stalls or FreeRTOS watchdog timeouts during setup.
 
-* If Wi-Fi SSID and password are configured on the transport, `begin()` automatically connects to Wi-Fi first.
+#### State & Status Queries
+
+```cpp
+usmp_state_t state() const;
+bool isConnecting() const;
+usmp_err_t lastError() const;
+const char* lastErrorString() const;
+```
+
+* **`state()`**: Returns current FSM state (`USMP_STATE_IDLE`, `USMP_STATE_CONNECTING_SOCKET`, `USMP_STATE_AWAITING_CHALLENGE`, `USMP_STATE_CALCULATING_ECDH`, `USMP_STATE_AWAITING_SESSION_OK`, `USMP_STATE_ESTABLISHED`, `USMP_STATE_ERROR`).
+* **`isConnecting()`**: Returns `true` while the handshake state machine is actively progressing.
+* **`lastError()`**: Returns the latest `usmp_err_t` typed error code.
+* **`lastErrorString()`**: Returns a descriptive, human-readable error description (e.g. `"Authentication failed"`, `"Peer closed connection"`).
 
 #### `maintain`
 
@@ -63,9 +123,12 @@ Establishes the connection and performs the handshake over UDP.
 void maintain();
 ```
 
-Performs background driver tasks. **You must call this inside your main `loop()` function.**
+Performs background driver tasks and watchdog servicing. **You must call this inside your main `loop()` function.**
 
-* Checks for incoming data, drains control frames (`PING`, `PONG`, `REKEY`) automatically in the background, triggers registered callbacks, handles keepalive pings, and automatically reconnects if the socket drops.
+* Advances asynchronous handshake state progression without blocking.
+* Services hardware watchdogs via `usmp_port_wdt_feed()` (`yield()` / `ESP.wdtFeed()`).
+* Drains control frames (`PING`, `PONG`, `REKEY`) automatically in the background.
+* Triggers registered event callbacks and executes automatic reconnects on socket drop.
 
 #### `keepalive`
 
@@ -77,7 +140,7 @@ Sets the interval (in milliseconds) for keepalive heartbeat checks (default: `30
 
 > [!CAUTION]
 > **Order of Configuration**
-> You must call `keepalive()` **after** calling `begin()`. The `begin()` method executes a `memset` on the internal context, which overrides any custom keepalive interval back to the default 30 seconds.
+> You must call `keepalive()` **after** calling `begin()` or `beginAsync()`.
 
 #### `alive`
 
@@ -85,7 +148,7 @@ Sets the interval (in milliseconds) for keepalive heartbeat checks (default: `30
 bool alive();
 ```
 
-Checks if your secure session is currently connected and active.
+Checks if your secure session is currently connected and active (`USMP_STATE_ESTABLISHED`).
 
 #### `deviceId` & `sessionId`
 
@@ -105,6 +168,14 @@ void setLogLevel(usmp_log_level_t level);
 
 Configures internal protocol logging thresholds (`USMP_LOG_NONE`, `USMP_LOG_ERROR`, `USMP_LOG_WARN`, `USMP_LOG_INFO`, `USMP_LOG_DEBUG`).
 
+#### `setHandshakeScratch`
+
+```cpp
+void setHandshakeScratch(uint8_t* scratch, size_t len);
+```
+
+Injects an external scratchpad buffer (minimum size: `USMP_HANDSHAKE_SCRATCH_LEN` / 2048 bytes) for zero-heap handshake calculations.
+
 #### `reconnect`
 
 ```cpp
@@ -120,6 +191,22 @@ void close();
 ```
 
 Gracefully closes the session (sends a `BYE` frame) and shuts down the connection.
+
+---
+
+### Standard Arduino `Print` Stream Interface
+
+In USMP v1.3.0, `USMPClient` inherits directly from Arduino's standard `Print` base class. You can print numbers, formatted strings, and floats directly into encrypted USMP packets:
+
+```cpp
+// Stream printing
+usmp.print("Sensor reading: ");
+usmp.print(42.5);
+usmp.println(" status=OK");
+```
+
+* **Zero-Heap Line Buffering**: Stream writes (`write()`, `print()`) are buffered in an internal zero-heap 452-byte TX buffer until a newline character (`\n`) is encountered or `usmp.flush()` is explicitly called.
+* **`usmp.availableForWrite()`**: Returns remaining bytes in the line buffer.
 
 ---
 
@@ -207,11 +294,10 @@ USMP::UDP(const char *gateway_ip, uint16_t port = 9000);
 
 ---
 
-## Advanced: Receive Timeouts
+## Advanced: Bounded Timeouts & Watchdog Protection
 
-Once a session is established, receives are bounded so `maintain()` can never block indefinitely on a stalled peer or a stray packet. The bounds are compile-time overridable via `-D` build flags (e.g. in `platformio.ini` `build_flags`):
+To protect against hardware watchdog resets and FreeRTOS task starvation during link outages, USMP v1.3.0 enforces bounded timeouts across all connection phases (overridable via `-D` flags in `platformio.ini` `build_flags`):
 
-* **`USMP_UDP_RECV_TIMEOUT_MS`** (default `50`) — per-attempt UDP receive wait. The core retries up to ~10× per read, so the effective budget for an in-flight fragment is ~10× this value (~500 ms).
-* **`USMP_TCP_RECV_TIMEOUT_MS`** (default `2000`) — TCP no-progress stall timeout; trips only when zero bytes arrive for this long mid-frame, so a large-but-flowing frame is never cut off.
-
-Handshake receives are unbounded regardless — they must wait for the gateway's reply. Raise these on high-latency links; lower them for snappier failure detection.
+* **`USMP_HANDSHAKE_RECV_TIMEOUT_MS`** (default `5000`) — Maximum wait for gateway handshake replies. Replaced unbounded wait loops to prevent CPU stalls, while regularly servicing the hardware watchdog via `usmp_port_wdt_feed()`.
+* **`USMP_UDP_RECV_TIMEOUT_MS`** (default `50`) — Per-attempt UDP receive wait. The core retries up to ~10× per read (~500 ms effective budget).
+* **`USMP_TCP_RECV_TIMEOUT_MS`** (default `2000`) — TCP stall timeout; trips only when zero progress occurs mid-frame.

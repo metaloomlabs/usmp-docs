@@ -4,17 +4,27 @@ This document lists common issues encountered when deploying, testing, or develo
 
 ## 1. Handshake Failures
 
-### 1.1 `Client HMAC verification failed` (Server Side) or `Server HMAC verification failed` (Client Side)
+### 1.1 Wire Protocol Version Mismatch (`USMP_ERR_PROTOCOL` / `-5`)
 
-* **Symptom**: The handshake fails at Step 3 or Step 4 with an authentication or HMAC error.
+* **Symptom**: Handshake is instantly aborted by the peer with error `-5` (`USMP_ERR_PROTOCOL`).
+* **Cause**: One endpoint is running an older USMP release (e.g. v1.2.0 with wire version `0x01`), while the peer requires USMP v1.3.0 (wire version `0x02`).
+* **Resolution**:
+  * Upgrade both client and gateway to USMP v1.3.0.
+  * Verify Wireshark / raw header byte 2 (`version`) shows `0x02`.
+
+### 1.2 `Client HMAC verification failed` (Server Side) or `Server HMAC verification failed` (Client Side)
+
+* **Symptom**: The handshake fails at Step 3 or Step 4 with an authentication or HMAC error (`USMP_ERR_AUTH` / `-2`).
 * **Cause**:
   * The client and server are not using the exact same Pre-Shared Key (PSK).
   * The PSK loaded at runtime on the device does not match the PSK configured in the server's device registry.
+  * String encoding discrepancy (e.g., passing a hex string where a binary 32-byte key is expected).
 * **Resolution**:
-  * Verify that the PSK is correct and identical on both sides.
+  * Verify that the PSK is identical on both sides.
+  * When using 64-character hex strings in C / Arduino, use `usmp_psk_from_hex()` or binary byte arrays to avoid passing literal ASCII characters.
   * If using dynamic PSK resolution (`Callable` or dictionary registry on the server), check that the device ID parsed from the HELLO packet exactly matches the registration key.
 
-### 1.2 `Device ID not registered` (Server Side)
+### 1.3 `Device ID not registered` (Server Side)
 
 * **Symptom**: The server rejects the handshake after receiving the client's HELLO frame.
 * **Cause**: The server is using a dictionary of PSKs, and the client's device ID is not a key in that dictionary.
@@ -22,31 +32,55 @@ This document lists common issues encountered when deploying, testing, or develo
   * Register the device's ID in the server configuration.
   * If device IDs are dynamic (e.g., random or MAC-address-based), ensure the server resolves the correct PSK for the incoming device ID.
 
-## 2. Encryption and Connection Errors
+---
 
-### 2.1 `Decryption failed` or `CryptoError`
+## 2. Mutex & Concurrency Errors
+
+### 2.1 Mutex Lock Acquisition Failed (`USMP_ERR_MUTEX_FAILED` / `-10`)
+
+* **Symptom**: API calls return `-10` (`USMP_ERR_MUTEX_FAILED`).
+* **Cause**:
+  * An RTOS task attempted to acquire `tx_mutex` or `rx_mutex` with a timeout that expired due to task starvation or another task deadlocking the lock.
+  * Attempting to call `usmp_send()` or `usmp_recv()` from an Interrupt Service Routine (ISR), which violates FreeRTOS mutex rules.
+* **Resolution**:
+  * Ensure USMP functions are called only from standard task contexts, never from ISRs (use RTOS queues to bridge ISR data to an agent task).
+  * Check that higher-priority tasks do not monopolize CPU time without yielding (`vTaskDelay`).
+  * Remember that in v1.3.0 `tx_mutex` and `rx_mutex` are independent: you can safely run one dedicated TX task and one dedicated RX task simultaneously.
+
+### 2.2 Peer Disconnection (`USMP_ERR_PEER_CLOSED` / `-11`)
+
+* **Symptom**: `usmp_recv()` or `usmp_step()` returns `-11` (`USMP_ERR_PEER_CLOSED`).
+* **Cause**: The remote peer closed the TCP socket connection gracefully (sent a FIN or CLOSE frame) or reset the connection (TCP RST).
+* **Resolution**:
+  * Treat `-11` as a trigger for graceful reconnection with exponential backoff rather than a fatal crypto fault.
+
+---
+
+## 3. Encryption and Connection Errors
+
+### 3.1 `Decryption failed` or `CryptoError` (`USMP_ERR_CRYPTO` / `-3`)
 
 * **Symptom**: Connection is established, but immediately raises a decryption failure error on the first payload frame.
 * **Cause**:
   * Mismatched session keys between client and server (usually caused by a handshake sequence mismatch or memory corruption).
   * The frame was modified or corrupted in transit, causing the AES-GCM authentication tag check to fail.
-  * Nonce generation issues.
+  * Nonce reuse caused by multi-threaded task races without mutex protection (in v1.3.0, `tx_mutex` guarantees thread-safe nonce sequencing).
 * **Resolution**:
   * Capture network packets to verify frame integrity.
   * Re-establish the session (re-run handshake) to derive fresh session keys.
 
-### 2.2 `Sequence mismatch`
+### 3.2 `Sequence mismatch` / Replay Window Drops
 
-* **Symptom**: The receiver drops data packets with a sequence number error.
+* **Symptom**: The receiver drops data packets with a sequence number error (`USMP_ERR_REPLAY` / `-4`).
 * **Cause**:
-  * Out of order delivery or packet loss.
+  * Out-of-order delivery exceeding the 64-bit sliding anti-replay window on UDP datagrams.
+  * Stream (TCP) sequence deviation: packets delivered out of sequence or skipped.
   * A potential replay attack.
-  * A bug in sequence counter management on one of the endpoints.
 * **Resolution**:
-  * Ensure the transport channel preserves packet order (e.g., TCP).
-  * If a packet was lost, trigger a session reconnect to reset sequence counters.
+  * On TCP, ensure connection drop recovery cleanly resets the session rather than resuming stale sequence numbers.
+  * On UDP, ensure network links do not experience extreme packet re-ordering (beyond 64 packets).
 
-### 2.3 TCP Connection Failures & Firewall Blocks
+### 3.3 TCP Connection Failures & Firewall Blocks
 
 * **Symptom**: The client prints `[USMP] TCP connect failed` or `Unable to connect to <IP>:<Port>` even though Wi-Fi is connected.
 * **Cause**:
@@ -55,31 +89,41 @@ This document lists common issues encountered when deploying, testing, or develo
 * **Resolution**:
   * Verify that the server is online and listening on the specified IP and port.
   * Ensure the client's network subnet matches the server's network subnet (especially if using static IP configurations).
-  * Open port `9000` (or your custom port) on the host machine's firewall.
-  * On Windows, run the following command in an **elevated Command Prompt (Admin)** to allow incoming TCP traffic on port `9000` for both Public and Private networks:
+  * Open port `8443` (or your custom port) on the host machine's firewall.
+  * On Windows, run the following command in an **elevated Command Prompt (Admin)** to allow incoming TCP traffic:
 
     ```powershell
-    netsh advfirewall firewall add rule name="USMP TCP 9000" dir=in action=allow protocol=TCP localport=9000 profile=any
+    netsh advfirewall firewall add rule name="USMP TCP 8443" dir=in action=allow protocol=TCP localport=8443 profile=any
     ```
 
     Or in **PowerShell (Admin)**:
 
     ```powershell
-    New-NetFirewallRule -DisplayName "USMP TCP 9000" -Direction Inbound -LocalPort 9000 -Protocol TCP -Action Allow -Profile Any
+    New-NetFirewallRule -DisplayName "USMP TCP 8443" -Direction Inbound -LocalPort 8443 -Protocol TCP -Action Allow -Profile Any
     ```
 
-## 3. Embedded & Hardware Limitations
+---
 
-### 3.1 Stack Overflow / Crashes during Handshake (Arduino / ESP32)
+## 4. Embedded & Hardware Limitations
 
-* **Symptom**: The microcontroller resets or halts during the `usmp_connect()` call.
+### 4.1 Watchdog Resets (WDT) During Handshake (Arduino / ESP32)
+
+* **Symptom**: The microcontroller resets with a Watchdog Timer timeout (`Task watchdog got triggered`) during connection attempts.
 * **Cause**:
-  * The large cryptographic buffers or mbedtls contexts exceeded the available stack space.
-  * Pre-existing heap fragmentation preventing allocation of handshake packets.
+  * The handshake process blocked waiting on network sockets longer than the hardware watchdog timeout (typically 3–5 seconds on ESP32/ESP8266).
 * **Resolution**:
-  * Ensure the task stack size allocated to the USMP task is at least 4-8 KB on ESP32.
-  * Verify that the compiler options do not inline excessively large stack structures.
-  * Use our heap-allocated version of handshake buffers to relieve stack pressure.
+  * Use the non-blocking state machine: call `usmp_connect_async()` and advance it iteratively in your task loop with `usmp_step(&ctx)`.
+  * In Arduino, switch to `usmp.beginAsync()` and allow `usmp.maintain()` to drive the connection in `loop()` without blocking.
+  * Ensure platform port implements `usmp_port_wdt_feed()` (which hooks into `esp_task_wdt_reset()`).
+
+### 4.2 Heap Fragmentation & Memory Allocation Crashes
+
+* **Symptom**: Microcontroller crashes or reboots after hours of operation, or fails during transport allocation.
+* **Cause**: Dynamic memory allocation (`malloc`, `free`) in repetitive connection cycles fragmented the heap.
+* **Resolution**:
+  * Use zero-heap static initializers: `usmp_transport_tcp_init_static()` and `usmp_transport_udp_init_static()` in C.
+  * On Arduino, instantiate `USMPClientStatic<TxSize, RxSize>` instead of `USMPClient` to eliminate all heap allocation.
+  * In USMP v1.3.0, handshake scratchpads (`USMP_HANDSHAKE_SCRATCH_LEN = 2048`) are allocated on stack or caller buffers and securely zeroized.
 
 ## 4. Keepalive & Inactivity Timeout Issues
 
