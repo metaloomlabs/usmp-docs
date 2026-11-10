@@ -39,6 +39,8 @@ USMP is designed to be completely platform-agnostic. The core state machine requ
 | `usmp_port_delay_ms` | `vTaskDelay(pdMS_TO_TICKS(ms))` | Yields execution to FreeRTOS to prevent task starvation. |
 | `usmp_port_millis` | `esp_timer_get_time() / 1000` | Retrieves system uptime millisecond counters. |
 | `usmp_port_log` | `ESP_LOGI` / `ESP_LOGW` / `ESP_LOGE` | Routes internal protocol logs directly to the ESP-IDF terminal logging engine. |
+| `usmp_port_mutex_*` | `xSemaphoreCreateMutex()`, etc. | FreeRTOS priority-inheriting mutexes for split `tx_mutex` & `rx_mutex` concurrency. |
+| `usmp_port_wdt_feed` | `esp_task_wdt_reset()` | Services the FreeRTOS Task Watchdog Timer (TWDT) during handshake and ARQ loops. |
 
 ---
 
@@ -46,36 +48,88 @@ USMP is designed to be completely platform-agnostic. The core state machine requ
 
 ### 1. TCP Transport
 
-The TCP transport uses native BSD sockets provided by lwIP. To minimize handshake round-trip times and telemetry latency, we configure the socket with the `TCP_NODELAY` flag enabled. Both numeric IPv4 addresses and DNS hostnames are supported.
+The TCP transport uses native BSD sockets provided by lwIP with `TCP_NODELAY` enabled. Both numeric IPv4 addresses and DNS hostnames are supported.
 
 ```c
 usmp_transport_t transport;
-// Supports both numeric IPs and DNS hostnames (resolved via getaddrinfo)
+
+// Dynamic allocation (allocates internal context on heap via malloc)
 usmp_transport_tcp_init(&transport, "usmp.mycompany.com", 9000);
+
+// OR: Zero-heap static initialization (uses static/BSS memory)
+static usmp_tcp_ctx_t s_tcp_ctx;
+usmp_transport_tcp_init_static(&transport, &s_tcp_ctx, "usmp.mycompany.com", 9000);
 ```
 
 ### 2. UDP Transport
 
-The UDP transport is connectionless and lightweight. It binds a local socket and routes packets to the target IP. USMP automatically handles sequence numbers, reliability, and frame validation. Both numeric IPv4 addresses and DNS hostnames are supported.
+The UDP transport is connectionless and lightweight with CoAP RTT estimation (RFC 7252 / Jacobson-Karn) and automatic watchdog feeding.
 
 ```c
 usmp_transport_t transport;
-// Supports both numeric IPs and DNS hostnames (resolved via getaddrinfo)
+
+// Dynamic allocation (allocates internal context on heap via malloc)
 usmp_transport_udp_init(&transport, "usmp.mycompany.com", 9000);
+
+// OR: Zero-heap static initialization (uses static/BSS memory)
+static usmp_udp_ctx_t s_udp_ctx;
+usmp_transport_udp_init_static(&transport, &s_udp_ctx, "usmp.mycompany.com", 9000);
+```
+
+---
+
+## Zero-Heap Memory & Non-Blocking Concurrency
+
+USMP v1.3.0 is optimized for mission-critical embedded systems with strict memory guarantees:
+
+### Zero-Heap Handshake Scratchpad
+
+Provide caller-managed memory to eliminate 100% of dynamic heap allocations during the handshake:
+
+```c
+static uint8_t s_scratch[USMP_HANDSHAKE_SCRATCH_LEN]; // 2048 bytes
+ctx.scratch = s_scratch;
+ctx.scratch_len = sizeof(s_scratch);
+```
+
+Contents are securely zeroized via `mbedtls_platform_zeroize()` upon handshake completion. You can enforce compile-time zero-heap verification by defining `-DUSMP_ZERO_HEAP`.
+
+### Split RTOS Mutex Concurrency
+
+`usmp_t` embeds independent `tx_mutex` and `rx_mutex` FreeRTOS handles:
+* Concurrent sender tasks calling `usmp_send()` are safely serialized, preventing AES-GCM nonce reuse.
+* A blocking `usmp_recv()` task never deadlocks with background telemetry tasks.
+* In-band rekeying (`usmp_rekey`) acquires `tx_mutex` then `rx_mutex` in strict hierarchical order.
+
+### Non-Blocking Handshake State Machine
+
+Instead of blocking the calling task for 2–5 seconds during connection bring-up, drive the non-blocking state machine incrementally:
+
+```c
+usmp_connect_async(&ctx, &transport);
+
+while (true) {
+    vTaskDelay(pdMS_TO_TICKS(50));
+    
+    // Ticks FSM, processes frames, and feeds watchdog via esp_task_wdt_reset()
+    usmp_err_t err = usmp_step(&ctx);
+    if (err < 0) {
+        ESP_LOGE("APP", "Connection error: %s (%d)", usmp_strerror(err), err);
+        usmp_reconnect_async(&ctx);
+    }
+}
 ```
 
 ---
 
 ## Memory Footprint & Stack Allocation
 
-USMP is optimized for resource-constrained environments. Once a session is active, it performs **zero heap allocations**!
-
 | Context / Phase | RAM Consumption | Lifetime |
 | :--- | :--- | :--- |
-| **`usmp_t` Session Context** | ~168 bytes (32-bit) | Persistent (lives as long as the session is open). |
-| **Transmit & Receive Buffers** | ~1 KB | Temporary stack memory (allocated only during send/recv calls). |
-| **Handshake Buffers** | ~1 KB | Transient heap memory (freed immediately after handshake completes). |
-| **mbedTLS Handshake Tasks** | ~2 KB – 4 KB | Transient stack memory (allocated during key exchange and signing). |
+| **`usmp_t` Session Context** | ~240 bytes (ESP32 32-bit) | Persistent (lives for session duration). |
+| **Transmit & Receive Buffers** | ~1 KB | Stack memory (allocated only during send/recv calls). |
+| **Handshake Memory** | 0 bytes heap (with scratchpad) | Reuses static 2048-byte scratchpad; securely zeroized after completion. |
+| **mbedTLS Handshake Tasks** | ~2 KB – 4 KB | Transient stack memory during key exchange. |
 
 > [!CAUTION]
 > **Runtime PSK Provisioning Required (No Compile-time `USMP_PSK`)**
