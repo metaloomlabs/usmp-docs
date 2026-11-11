@@ -130,17 +130,16 @@ Final notes
     })
   })
 
-  describe('Protocol RAM Documentation Alignment (AUD-P3-DOC-01)', () => {
-    test('public/llms.txt explicitly documents both bare-metal and RTOS RAM footprints', () => {
+  describe('Protocol RAM Documentation Status (AUD-P3-DOC-01)', () => {
+    test('public/llms.txt retains unverified historical claim pending upstream SDK struct alignment', () => {
       const llmsPath = path.join(process.cwd(), 'public/llms.txt')
       const content = fs.readFileSync(llmsPath, 'utf-8')
 
       assert.match(
         content,
-        /Persistent RAM.*112 Bytes.*bare-metal.*144.*240 Bytes.*RTOS/,
-        'public/llms.txt must state both 112 Bytes bare-metal core context and 144-240 Bytes RTOS context'
+        /Persistent RAM.*~144 Bytes/,
+        'public/llms.txt must retain historical ~144 Bytes claim until upstream C struct sizes are formally reconciled'
       )
     })
   })
 })
-

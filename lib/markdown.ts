@@ -1,7 +1,7 @@
 import { createReadStream, existsSync, promises as fs } from 'node:fs'
 import path from 'node:path'
 import grayMatter from 'gray-matter'
-import { type Element, type Text } from 'hast'
+import { type Element } from 'hast'
 import { compileMDX } from 'next-mdx-remote/rsc'
 import { cache } from 'react'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
