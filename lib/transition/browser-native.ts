@@ -3,9 +3,6 @@ import { use, useEffect, useRef, useState } from 'react'
 
 import { useHash } from './use-hash'
 
-const suspenseBoundaries = new Set<string>()
-let suspenseResolve: (() => void) | null = null
-
 export function useBrowserNativeTransitions() {
   const pathname = usePathname()
   const currentPathname = useRef(pathname)
@@ -57,15 +54,9 @@ export function useBrowserNativeTransitions() {
   const hash = useHash()
   // biome-ignore lint/correctness/useExhaustiveDependencies: intentional
   useEffect(() => {
-    const finishTransition = async () => {
+    const finishTransition = () => {
       currentPathname.current = pathname
       if (transitionRef.current) {
-        if (suspenseBoundaries.size > 0) {
-          await new Promise<void>((resolve) => {
-            suspenseResolve = resolve
-          })
-        }
-
         transitionRef.current[1]()
         transitionRef.current = null
       }
@@ -73,18 +64,4 @@ export function useBrowserNativeTransitions() {
 
     finishTransition()
   }, [hash, pathname])
-}
-
-export function useTrackSuspense(id: string) {
-  useEffect(() => {
-    suspenseBoundaries.add(id)
-
-    return () => {
-      suspenseBoundaries.delete(id)
-      if (suspenseBoundaries.size === 0 && suspenseResolve) {
-        suspenseResolve()
-        suspenseResolve = null
-      }
-    }
-  }, [id])
 }

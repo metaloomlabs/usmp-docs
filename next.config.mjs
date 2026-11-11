@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  allowedDevOrigins: ['192.168.1.43', '192.168.1.43:3000'],
+  experimental: {
+    workerThreads: false,
+    cpus: 1,
+  },
 }
 
 export default nextConfig
