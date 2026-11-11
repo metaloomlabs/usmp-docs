@@ -33,7 +33,13 @@ export function SheetLeft() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="link" size="icon" className="flex cursor-pointer md:hidden">
+        <Button
+          variant="link"
+          size="icon"
+          className="flex cursor-pointer md:hidden"
+          aria-label="Open navigation menu"
+          title="Open navigation menu"
+        >
           <LuAlignLeft className="size-6" />
         </Button>
       </SheetTrigger>

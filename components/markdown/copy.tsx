@@ -23,7 +23,14 @@ export function Copy({ content }: CopyProps) {
   }
 
   return (
-    <Button variant="outline" size="icon" onClick={handleCopy} className="size-8! cursor-pointer">
+    <Button
+      variant="outline"
+      size="icon"
+      onClick={handleCopy}
+      className="size-8! cursor-pointer"
+      aria-label={isCopied ? 'Code copied to clipboard' : 'Copy code to clipboard'}
+      title={isCopied ? 'Copied!' : 'Copy code to clipboard'}
+    >
       <LuCopy
         className={cn(
           'absolute size-3.5! transform transition-opacity duration-300',
