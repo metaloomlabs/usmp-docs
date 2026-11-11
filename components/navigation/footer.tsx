@@ -1,5 +1,5 @@
-import { FaDiscord } from 'react-icons/fa6'
-import { LuCompass, LuGithub, LuLinkedin, LuYoutube } from 'react-icons/lu'
+import { FaDiscord, FaXTwitter } from 'react-icons/fa6'
+import { LuGithub, LuLinkedin, LuYoutube } from 'react-icons/lu'
 
 import { Logo } from '@/components/navigation/logo'
 import { Link } from '@/lib/transition'
@@ -195,13 +195,13 @@ export function Footer() {
               <LuLinkedin className="size-5" />
             </a>
             <a
-              href="https://twitter.com"
+              href="https://x.com/metaloomlabs"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-foreground transition-colors"
-              aria-label="Twitter"
+              aria-label="X (formerly Twitter)"
             >
-              <LuCompass className="size-5" />
+              <FaXTwitter className="size-5" />
             </a>
             <a
               href="https://youtube.com"
