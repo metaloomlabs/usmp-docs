@@ -131,14 +131,14 @@ Final notes
   })
 
   describe('Protocol RAM Documentation Status (AUD-P3-DOC-01)', () => {
-    test('public/llms.txt retains unverified historical claim pending upstream SDK struct alignment', () => {
+    test('public/llms.txt explicitly labels ~144 Bytes claim as legacy estimate pending SDK reconciliation', () => {
       const llmsPath = path.join(process.cwd(), 'public/llms.txt')
       const content = fs.readFileSync(llmsPath, 'utf-8')
 
       assert.match(
         content,
-        /Persistent RAM.*~144 Bytes/,
-        'public/llms.txt must retain historical ~144 Bytes claim until upstream C struct sizes are formally reconciled'
+        /Persistent RAM.*~144 Bytes.*legacy estimate/i,
+        'public/llms.txt must clearly label ~144 Bytes as a legacy estimate'
       )
     })
   })
