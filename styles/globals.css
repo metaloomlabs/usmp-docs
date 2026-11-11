@@ -234,12 +234,11 @@ pre > code {
   color: hsl(0, 0%, 71%);
 }
 
-span.katex-display {
+.katex-display {
   display: flex;
-}
-
-span.katex-html {
-  display: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0;
 }
 
 .rehype-code-title {

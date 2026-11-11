@@ -8,6 +8,7 @@ import { Providers } from '@/providers'
 import { Settings } from '@/types/settings'
 
 import '@/styles/globals.css'
+import 'katex/dist/katex.min.css'
 
 const baseUrl = Settings.metadataBase
 
