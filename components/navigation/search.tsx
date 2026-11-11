@@ -4,6 +4,7 @@ import { type ReactNode, useEffect, useMemo, useState } from 'react'
 import { LuFileText, LuSearch } from 'react-icons/lu'
 
 import { Anchor } from '@/components/anchor'
+import { SearchHighlight } from '@/components/navigation/search-highlight'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -15,7 +16,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { advanceSearch, highlight, type search } from '@/lib/search'
+import { advanceSearch, type search } from '@/lib/search'
 import { cn, debounce } from '@/lib/utils'
 import { Documents } from '@/settings/documents'
 
@@ -193,12 +194,9 @@ export function Search() {
                             <span className="truncate">{item.title}</span>
                           </div>
                           {'snippet' in item && item.snippet && (
-                            <p
-                              className="truncate text-xs text-neutral-500 dark:text-neutral-400"
-                              dangerouslySetInnerHTML={{
-                                __html: highlight(item.snippet, searchedInput),
-                              }}
-                            />
+                            <p className="truncate text-xs text-neutral-500 dark:text-neutral-400">
+                              <SearchHighlight text={item.snippet} query={searchedInput} />
+                            </p>
                           )}
                         </Anchor>
                       </DialogClose>

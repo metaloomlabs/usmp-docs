@@ -33,6 +33,65 @@ export function escapeRegex(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
+export function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+export interface HighlightToken {
+  text: string
+  isMatch: boolean
+}
+
+export function tokenizeHighlight(text: string, searchTerms: string): HighlightToken[] {
+  if (!text) return []
+  if (!searchTerms?.trim()) return [{ text, isMatch: false }]
+
+  const rawTerms = searchTerms
+    .trim()
+    .split(/\s+/)
+    .map((term) => term.trim())
+    .filter(Boolean)
+
+  if (rawTerms.length === 0) return [{ text, isMatch: false }]
+
+  // Deduplicate case-insensitively, preferring the longer variant if lengths differ
+  const termMap = new Map<string, string>()
+  for (const term of rawTerms) {
+    const lower = term.toLowerCase()
+    if (!termMap.has(lower) || term.length > (termMap.get(lower)?.length || 0)) {
+      termMap.set(lower, term)
+    }
+  }
+
+  // Sort descending by length so longer terms match first before substrings
+  const terms = Array.from(termMap.values()).sort((a, b) => b.length - a.length)
+  const escapedTerms = terms.map((term) => escapeRegex(term))
+
+  try {
+    const pattern = new RegExp(`(${escapedTerms.join('|')})`, 'gi')
+    const lowerTerms = new Set(terms.map((t) => t.toLowerCase()))
+
+    const parts = text.split(pattern)
+    const tokens: HighlightToken[] = []
+
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i]
+      if (!part) continue
+      const isMatch = lowerTerms.has(part.toLowerCase())
+      tokens.push({ text: part, isMatch })
+    }
+
+    return tokens.length > 0 ? tokens : [{ text, isMatch: false }]
+  } catch {
+    return [{ text, isMatch: false }]
+  }
+}
+
 export function calculateRelevance(
   query: string,
   title: string,
@@ -161,21 +220,17 @@ export function extractSnippet(content: string, query: string): string {
 }
 
 export function highlight(snippet: string, searchTerms: string): string {
-  if (!snippet || !searchTerms) return snippet
+  if (!snippet) return ''
+  if (!searchTerms?.trim()) return escapeHtml(snippet)
 
-  const terms = searchTerms
-    .split(/\s+/)
-    .filter((term) => term.trim().length > 0)
-    .map((term) => escapeRegex(term))
-
-  if (terms.length === 0) return snippet
-
-  try {
-    const regex = new RegExp(`(${terms.join('|')})`, 'gi')
-    return snippet.replace(regex, "<span class='highlight'>$1</span>")
-  } catch {
-    return snippet
-  }
+  const tokens = tokenizeHighlight(snippet, searchTerms)
+  return tokens
+    .map((token) =>
+      token.isMatch
+        ? `<span class='highlight'>${escapeHtml(token.text)}</span>`
+        : escapeHtml(token.text)
+    )
+    .join('')
 }
 
 export function searchDocuments(query: string, documents: SearchDocument[]): SearchResult[] {
@@ -197,12 +252,11 @@ export function searchDocuments(query: string, documents: SearchDocument[]): Sea
 
     if (relevanceScore > 0) {
       const snippet = extractSnippet(doc._searchMeta.cleanContent, lowerQuery)
-      const highlightedSnippet = highlight(snippet, queryWords.join(' '))
 
       results.push({
         title: doc.title,
         href: doc.slug,
-        snippet: highlightedSnippet,
+        snippet,
         description: doc.description || '',
         relevance: relevanceScore,
       })

@@ -3,10 +3,14 @@ import { twMerge } from 'tailwind-merge'
 
 export {
   advanceSearch,
+  escapeHtml,
+  escapeRegex,
+  type HighlightToken,
   highlight,
   type SearchDocument,
   type SearchResult as search,
   searchDocuments,
+  tokenizeHighlight,
 } from '@/lib/search'
 
 export function cn(...inputs: ClassValue[]) {

@@ -145,7 +145,12 @@ describe('Search Functionality & Special Characters - P1 Regression Tests', () =
     const results = searchDocuments('chacha20 poly1305', mockDocuments)
     assert.ok(results.length > 0)
     assert.equal(results[0].title, 'Cryptographic Details')
-    assert.ok(results[0].snippet?.includes("<span class='highlight'>"))
+    // Snippet is pure clean text (avoiding double-highlighting)
+    assert.ok(results[0].snippet?.toLowerCase().includes('chacha20'))
+    assert.ok(!results[0].snippet?.includes('<span'))
+    // Direct highlight function wraps matches safely
+    const highlighted = highlight(results[0].snippet!, 'chacha20 poly1305')
+    assert.ok(highlighted.includes("<span class='highlight'>"))
   })
 
   it('correctly calculates relevance without throwing for edge cases', () => {
