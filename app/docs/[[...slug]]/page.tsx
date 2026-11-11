@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: PageProps) {
   const { frontmatter, lastUpdated } = res
 
   return {
-    title: `${frontmatter.title} - ${Settings.title}`,
+    title: frontmatter.title,
     description: frontmatter.description,
     keywords: frontmatter.keywords,
     ...(lastUpdated && {
