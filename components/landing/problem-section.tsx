@@ -20,9 +20,9 @@ export function ProblemSection() {
                 ✗
               </div>
               <div>
-                <h4 className="text-base font-bold text-foreground font-sans">
+                <h3 className="text-base font-bold text-foreground font-sans">
                   Raw Sockets (TCP/UDP)
-                </h4>
+                </h3>
                 <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
                   Extremely fast and lightweight, but completely open to eavesdropping, spoofing,
                   and tampering.
@@ -35,7 +35,7 @@ export function ProblemSection() {
                 ✗
               </div>
               <div>
-                <h4 className="text-base font-bold text-foreground font-sans">Full TLS / DTLS</h4>
+                <h3 className="text-base font-bold text-foreground font-sans">Full TLS / DTLS</h3>
                 <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
                   Rock-solid security, but massive. It consumes 60–100 KB of flash, wastes precious
                   active RAM, slows down handshakes, and requires complex certificate authority (CA)

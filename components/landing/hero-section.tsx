@@ -247,11 +247,11 @@ export function HeroSection() {
                     0{idx + 1}
                   </div>
                   <div>
-                    <h4
+                    <div
                       className={`text-sm font-semibold font-mono leading-tight ${activeHandshakeStep === idx ? 'text-foreground' : 'text-neutral-700 dark:text-neutral-300'}`}
                     >
                       {step.title}
-                    </h4>
+                    </div>
                     <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400 leading-normal line-clamp-2">
                       {step.desc}
                     </p>

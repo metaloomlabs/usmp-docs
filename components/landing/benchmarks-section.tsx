@@ -47,9 +47,9 @@ export function BenchmarksSection() {
           <div className="p-6 rounded-2xl border border-border/60 bg-neutral-50 dark:bg-neutral-950/40 space-y-6">
             {benchmarkMetric === 'rom' ? (
               <>
-                <h4 className="text-xs font-bold text-neutral-700 dark:text-neutral-300 font-mono tracking-wider">
+                <div className="text-xs font-bold text-neutral-700 dark:text-neutral-300 font-mono tracking-wider">
                   Compiled Binary Size on MCU (Flash bytes)
-                </h4>
+                </div>
                 {/* Bar 1: USMP */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs font-bold text-foreground">
@@ -92,9 +92,9 @@ export function BenchmarksSection() {
               </>
             ) : (
               <>
-                <h4 className="text-xs font-bold text-neutral-700 dark:text-neutral-300 font-mono tracking-wider">
+                <div className="text-xs font-bold text-neutral-700 dark:text-neutral-300 font-mono tracking-wider">
                   Persistent Stack/Heap Memory Overhead (Active RAM)
-                </h4>
+                </div>
                 {/* Bar 1: USMP */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs font-bold text-foreground">
@@ -162,9 +162,9 @@ export function BenchmarksSection() {
             <div className="flex gap-3">
               <LuCpu className="size-5.5 text-emerald-500 shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-sm font-bold text-foreground font-sans">
+                <h3 className="text-sm font-bold text-foreground font-sans">
                   112 Bytes Persistent RAM
-                </h4>
+                </h3>
                 <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                   The entire session context uses just 112 bytes of SRAM. Once the handshake is
                   complete, the driver performs <strong>zero dynamic heap allocations</strong>,
@@ -176,7 +176,7 @@ export function BenchmarksSection() {
             <div className="flex gap-3">
               <LuZap className="size-5.5 text-emerald-500 shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-sm font-bold text-foreground font-sans">Zero CPU Idle Cost</h4>
+                <h3 className="text-sm font-bold text-foreground font-sans">Zero CPU Idle Cost</h3>
                 <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                   All post-handshake encryption and decryption is backed by the ESP32’s
                   hardware-accelerated cryptographic engine, completing operations in under 1
@@ -188,9 +188,9 @@ export function BenchmarksSection() {
             <div className="flex gap-3">
               <LuLayers className="size-5.5 text-emerald-500 shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-sm font-bold text-foreground font-sans">
+                <h3 className="text-sm font-bold text-foreground font-sans">
                   Built-in Fragmentation
-                </h4>
+                </h3>
                 <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                   Transparently chunk large payloads (up to ~1.8 KB) into 4 sequential 452-byte
                   frames and reassemble them at the destination.

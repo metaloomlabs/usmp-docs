@@ -156,7 +156,9 @@ export function CodeTabsSection() {
             <button
               type="button"
               onClick={() => copyToClipboard(codeSnippets[activeCodeTab])}
-              className="flex items-center gap-1 text-[10px] font-mono text-neutral-600 dark:text-neutral-400 hover:text-foreground dark:hover:text-white bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 px-2.5 py-1 rounded transition-colors"
+              aria-label={copiedCode ? 'Code copied to clipboard' : 'Copy code to clipboard'}
+              title={copiedCode ? 'Copied!' : 'Copy code to clipboard'}
+              className="flex items-center gap-1 text-[10px] font-mono text-neutral-600 dark:text-neutral-400 hover:text-foreground dark:hover:text-white bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 px-2.5 py-1 min-h-[28px] rounded transition-colors"
             >
               {copiedCode ? (
                 <>

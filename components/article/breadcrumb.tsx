@@ -28,6 +28,7 @@ export function ArticleBreadcrumb({ paths }: BreadcrumbProps) {
               title="Documentation Home"
               aria-label="Documentation Home"
               href={`/docs${PageRoutes[0].href}`}
+              className="inline-flex items-center justify-center min-h-[28px] min-w-[28px] p-1"
             >
               <LuHouse className="h-4" />
             </Link>
@@ -44,12 +45,16 @@ export function ArticleBreadcrumb({ paths }: BreadcrumbProps) {
                     title={toTitleCase(paths[0])}
                     aria-label={toTitleCase(paths[0])}
                     href={`/docs/${paths[0]}`}
+                    className="inline-flex items-center min-h-[28px] py-1"
                   >
                     {toTitleCase(paths[0])}
                   </Link>
                 </BreadcrumbLink>
               ) : (
-                <span className="text-muted-foreground select-none" title={toTitleCase(paths[0])}>
+                <span
+                  className="text-muted-foreground select-none inline-flex items-center min-h-[28px] py-1"
+                  title={toTitleCase(paths[0])}
+                >
                   {toTitleCase(paths[0])}
                 </span>
               )}
@@ -77,20 +82,23 @@ export function ArticleBreadcrumb({ paths }: BreadcrumbProps) {
                             title={toTitleCase(path)}
                             aria-label={toTitleCase(path)}
                             href={href}
+                            className="inline-flex items-center min-h-[28px] py-1"
                           >
                             {toTitleCase(path)}
                           </Link>
                         </BreadcrumbLink>
                       ) : (
                         <span
-                          className="text-muted-foreground select-none"
+                          className="text-muted-foreground select-none inline-flex items-center min-h-[28px] py-1"
                           title={toTitleCase(path)}
                         >
                           {toTitleCase(path)}
                         </span>
                       )
                     ) : (
-                      <BreadcrumbPage className="b">{toTitleCase(path)}</BreadcrumbPage>
+                      <BreadcrumbPage className="b inline-flex items-center min-h-[28px] py-1">
+                        {toTitleCase(path)}
+                      </BreadcrumbPage>
                     )}
                   </BreadcrumbItem>
                 </Fragment>
@@ -110,17 +118,27 @@ export function ArticleBreadcrumb({ paths }: BreadcrumbProps) {
                   {index < paths.length - 1 ? (
                     routable ? (
                       <BreadcrumbLink asChild>
-                        <Link title={toTitleCase(path)} aria-label={toTitleCase(path)} href={href}>
+                        <Link
+                          title={toTitleCase(path)}
+                          aria-label={toTitleCase(path)}
+                          href={href}
+                          className="inline-flex items-center min-h-[28px] py-1"
+                        >
                           {toTitleCase(path)}
                         </Link>
                       </BreadcrumbLink>
                     ) : (
-                      <span className="text-muted-foreground select-none" title={toTitleCase(path)}>
+                      <span
+                        className="text-muted-foreground select-none inline-flex items-center min-h-[28px] py-1"
+                        title={toTitleCase(path)}
+                      >
                         {toTitleCase(path)}
                       </span>
                     )
                   ) : (
-                    <BreadcrumbPage className="b">{toTitleCase(path)}</BreadcrumbPage>
+                    <BreadcrumbPage className="b inline-flex items-center min-h-[28px] py-1">
+                      {toTitleCase(path)}
+                    </BreadcrumbPage>
                   )}
                 </BreadcrumbItem>
               </Fragment>
