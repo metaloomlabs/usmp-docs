@@ -1,8 +1,9 @@
 'use client'
 
-import { type MouseEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
+import { type MouseEvent, useEffect, useState } from 'react'
 import { LuAlignLeft } from 'react-icons/lu'
+
 import { cn } from '@/lib/utils'
 
 export interface TableAnchorProps {
@@ -14,47 +15,93 @@ export function TableAnchor({ tocs }: TableAnchorProps) {
 
   useEffect(() => {
     if (!tocs.length) return
+    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') return
 
-    const handleScroll = () => {
-      const headings = Array.from(document.querySelectorAll('h2, h3, h4'))
-      if (!headings.length) return
+    // Set initial active href to matching hash or first toc item
+    const hash = window.location.hash
+    if (hash && tocs.some((t) => t.href === hash)) {
+      setActiveHref(hash)
+    } else if (tocs[0]) {
+      setActiveHref(tocs[0].href)
+    }
 
-      const scrollPosition = window.scrollY + 100
-      let currentActiveHref = ''
+    const headingElements = Array.from(document.querySelectorAll('h2, h3, h4'))
+    if (!headingElements.length) return
 
-      for (let i = 0; i < headings.length; i++) {
-        const heading = headings[i] as HTMLElement
-        const top = heading.offsetTop
-
-        if (scrollPosition >= top) {
-          const headingId = heading.id
-          const headingText = heading.innerText.trim()
-
-          const match = tocs.find(
-            (t) =>
-              (headingId && t.href.endsWith(headingId)) ||
-              t.text.toLowerCase().replace(/[^a-z0-9]/g, '') ===
-                headingText.toLowerCase().replace(/[^a-z0-9]/g, '')
-          )
-
-          if (match) {
-            currentActiveHref = match.href
-          }
-        }
-      }
-
-      if (currentActiveHref) {
-        setActiveHref(currentActiveHref)
-      } else if (tocs[0]) {
-        setActiveHref(tocs[0].href)
+    // Map each heading element to its matching TOC href
+    const elementToHref = new Map<Element, string>()
+    for (const heading of headingElements) {
+      const headingId = heading.id
+      const headingText = (heading.textContent || '').trim()
+      const match = tocs.find(
+        (t) =>
+          (headingId && (t.href === `#${headingId}` || t.href.endsWith(headingId))) ||
+          t.text.toLowerCase().replace(/[^a-z0-9]/g, '') ===
+            headingText.toLowerCase().replace(/[^a-z0-9]/g, '')
+      )
+      if (match) {
+        elementToHref.set(heading, match.href)
       }
     }
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
+    const visibleHeadings = new Set<Element>()
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            visibleHeadings.add(entry.target)
+          } else {
+            visibleHeadings.delete(entry.target)
+          }
+        }
+
+        // If headings are in the active observation band, pick the first one in document order
+        if (visibleHeadings.size > 0) {
+          for (const heading of headingElements) {
+            if (visibleHeadings.has(heading)) {
+              const href = elementToHref.get(heading)
+              if (href) {
+                setActiveHref(href)
+                break
+              }
+            }
+          }
+        } else {
+          // If none are currently intersecting, determine the most recent heading passed
+          const topMargin = 100
+          let lastAboveHref: string | null = null
+          for (const heading of headingElements) {
+            const rect = heading.getBoundingClientRect()
+            if (rect.top <= topMargin) {
+              const href = elementToHref.get(heading)
+              if (href) lastAboveHref = href
+            } else {
+              break
+            }
+          }
+
+          if (lastAboveHref) {
+            setActiveHref(lastAboveHref)
+          } else if (window.scrollY < 100 && tocs[0]) {
+            setActiveHref(tocs[0].href)
+          }
+        }
+      },
+      {
+        rootMargin: '-80px 0% -60% 0%',
+        threshold: 0,
+      }
+    )
+
+    for (const heading of headingElements) {
+      if (elementToHref.has(heading)) {
+        observer.observe(heading)
+      }
+    }
 
     return () => {
-      window.removeEventListener('scroll', handleScroll)
+      observer.disconnect()
     }
   }, [tocs])
 
@@ -73,7 +120,8 @@ export function TableAnchor({ tocs }: TableAnchorProps) {
         targetElement =
           (headings.find(
             (h) =>
-              (h as HTMLElement).innerText.toLowerCase().replace(/[^a-z0-9]/g, '') === cleanTocText
+              (h as HTMLElement).textContent?.toLowerCase().replace(/[^a-z0-9]/g, '') ===
+              cleanTocText
           ) as HTMLElement) || null
       }
     }

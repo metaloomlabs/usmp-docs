@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "npm run generate-content-json && next build",
+    "build": "npm run generate-content-json && next build --webpack",
     "start": "next start",
     "clean": "npm run clean",
     "update": "npm update",
-    "generate-content-json": "tsx scripts/content.ts"
+    "generate-content-json": "tsx scripts/content.ts",
+    "test": "tsx --test tests/**/*.test.ts"
   },
   "dependencies": {
     "@next/third-parties": "^16.2.9",
