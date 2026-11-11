@@ -15,7 +15,8 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { advanceSearch, cn, debounce, highlight, type search } from '@/lib/utils'
+import { advanceSearch, highlight, type search } from '@/lib/search'
+import { cn, debounce } from '@/lib/utils'
 import { Documents } from '@/settings/documents'
 
 interface Document {
@@ -34,11 +35,16 @@ export function Search() {
 
   const debounceSearch = useMemo(
     () =>
-      debounce((input) => {
+      debounce(async (input) => {
         setIsLoading(true)
-        const results = advanceSearch(input.trim())
-        setResults(results)
-        setIsLoading(false)
+        try {
+          const searchResults = await advanceSearch(input.trim())
+          setResults(searchResults)
+        } catch {
+          setResults([])
+        } finally {
+          setIsLoading(false)
+        }
       }, 300),
     []
   )
