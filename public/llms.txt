@@ -12,7 +12,7 @@ USMP is a secure, lightweight, and transport-agnostic session-layer communicatio
 - **Non-Blocking Handshake FSM**: State machine driven by `usmp_connect_async()` and `usmp_step()` with bounded timeouts and watchdog feeding (`usmp_port_wdt_feed`).
 - **Microcontroller Overhead**: 
   - **Flash ROM**: < 10 KB (Stripped Xtensa / ARM Cortex).
-  - **Persistent RAM**: ~144 Bytes (`usmp_t` core context).
+  - **Persistent RAM**: ~144 Bytes (legacy estimate for `usmp_t` core context; actual runtime RAM depends on transport buffers and concurrency handles).
   - **Handshake Speed**: 10-30 ms (4-step packet flow with CoAP RFC 7252 dynamic RTO).
 - **Fragmentation**: Automatic chunking of payloads up to 1.8 KB into 452-byte frames.
 

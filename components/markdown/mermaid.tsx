@@ -1,6 +1,5 @@
 'use client'
 
-import mermaid from 'mermaid'
 import { memo, useEffect, useRef } from 'react'
 
 interface MermaidProps {
@@ -19,11 +18,21 @@ const normalizeChart = (input?: string): string => {
     .join('\n')
 }
 
-mermaid.initialize({
-  startOnLoad: false,
-  theme: 'neutral',
-  securityLevel: 'strict',
-})
+let mermaidPromise: Promise<typeof import('mermaid')> | null = null
+
+function getMermaid() {
+  if (!mermaidPromise) {
+    mermaidPromise = import('mermaid').then((m) => {
+      m.default.initialize({
+        startOnLoad: false,
+        theme: 'neutral',
+        securityLevel: 'strict',
+      })
+      return m
+    })
+  }
+  return mermaidPromise
+}
 
 export const Mermaid = memo(({ chart, className }: MermaidProps) => {
   const ref = useRef<HTMLDivElement>(null)
@@ -39,6 +48,7 @@ export const Mermaid = memo(({ chart, className }: MermaidProps) => {
       const id = `mermaid-${crypto.randomUUID().replace(/[^a-zA-Z0-9]/g, '')}`
 
       try {
+        const { default: mermaid } = await getMermaid()
         const { svg } = await mermaid.render(id, normalizeChart(chart))
         if (!isMounted || !ref.current) return
 

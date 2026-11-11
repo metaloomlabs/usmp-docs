@@ -175,7 +175,6 @@ async function processMdxFile(filePath: string) {
     slug,
     title: frontmatter.title || (matchedDoc && isRoute(matchedDoc) ? matchedDoc.title : 'Untitled'),
     description: frontmatter.description || '',
-    content: documentContent,
     _searchMeta: {
       cleanContent: cleanContentForSearch(documentContent),
       headings,
