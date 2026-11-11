@@ -170,7 +170,7 @@ keywords: ${JSON.stringify(frontmatter.keywords || [])}
 ${finalBodyContent}`
 
     const parsedMdx = await parseMdx<MdxHeaders>(updatedMdx)
-    const tocs = await getTable(slug)
+    const tocs = await getTable(slug, mdx)
 
     return {
       frontmatter: parsedMdx.frontmatter,
@@ -188,7 +188,8 @@ ${finalBodyContent}`
 const headingsRegex = /^(#{2,4})\s(.+)$/gm
 
 export async function getTable(
-  slug: string
+  slug: string,
+  rawMdx?: string
 ): Promise<{ level: number; text: string; href: string }[]> {
   const extractedHeadings: {
     level: number
@@ -196,29 +197,31 @@ export async function getTable(
     href: string
   }[] = []
 
-  let mdx = ''
-  if (Settings.gitload) {
-    const contentPath = getDocumentPath(slug)
-    try {
-      const response = await fetch(contentPath)
-      if (!response.ok) {
-        throw new Error(`Failed to fetch content from GitHub: ${response.statusText}`)
+  let mdx = rawMdx ?? ''
+  if (!mdx) {
+    if (Settings.gitload) {
+      const contentPath = getDocumentPath(slug)
+      try {
+        const response = await fetch(contentPath)
+        if (!response.ok) {
+          throw new Error(`Failed to fetch content from GitHub: ${response.statusText}`)
+        }
+        mdx = await response.text()
+      } catch (error) {
+        console.error('Error fetching content from GitHub:', error)
+        return []
       }
-      mdx = await response.text()
-    } catch (error) {
-      console.error('Error fetching content from GitHub:', error)
-      return []
-    }
-  } else {
-    const contentPath = getDocumentPath(slug)
-    try {
-      const stream = createReadStream(contentPath, { encoding: 'utf-8' })
-      for await (const chunk of stream) {
-        mdx += chunk
+    } else {
+      const contentPath = getDocumentPath(slug)
+      try {
+        const stream = createReadStream(contentPath, { encoding: 'utf-8' })
+        for await (const chunk of stream) {
+          mdx += chunk
+        }
+      } catch (error) {
+        console.error('Error reading local file:', error)
+        return []
       }
-    } catch (error) {
-      console.error('Error reading local file:', error)
-      return []
     }
   }
 
