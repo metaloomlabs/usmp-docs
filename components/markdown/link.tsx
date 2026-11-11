@@ -1,22 +1,55 @@
-import { type ReactNode } from 'react'
+'use client'
 
+import { usePathname } from 'next/navigation'
+import { type AnchorHTMLAttributes, type ReactNode } from 'react'
+
+import { resolveMarkdownLink } from '@/lib/resolve-link'
 import { Link } from '@/lib/transition'
 
-interface RouteProps {
+interface RouteProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   href?: string
   children: ReactNode
 }
 
-export function Route({ href = '#', children }: RouteProps) {
-  const isInternal = href.startsWith('/') || href.startsWith('#')
+export function Route({
+  href = '#',
+  children,
+  className,
+  title,
+  target,
+  rel,
+  ...rest
+}: RouteProps) {
+  const pathname = usePathname() || '/docs'
+  const resolved = resolveMarkdownLink(href, pathname)
 
-  if (isInternal) {
-    return <Link href={href}>{children}</Link>
+  if (resolved.isExternal) {
+    return (
+      <a
+        href={resolved.href}
+        target={target ?? '_blank'}
+        rel={rel ?? 'noopener noreferrer'}
+        className={className}
+        title={title}
+        {...rest}
+      >
+        {children}
+      </a>
+    )
+  }
+
+  // Pure anchor fragment on the current page
+  if (resolved.href.startsWith('#')) {
+    return (
+      <a href={resolved.href} className={className} title={title} {...rest}>
+        {children}
+      </a>
+    )
   }
 
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
+    <Link href={resolved.href} className={className} title={title} {...rest}>
       {children}
-    </a>
+    </Link>
   )
 }
