@@ -22,7 +22,7 @@ const normalizeChart = (input?: string): string => {
 mermaid.initialize({
   startOnLoad: false,
   theme: 'neutral',
-  securityLevel: 'loose',
+  securityLevel: 'strict',
 })
 
 export const Mermaid = memo(({ chart, className }: MermaidProps) => {
@@ -33,20 +33,67 @@ export const Mermaid = memo(({ chart, className }: MermaidProps) => {
 
     if (!current || !chart) return
 
+    let isMounted = true
+
     const renderChart = async () => {
-      const id = `mermaid-${crypto.randomUUID()}`
+      const id = `mermaid-${crypto.randomUUID().replace(/[^a-zA-Z0-9]/g, '')}`
 
       try {
         const { svg } = await mermaid.render(id, normalizeChart(chart))
-        current.innerHTML = svg
+        if (!isMounted || !ref.current) return
+
+        const parser = new DOMParser()
+        const doc = parser.parseFromString(svg, 'image/svg+xml')
+        const svgElement = doc.documentElement
+
+        if (svgElement && svgElement.nodeName.toLowerCase() === 'svg') {
+          // Defensively strip any script tags
+          const scripts = svgElement.querySelectorAll('script')
+          for (let i = 0; i < scripts.length; i++) {
+            scripts[i].remove()
+          }
+
+          // Defensively strip any inline event handlers and unsafe URI schemes
+          const allElements = svgElement.querySelectorAll('*')
+          for (let i = 0; i < allElements.length; i++) {
+            const el = allElements[i]
+            for (const attr of Array.from(el.attributes)) {
+              const attrName = attr.name.toLowerCase()
+              const attrVal = attr.value.trim().toLowerCase()
+              if (attrName.startsWith('on')) {
+                el.removeAttribute(attr.name)
+              }
+              if (
+                (attrName === 'href' || attrName === 'xlink:href') &&
+                attrVal.startsWith('javascript:')
+              ) {
+                el.removeAttribute(attr.name)
+              }
+            }
+          }
+
+          ref.current.replaceChildren(svgElement)
+        } else {
+          ref.current.replaceChildren()
+        }
       } catch (err) {
-        current.innerHTML = `<pre style="color:red">Mermaid error: ${
+        if (!isMounted || !ref.current) return
+        ref.current.replaceChildren()
+        const pre = document.createElement('pre')
+        pre.className =
+          'text-xs text-destructive p-3 rounded-md bg-destructive/10 border border-destructive/20 font-mono overflow-x-auto'
+        pre.textContent = `Mermaid rendering error: ${
           err instanceof Error ? err.message : String(err)
-        }</pre>`
+        }`
+        ref.current.appendChild(pre)
       }
     }
 
     void renderChart()
+
+    return () => {
+      isMounted = false
+    }
   }, [chart])
 
   return <div ref={ref} className={className} />
