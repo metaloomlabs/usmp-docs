@@ -447,6 +447,27 @@ describe('P3 Batch 3 Phase 2: Mermaid SVG Security & Sanitizer Regression Tests'
       sanitizeSvgElement(root as unknown as Element)
       assert.equal(anchor.getAttribute('rel'), 'noopener noreferrer')
     })
+
+    it('enforces rel="noopener noreferrer" for case-insensitive and whitespace-padded target="_blank"', () => {
+      const root = createMockElement('svg')
+      const anchorUpper = appendChild(
+        root,
+        createMockElement('a', { href: 'https://example.com', target: '_BLANK' }, 'Link 1')
+      )
+      const anchorPadded = appendChild(
+        root,
+        createMockElement('a', { href: 'https://example.com', target: '  _blank  ' }, 'Link 2')
+      )
+      const anchorTab = appendChild(
+        root,
+        createMockElement('a', { href: 'https://example.com', target: '\t_Blank\n' }, 'Link 3')
+      )
+
+      sanitizeSvgElement(root as unknown as Element)
+      assert.equal(anchorUpper.getAttribute('rel'), 'noopener noreferrer')
+      assert.equal(anchorPadded.getAttribute('rel'), 'noopener noreferrer')
+      assert.equal(anchorTab.getAttribute('rel'), 'noopener noreferrer')
+    })
   })
 
   describe('Attribute Allowlist per SVG Element (ALLOWED_SVG_ATTRIBUTES)', () => {
@@ -621,6 +642,76 @@ describe('P3 Batch 3 Phase 2: Mermaid SVG Security & Sanitizer Regression Tests'
       assert.equal(badUse1.getAttribute('href'), null)
       assert.equal(badUse2.getAttribute('xlink:href'), null)
       assert.equal(safeUse.getAttribute('href'), '#local-arrowhead')
+    })
+
+    it('sanitizes root SVG style containing an external url()', () => {
+      const root = createMockElement('svg', {
+        style: 'background: url(https://evil.com/leak.png)',
+      })
+      sanitizeSvgElement(root as unknown as Element)
+      assert.equal(root.getAttribute('style'), 'background: none;')
+    })
+
+    it('sanitizes root SVG style containing safe and unsafe declarations together', () => {
+      const root = createMockElement('svg', {
+        style: 'color: red; background: url(https://evil.com/leak.png); max-width: 100%;',
+      })
+      sanitizeSvgElement(root as unknown as Element)
+      assert.equal(root.getAttribute('style'), 'color: red; background: none; max-width: 100%;')
+    })
+
+    it('removes root SVG style attribute if it contains only unsafe declarations', () => {
+      const root = createMockElement('svg', {
+        style: 'behavior: url(x.htc); -moz-binding: url(x.xml);',
+      })
+      sanitizeSvgElement(root as unknown as Element)
+      assert.equal(root.getAttribute('style'), null)
+    })
+
+    it('preserves root SVG style containing legitimate declarations', () => {
+      const root = createMockElement('svg', {
+        style: 'max-width: 100%; height: auto;',
+      })
+      sanitizeSvgElement(root as unknown as Element)
+      assert.equal(root.getAttribute('style'), 'max-width: 100%; height: auto;')
+    })
+
+    it('sanitizes and preserves @keyframes rules inside <style> blocks in the DOM', () => {
+      const root = createMockElement('svg')
+      const style = appendChild(
+        root,
+        createMockElement(
+          'style',
+          {},
+          '@keyframes pulse { from { opacity: 0; background: url(https://evil.com); } to { opacity: 1; } }'
+        )
+      )
+      sanitizeSvgElement(root as unknown as Element)
+      assert.ok(style.textContent.includes('@keyframes pulse'))
+      assert.ok(style.textContent.includes('from { opacity: 0; background: none; }'))
+      assert.ok(style.textContent.includes('to { opacity: 1; }'))
+      assert.ok(!style.textContent.includes('evil.com'))
+    })
+
+    it('preserves XML-entity-encoded local SVG references in <use href="&#x23;local-marker">', () => {
+      const root = createMockElement('svg')
+      const safeUseEntity = appendChild(
+        root,
+        createMockElement('use', { href: '&#x23;local-marker', id: 'entity-use' })
+      )
+      const safeUseNamed = appendChild(
+        root,
+        createMockElement('use', { 'xlink:href': '&#35;local-named', id: 'named-use' })
+      )
+      const badUseEntity = appendChild(
+        root,
+        createMockElement('use', { href: '&#106;avascript:alert(1)' })
+      )
+
+      sanitizeSvgElement(root as unknown as Element)
+      assert.equal(safeUseEntity.getAttribute('href'), '&#x23;local-marker')
+      assert.equal(safeUseNamed.getAttribute('xlink:href'), '&#35;local-named')
+      assert.equal(badUseEntity.getAttribute('href'), null)
     })
   })
 

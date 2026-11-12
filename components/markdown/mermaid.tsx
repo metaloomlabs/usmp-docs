@@ -895,6 +895,15 @@ export function sanitizeSvgElement(svgElement: Element): Element {
     for (const attr of Array.from(svgElement.attributes)) {
       if (isUnsafeAttribute(attr.name, attr.value, rootTag)) {
         svgElement.removeAttribute(attr.name)
+      } else if (attr.name.toLowerCase() === 'style') {
+        const cleanedStyle = parseAndSanitizeDeclarations(attr.value)
+        if (cleanedStyle !== attr.value) {
+          if (cleanedStyle) {
+            svgElement.setAttribute(attr.name, cleanedStyle)
+          } else {
+            svgElement.removeAttribute(attr.name)
+          }
+        }
       }
     }
   }
@@ -936,8 +945,11 @@ export function sanitizeSvgElement(svgElement: Element): Element {
       }
 
       // 4. Anchor safety: if <a> opens in new tab, enforce noopener noreferrer
-      if (tagName === 'a' && el.getAttribute('target') === '_blank') {
-        el.setAttribute('rel', 'noopener noreferrer')
+      if (tagName === 'a') {
+        const targetVal = el.getAttribute('target')?.trim().toLowerCase()
+        if (targetVal === '_blank') {
+          el.setAttribute('rel', 'noopener noreferrer')
+        }
       }
 
       // 5. Sanitize CSS rules in <style> blocks
